@@ -13,8 +13,8 @@ function StartPage() {
       </div>
 
       {/* Chat Section */}
-      <div className="w-1/3 bg-gray-900 p-4 border-l border-gray-700">
-        <h2 className="text-2xl font-bold text-white mb-4">{t('chat')}</h2>
+      <div className="w-1/3 flex flex-col justify-between bg-gray-900 p-4 border-l border-gray-700">
+        <h2 className="text-2xl font-bold text-white ">{t('chat')}</h2>
         <Chat/>
       </div>
     </div>

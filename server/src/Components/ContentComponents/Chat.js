@@ -24,9 +24,8 @@ function Chat() {
   };
 
   return (
-    <div className="w-2/3 flex flex-col h-full bg-gray-900 p-4 rounded-lg">
-      {/* Messages Container */}
-      <div className="flex-grow overflow-y-auto space-y-2">
+    <>
+    <div className="flex-grow overflow-y-auto space-y-2 p-5">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -39,9 +38,12 @@ function Chat() {
         ))}
         <div ref={chatRef} />
       </div>
+    <div className="flex flex-col bg-gray-900 p-4 rounded-lg">
+      {/* Messages Container */}
+      
 
       {/* Input and Send Button */}
-      <div className=" w-2/3 mt-4 flex">
+      <div className="mt-4 flex">
         <input
           type="text"
           className="flex-grow p-2 rounded-l-lg bg-gray-800 text-white border border-gray-700 focus:outline-none"
@@ -58,6 +60,7 @@ function Chat() {
         </button>
       </div>
     </div>
+    </>
   );
 }
 
