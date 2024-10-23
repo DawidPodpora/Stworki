@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Stworki/static/css/main.4c9c69f9.css",
+    "main.js": "/Stworki/static/js/main.a16f6dfb.js",
+    "static/js/453.a524a042.chunk.js": "/Stworki/static/js/453.a524a042.chunk.js",
+    "index.html": "/Stworki/index.html",
+    "main.4c9c69f9.css.map": "/Stworki/static/css/main.4c9c69f9.css.map",
+    "main.a16f6dfb.js.map": "/Stworki/static/js/main.a16f6dfb.js.map",
+    "453.a524a042.chunk.js.map": "/Stworki/static/js/453.a524a042.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4c9c69f9.css",
+    "static/js/main.a16f6dfb.js"
+  ]
+}
