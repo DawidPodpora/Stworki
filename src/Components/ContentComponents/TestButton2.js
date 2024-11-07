@@ -124,11 +124,11 @@ function TestButton2() {
             <img src={a} className=" absolute w-full h-full object-cover rounded-xl"/>
             
             <div  className=" p-3 flex flex-col absolute bg-black1 text-maincolor4 w-full h-full text-opacity-0 bg-opacity-0 hover:bg-opacity-70 hover:text-opacity-100 rounded-xl">
-              <p>POW </p>
-              <p>VIT </p>
-              <p>STR </p>
-              <p>DEX </p>
-              <p>INT </p>
+              <p>POW</p>
+              <p>VIT</p>
+              <p>STR</p>
+              <p>DEX</p>
+              <p>INT</p>
             </div>
             
             
