@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const ItemSchema= require('../models/Item');
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import ItemSchema from '../model/Item.js';
+
 const CreatureSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -37,4 +38,4 @@ const CreatureSchema = new mongoose.Schema({
 
 const Creatures = mongoose.model('Creatures', CreatureSchema);
 
-module.exports = Creatures;
+export default Creatures;

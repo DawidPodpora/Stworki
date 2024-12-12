@@ -1,6 +1,7 @@
-const Creature = require('../models/Creature');
-const Species = require('../models/Species');
-const mongoose = require('mongoose');
+import Creature from '../model/Creature.js';
+import Species from '../model/Species.js';
+import mongoose from 'mongoose';
+
 
 const statConversion = async(creature) =>
 {
@@ -233,23 +234,21 @@ const fightMechanism = async(creature1 , creature2) =>
     }
 }
 
-const getCreaturesbyName = async (req, res) => {
+export const getCreaturesbyName = async (req, res) => {
     try {
     
-      const creature1 = await Creature.findOne({name:'maciek'});
-      
-      const creature2 = await Creature.findOne({name:'darek'});
-      
-      fightMechanism(creature1, creature2);
+    const creature1 = await Creature.findOne({name:'maciek'});
+    
+    const creature2 = await Creature.findOne({name:'darek'});
+    
+    fightMechanism(creature1, creature2);
         res.status(200).json(creature1); // Odpowiadamy na żądanie z danymi stworków
     } 
     //po niepowodzeniu
     catch (error) {
     console.log('nie Udalo sie');
-      res.status(500).json({ message: 'Błąd przy pobieraniu stworków', error: error.message });
+    res.status(500).json({ message: 'Błąd przy pobieraniu stworków', error: error.message });
     }
 
 
-  };
-
-  module.exports = getCreaturesbyName;
+};

@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const bcrypt = require('bcrypt');
 
 const SpeciesSchema = new mongoose.Schema({
     name: {
@@ -33,4 +32,4 @@ const SpeciesSchema = new mongoose.Schema({
 
 const Species = mongoose.model('Species', SpeciesSchema);
 
-module.exports = Species;
+export default Species;
