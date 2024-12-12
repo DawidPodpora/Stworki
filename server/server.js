@@ -7,6 +7,7 @@ import router from './router/route.js'; // Importowanie tras (routes) aplikacji
 const app = express(); // Tworzenie instancji aplikacji Express
 const port = 8080; // Ustawienie portu, na którym serwer będzie nasłuchiwał
 
+
 /** Middlewares */
 app.use(cors({ origin: 'http://localhost:3000' })); 
 // Konfiguracja CORS, umożliwia dostęp do serwera tylko z adresu http://localhost:3000 (zwykle frontend lokalnie)
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api', router); 
 // Przypisanie tras API (importowanych z router/route.js) do ścieżki '/api'. Wszystkie trasy będą zaczynały się od '/api'
 
+
 /** Start server only when we have valid connection */
 connect().then(() => {
     try {
@@ -49,3 +51,5 @@ connect().then(() => {
     console.log("Invalid database connection:", error); 
     // Obsługa błędów przy połączeniu z bazą danych
 });
+
+
