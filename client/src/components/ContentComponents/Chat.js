@@ -36,8 +36,8 @@ function Chat() {
             key={message.id}
             className={`p-2 max-w-xs rounded-lg break-words ${
               message.sender === 'me'
-                ? 'ml-auto bg-blue-600 text-white'
-                : 'mr-auto bg-gray-700 text-white'
+                ? 'ml-auto bg-maincolor1 text-white bg-opacity-70'
+                : 'mr-auto bg-maincolor2 text-white bg-opacity-70'
             }`}
           >
             <span className="font-semibold">
