@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import Species from '../model/Species.js';
+
 const router = express.Router();
-const Species = require('../models/Species');
 // Endpoint do stworzenia gatunku
 router.post('/create', async (req, res) => {
     try {
@@ -23,4 +24,4 @@ router.post('/create', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;
