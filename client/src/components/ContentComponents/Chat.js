@@ -5,6 +5,7 @@ function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const chatRef = useRef(null);
 
+  const currentUser = 'Player1';
   // Automatycznie przewijaj czat na dół po każdej nowej wiadomości
   useEffect(() => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -15,7 +16,7 @@ function Chat() {
       const message = {
         id: Date.now(),
         text: newMessage,
-        sender: 'me', // wiadomość od użytkownika
+        sender: currentUser, // wiadomość od użytkownika
       };
       setMessages((prevMessages) => [...prevMessages, message]);
       setNewMessage('');
@@ -41,7 +42,7 @@ function Chat() {
             }`}
           >
             <span className="font-semibold">
-              {message.sender === 'me' ? 'Ty' : 'Inny użytkownik'}:
+              {message.sender}:
             </span>{" "}
             {message.text}
           </div>
