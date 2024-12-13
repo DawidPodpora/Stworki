@@ -34,7 +34,7 @@ function Chat() {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`p-2 max-w-xs rounded-lg ${
+            className={`p-2 max-w-xs rounded-lg break-words ${
               message.sender === 'me'
                 ? 'ml-auto bg-blue-600 text-white'
                 : 'mr-auto bg-gray-700 text-white'
