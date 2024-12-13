@@ -1,5 +1,5 @@
-const Creature = require('../models/Creature');
-const Species = require('../models/Species');
+import Creature from '../model/Creature';
+import Species from '../model/Species';
 
 const getCreatures = async (req, res) => {
   try {
@@ -24,4 +24,4 @@ const getCreatures = async (req, res) => {
   }
 };
 
-module.exports = getCreatures; // Musisz eksportować funkcję
+export default getCreatures;
