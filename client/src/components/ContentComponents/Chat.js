@@ -5,11 +5,7 @@ function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const chatRef = useRef(null);
 
-  // Lista dostępnych emotikonów
-  const emojiList = [
-    "😊", "😂", "😢", "😍", "😎", "😱", "🤔", "😅", "🥺", "😤", "❤️", "🔥"
-  ];
-
+  const currentUser = 'Player1';
   // Automatycznie przewijaj czat na dół po każdej nowej wiadomości
   useEffect(() => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -20,16 +16,11 @@ function Chat() {
       const message = {
         id: Date.now(),
         text: newMessage,
-        sender: 'me', // wiadomość od użytkownika
+        sender: currentUser, // wiadomość od użytkownika
       };
       setMessages((prevMessages) => [...prevMessages, message]);
       setNewMessage('');
     }
-  };
-
-  // Funkcja do dodawania emotikonu do wiadomości
-  const addEmoji = (emoji) => {
-    setNewMessage(newMessage + emoji);
   };
 
   const handleKeyPress = (e) => {
@@ -39,19 +30,19 @@ function Chat() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <div className="flex-grow overflow-y-auto space-y-2 p-5">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`p-2 max-w-xs rounded-lg ${
+            className={`p-2 max-w-xs rounded-lg break-words ${
               message.sender === 'me'
-                ? 'ml-auto bg-blue-600 text-white'
-                : 'mr-auto bg-gray-700 text-white'
+                ? 'ml-auto bg-maincolor1 text-white bg-opacity-70'
+                : 'mr-auto bg-maincolor2 text-white bg-opacity-70'
             }`}
           >
             <span className="font-semibold">
-              {message.sender === 'me' ? 'Ty' : 'Inny użytkownik'}:
+              {message.sender}:
             </span>{" "}
             {message.text}
           </div>
@@ -60,21 +51,8 @@ function Chat() {
         <div ref={chatRef} />
       </div>
 
-      <div className="flex flex-col bg-gray-900 p-4 rounded-lg">
-        {/* Dodawanie emotikonów */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {emojiList.map((emoji, index) => (
-            <button
-              key={index}
-              onClick={() => addEmoji(emoji)}
-              className="text-2xl p-2 hover:bg-gray-700 rounded-lg"
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-
         {/* Pole wejściowe i przycisk wysyłania */}
+      <div className="flex flex-col bg-gray-900 p-4 rounded-lg">
         <div className="mt-4 flex">
           <input
             type="text"
@@ -92,7 +70,7 @@ function Chat() {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
