@@ -5,11 +5,6 @@ function Chat() {
   const [newMessage, setNewMessage] = useState('');
   const chatRef = useRef(null);
 
-  // Lista dostępnych emotikonów
-  const emojiList = [
-    "😊", "😂", "😢", "😍", "😎", "😱", "🤔", "😅", "🥺", "😤", "❤️", "🔥"
-  ];
-
   // Automatycznie przewijaj czat na dół po każdej nowej wiadomości
   useEffect(() => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -27,11 +22,6 @@ function Chat() {
     }
   };
 
-  // Funkcja do dodawania emotikonu do wiadomości
-  const addEmoji = (emoji) => {
-    setNewMessage(newMessage + emoji);
-  };
-
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSendMessage();
@@ -39,7 +29,7 @@ function Chat() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <div className="flex-grow overflow-y-auto space-y-2 p-5">
         {messages.map((message) => (
           <div
@@ -60,21 +50,8 @@ function Chat() {
         <div ref={chatRef} />
       </div>
 
-      <div className="flex flex-col bg-gray-900 p-4 rounded-lg">
-        {/* Dodawanie emotikonów */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {emojiList.map((emoji, index) => (
-            <button
-              key={index}
-              onClick={() => addEmoji(emoji)}
-              className="text-2xl p-2 hover:bg-gray-700 rounded-lg"
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-
         {/* Pole wejściowe i przycisk wysyłania */}
+      <div className="flex flex-col bg-gray-900 p-4 rounded-lg">
         <div className="mt-4 flex">
           <input
             type="text"
@@ -92,7 +69,7 @@ function Chat() {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
