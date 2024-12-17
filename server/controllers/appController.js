@@ -184,7 +184,7 @@ export async function updateUser(req, res) {
             // Dodanie pola selectedEgg do danych użytkownika
             const updatedData = {
                 ...body,
-                selectedEgg: body.selectedEgg || undefined // Jeśli selectedEgg nie jest podane, nie zmieniać
+                selectedEgg: body.selectedEgg || undefined // Jeśli selectedEgg nie jest podane, nie
             };
 
             // Aktualizacja danych użytkownika w bazie danych
