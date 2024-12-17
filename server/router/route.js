@@ -6,7 +6,7 @@ import * as controller from '../controllers/appController.js'; // Importowanie w
 import { registerMail } from '../controllers/mailer.js'; // Importowanie funkcji do wysyłania e-maili
 import Auth, { localVariables } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
 import { getCreaturesbyName } from "../controllers/creaturesFight.js";
-
+import { createNewSpecies } from "../middleware/newSpecies.js";
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -43,5 +43,6 @@ router.route('/updateuser').put(Auth, controller.updateUser); // aktualizacja pr
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); // resetowanie hasła
 
 router.route('/creaturesFight').get(getCreaturesbyName);
-
+router.route('/userData').get(Auth, controller.getUserData);
+router.route('/newSpecie').post(createNewSpecies);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
