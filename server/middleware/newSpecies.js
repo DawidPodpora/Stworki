@@ -3,16 +3,17 @@ import Species from '../model/Species.js';
 
 const router = express.Router();
 // Endpoint do stworzenia gatunku
-router.post('/create', async (req, res) => {
+export async function createNewSpecies(req, res) 
+{
     try {
         
 
         const species = new Species({
-            name: "Caelilux",
-            baseStats: [6,5,3,7,9],
-            statsAfterLevel: [2,1,0,2,2],
-            element: 'water',
-            photos:['photo1','photo2','photo3'],
+            name: "Noctivolus",
+            baseStats: [4,4,4,9,9],
+            statsAfterLevel: [1,1,0,3,2],
+            element: 'dark',
+            photos:['dark2-1','dark2-2','dark2-3'],
             passive: "jakas pasywa",
         });
 
@@ -22,6 +23,5 @@ router.post('/create', async (req, res) => {
         console.error(error);
         res.status(500).json({ message: "Error creating Species", error: error.message });
     }
-});
-
+}
 export default router;
