@@ -1,7 +1,8 @@
-const express = require('express');
-const Creature = require('../models/Creature');
+import express from 'express';
+import Creature from '../model/Creature.js';
+import Item from '../model/Item.js';
+
 const router = express.Router();
-const Item = require('../models/Item');
 // Endpoint do stworzenia stworka
 router.post('/create', async (req, res) => {
     try {
@@ -60,4 +61,4 @@ router.post('/create', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

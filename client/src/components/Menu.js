@@ -1,4 +1,4 @@
-import React from 'react'; // Import biblioteki React
+import React, { useState, useEffect } from 'react' // Import biblioteki React
 import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation` z biblioteki do obsługi tłumaczeń
 
 // Komponent Menu
@@ -6,7 +6,38 @@ import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation`
 // `onButtonClick` - funkcja obsługująca kliknięcia przycisków w menu
 function Menu({ toogleOptions, onButtonClick }) {
   const { t } = useTranslation(); // Funkcja `t` służy do tłumaczeń w `react-i18next`
-  
+  const [username, setUsername] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+        const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
+        if (!token) {
+            console.warn('Brak tokenu w localStorage');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/api/userData', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
+                },
+            });
+
+            if (!response.ok) {
+                console.error('Błąd pobierania danych użytkownika:', response.statusText);
+                return;
+            }
+
+            const data = await response.json();
+            setUsername(data.username); // Aktualizacja stanu z nazwą użytkownika
+        } catch (error) {
+            console.error('Błąd podczas pobierania danych użytkownika:', error);
+        }
+    };
+
+    fetchUserData(); // Wywołanie funkcji
+}, []);
   // Lista etykiet dla przycisków menu, przetłumaczona za pomocą `t`
   const buttonLabels = [
     t('Strona główna'), // Tłumaczenie dla "Strona główna"
@@ -22,6 +53,9 @@ function Menu({ toogleOptions, onButtonClick }) {
   return (
     <div className="relative flex flex-col items-center bg-maincolor1 text-maincolor4 space-y-4 w-1/5 h-screen rounded-xl pt-10 border-r-2 border-maincolor5">
       {/* Przyciski menu */}
+      <div>
+            {username ? <h1>Witaj, {username}!</h1> : <p>Ładowanie danych użytkownika...</p>}
+        </div>
       {buttonLabels.map((label, index) => (
         <button
           key={index} // Unikalny klucz dla każdego przycisku

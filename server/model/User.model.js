@@ -24,24 +24,7 @@ export const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please provide a unique email"], // Wymagane: unikalny e-mail
         unique: true, // E-mail musi być unikalny
-    },
-
-    // Imię użytkownika
-    firstName: { type: String },
-
-    // Nazwisko użytkownika
-    lastName: { type: String },
-
-    // Numer telefonu użytkownika
-    mobile: { type: Number },
-
-    // Adres użytkownika
-    address: { type: String },
-
-    // Profil użytkownika (np. ścieżka do zdjęcia profilowego)
-    profile: { type: String },
-
-    // Nowe pole do przechowywania wybranego jajka (już jest w schemacie)
+    }
 });
 
 // Eksportowanie modelu User, który będzie używał zdefiniowanego schematu

@@ -184,7 +184,7 @@ export async function updateUser(req, res) {
             // Dodanie pola selectedEgg do danych użytkownika
             const updatedData = {
                 ...body,
-                selectedEgg: body.selectedEgg || undefined // Jeśli selectedEgg nie jest podane, nie zmieniać
+                selectedEgg: body.selectedEgg || undefined // Jeśli selectedEgg nie jest podane, nie
             };
 
             // Aktualizacja danych użytkownika w bazie danych
@@ -273,3 +273,16 @@ export async function resetPassword(req,res){
     }
 }
 
+export async function getUserData(req,res)
+{
+    try {
+        const userId = req.user.userId; // Pobranie userId z middleware
+        const user = await UserModel.findById(userId).select('-password'); // Znalezienie użytkownika
+        if (!user) {
+            return res.status(404).send({ error: 'Użytkownik nie znaleziony!' });
+        }
+        res.status(200).send(user); // Zwrócenie danych użytkownika
+    } catch (error) {
+        res.status(500).send({ error: 'Błąd serwera' });
+    }
+}
