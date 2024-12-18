@@ -1,9 +1,8 @@
 import mongoose from 'mongoose'; // Importowanie mongoose do obsługi bazy danych MongoDB
-
+import ItemSchema from '../model/Item.js';
+import CreatureSchema from './Creature.js';
 // Definicja schematu użytkownika
 export const UserSchema = new mongoose.Schema({
-    // Pole przechowujące wybrane jajko (domyślnie puste)
-    selectedEgg: { type: String, default: '' }, // Dodanie wartości domyślnej dla sytuacji, gdy użytkownik nie wybierze jajka
 
     // Pole do przechowywania nazwy użytkownika (unikalna wartość, wymagana)
     username: {
@@ -24,6 +23,56 @@ export const UserSchema = new mongoose.Schema({
         type: String,
         required: [true, "Please provide a unique email"], // Wymagane: unikalny e-mail
         unique: true, // E-mail musi być unikalny
+    },
+    money:{
+        type: Number,
+        default: 0,
+    },
+    creatures:{
+        type:[CreatureSchema],
+        default:[],
+        validate: {
+            validator: function (value) {
+                return Array.isArray(value) && value.length <= 6; 
+            },
+        }
+    },
+    items:{
+        type:[ItemSchema],
+        default:[],
+        alidate: {
+            validator: function (value) {
+                return Array.isArray(value) && value.length <= 15; // Maksymalnie 15 rzeczy
+            },
+        }
+    },
+    isInGuild:{
+        type: Boolean,
+        default: false,
+    },
+    exp:{
+        type: Number,
+        default: 0
+    },
+    level:{
+        type: Number,
+        default: 1,
+    },
+    rankingPoints:
+    {
+        type: Number,
+        default: 100,
+    },
+    isFirstLog:
+    {
+        type: Boolean,
+        default: true,
+    },
+    role:
+    {
+        type: String,
+        enum: ["user", "admin", "moderator"], 
+        defalut: "user",
     }
 });
 

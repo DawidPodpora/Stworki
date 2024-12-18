@@ -9,11 +9,11 @@ export async function createNewSpecies(req, res)
         
 
         const species = new Species({
-            name: "Noctivolus",
-            baseStats: [4,4,4,9,9],
-            statsAfterLevel: [1,1,0,3,2],
-            element: 'dark',
-            photos:['dark2-1','dark2-2','dark2-3'],
+            name: "Groverin",
+            baseStats: [4,8,3,5,10],
+            statsAfterLevel: [1,2,0,1,3],
+            element: 'nature',
+            photos:['nature3-1','nature3-2','nature3-3'],
             passive: "jakas pasywa",
         });
 

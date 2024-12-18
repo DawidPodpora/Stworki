@@ -38,4 +38,4 @@ const CreatureSchema = new mongoose.Schema({
 
 const Creatures = mongoose.model('Creatures', CreatureSchema);
 
-export default Creatures;
+export default CreatureSchema;
