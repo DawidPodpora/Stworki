@@ -1,10 +1,50 @@
 import Menu from './Menu.js'; // Import komponentu Menu
 import Options from './Options.js'; // Import komponentu Options
 import Content from './Content.js'; // Import komponentu Content
-import React, { useState } from 'react'; // Import React i hooka useState do zarządzania stanem
+import FirstOrb from './FirstOrb.js';
+import React, { useState, useEffect } from 'react'; // Import React i hooka useState do zarządzania stanem
 
 // Główny komponent strony
 function MainPage() {
+  const [username, setUsername] = useState(null);
+  const [firstChoice, setFirstChoice] = useState(false);
+    useEffect(() => {
+      const fetchUserData = async () => {
+          const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
+          if (!token) {
+              console.warn('Brak tokenu w localStorage');
+              return;
+          }
+  
+          try {
+              const response = await fetch('http://localhost:8080/api/userData', {
+                  method: 'GET',
+                  headers: {
+                      'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
+                  },
+              });
+  
+              if (!response.ok) {
+                  console.error('Błąd pobierania danych użytkownika:', response.statusText);
+                  return;
+              }
+              
+              const data = await response.json();
+              setUsername(data.username); // Aktualizacja stanu z nazwą użytkownika
+              if(data.isFirstLog === true)
+              {
+                setFirstChoice(true);
+                
+              }
+          } catch (error) {
+              console.error('Błąd podczas pobierania danych użytkownika:', error);
+          }
+
+      };
+  
+      fetchUserData(); // Wywołanie funkcji
+  }, []);
+
   // Stan dla widoczności panelu opcji
   const [isOptionsVisible, setOptionsVisible] = useState(false);
   
@@ -20,6 +60,10 @@ function MainPage() {
   const handleButtonClick = (buttonNumber) => {
     setSelectedButton(buttonNumber); // Ustawienie wybranego numeru przycisku
   };
+  const firsOrbActiveButton = () =>{
+    console.log("zmiana na co innego");
+    setFirstChoice((firstChoice) => !firstChoice);
+  }
 
   // Wygląd strony
   return (
@@ -28,6 +72,7 @@ function MainPage() {
       <Menu 
         toogleOptions={toggleOptionVisibility} // Przekazanie funkcji przełączania opcji
         onButtonClick={handleButtonClick} // Przekazanie funkcji obsługi kliknięcia przycisku
+        username={username}
       />
 
       {/* Komponent treści, wyświetlający zawartość na podstawie wybranego przycisku */}
@@ -36,6 +81,9 @@ function MainPage() {
       {/* Warunkowe wyświetlanie panelu opcji */}
       {isOptionsVisible && (
         <Options toogleOptions={toggleOptionVisibility} /> // Przekazanie funkcji zamykania opcji
+      )}
+      {firstChoice && (
+      <FirstOrb firsOrbActiveButton={firsOrbActiveButton}/>
       )}
     </div>
   );

@@ -286,3 +286,34 @@ export async function getUserData(req,res)
         res.status(500).send({ error: 'Błąd serwera' });
     }
 }
+
+export async function firstOrb(req,res) {
+    try{
+        const {orb} = req.body;
+        if(!orb)
+        {
+            return res.status(400).json({ error: 'Nie podano orb' });
+        }
+        console.log("aaaaaa");
+        const userId = req.user.userId;
+        console.log("bbbbbb");
+        const user = await UserModel.findByIdAndUpdate(userId,
+            {isFirstLog: false},
+            
+            {new: true}
+        );
+        console.log("ccccccc");
+        if (!user) {
+            return res.status(404).json({ error: 'Użytkownik nie został znaleziony' });
+        }
+        console.log("dddddd");
+        res.status(200).json({
+            message: `Pole isFirstLog zmienione na false dla użytkownika ${user.username}`,
+            user,
+        });
+    }catch(error)
+    {
+        res.status(500).send({ error: 'Błąd serwera' });
+    }
+    
+}

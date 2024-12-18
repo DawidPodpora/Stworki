@@ -4,40 +4,8 @@ import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation`
 // Komponent Menu
 // `toogleOptions` - funkcja do przełączania opcji
 // `onButtonClick` - funkcja obsługująca kliknięcia przycisków w menu
-function Menu({ toogleOptions, onButtonClick }) {
+function Menu({ toogleOptions, onButtonClick, username }) {
   const { t } = useTranslation(); // Funkcja `t` służy do tłumaczeń w `react-i18next`
-  const [username, setUsername] = useState(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-        const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
-        if (!token) {
-            console.warn('Brak tokenu w localStorage');
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8080/api/userData', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
-                },
-            });
-
-            if (!response.ok) {
-                console.error('Błąd pobierania danych użytkownika:', response.statusText);
-                return;
-            }
-
-            const data = await response.json();
-            setUsername(data.username); // Aktualizacja stanu z nazwą użytkownika
-        } catch (error) {
-            console.error('Błąd podczas pobierania danych użytkownika:', error);
-        }
-    };
-
-    fetchUserData(); // Wywołanie funkcji
-}, []);
   // Lista etykiet dla przycisków menu, przetłumaczona za pomocą `t`
   const buttonLabels = [
     t('Strona główna'), // Tłumaczenie dla "Strona główna"
