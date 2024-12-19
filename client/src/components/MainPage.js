@@ -11,6 +11,7 @@ function MainPage() {
   const [firstChoice, setFirstChoice] = useState(false);
   const [newCreature, setNewCreature] = useState(false);
   const [creatureData, setNewCreatureData] = useState();
+  const [userFullData, setUserFullData] = useState();
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -34,6 +35,7 @@ function MainPage() {
               }
               
               const data = await response.json();
+              setUserFullData(data);
               setUsername(data.username); // Aktualizacja stanu z nazwą użytkownika
               if(data.isFirstLog === true)
               {
@@ -87,7 +89,7 @@ function MainPage() {
       />
 
       {/* Komponent treści, wyświetlający zawartość na podstawie wybranego przycisku */}
-      <Content selectedButton={selectedButton} />
+      <Content selectedButton={selectedButton} data={userFullData} />
 
       {/* Warunkowe wyświetlanie panelu opcji */}
       {isOptionsVisible && (

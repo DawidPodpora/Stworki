@@ -3,7 +3,7 @@ import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponen
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
 
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
-function Content({ selectedButton }) {
+function Content({ selectedButton, data}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
@@ -28,7 +28,7 @@ function Content({ selectedButton }) {
   return (
     <div className="absolute w-4/5 bg-black1 h-screen right-0">
       {/* Renderowanie wybranego komponentu */}
-      <ComponentToRender />
+      <ComponentToRender data = {data}/>
     </div>
   );
 }

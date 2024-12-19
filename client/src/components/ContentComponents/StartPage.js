@@ -2,7 +2,7 @@ import React from 'react';
 import Chat from './Chat';
 import Notice from './Notice'; // Komponent do wyświetlania ogłoszeń
 
-function StartPage() {
+function StartPage({data}) {
   // Treści ogłoszeń
   const notices = [
     {
@@ -46,7 +46,7 @@ function StartPage() {
       {/* Sekcja czatu */}
       <div className="w-1/3 flex flex-col justify-between bg-gray-900 p-4 border-l border-gray-700">
         <h2 className="text-2xl font-bold text-white">Czat</h2>
-        <Chat />
+        <Chat data={data} />
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ const itemsForSale = [
   { id: 15, name: "Płaszcz Wiatru", price: 120, image: "/images/windcloak.png", description: "Płaszcz, który zwiększa szybkość ruchu i obronność." }
 ];
 
-function Shop() {
+function Shop({data}) {
   const [inventory, setInventory] = useState([]); // Stan przechowujący przedmioty w inventarzu
   const [activeTab, setActiveTab] = useState("shop"); // Stan kontrolujący aktywną zakładkę ("shop" lub "inventory")
 
