@@ -6,7 +6,7 @@ function Chat({data}) {
   const [newMessage, setNewMessage] = useState('');
   const chatRef = useRef(null);
   const socket = useRef(null);
-
+console.log(data);
   const currentUser = data.username;
   // Automatycznie przewijaj czat na dół po każdej nowej wiadomości
   useEffect(() => {

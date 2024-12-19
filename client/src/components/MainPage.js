@@ -11,7 +11,7 @@ function MainPage() {
   const [firstChoice, setFirstChoice] = useState(false);
   const [newCreature, setNewCreature] = useState(false);
   const [creatureData, setNewCreatureData] = useState();
-  const [userFullData, setUserFullData] = useState();
+  const [userFullData, setUserFullData] = useState(null);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -50,7 +50,7 @@ function MainPage() {
   
       fetchUserData(); // Wywołanie funkcji
   }, []);
-
+console.log("tak",userFullData);
   // Stan dla widoczności panelu opcji
   const [isOptionsVisible, setOptionsVisible] = useState(false);
   
@@ -89,7 +89,7 @@ function MainPage() {
       />
 
       {/* Komponent treści, wyświetlający zawartość na podstawie wybranego przycisku */}
-      <Content selectedButton={selectedButton} data={userFullData} />
+      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} />)}
 
       {/* Warunkowe wyświetlanie panelu opcji */}
       {isOptionsVisible && (
