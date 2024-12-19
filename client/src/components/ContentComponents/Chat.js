@@ -1,24 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { io } from 'socket.io-client';
 
-function Chat() {
+function Chat({data}) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const chatRef = useRef(null);
+  const socket = useRef(null);
 
-  const currentUser = 'Player1';
+  const currentUser = data.username;
   // Automatycznie przewijaj czat na dół po każdej nowej wiadomości
   useEffect(() => {
-    chatRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // połącz z backendem WebSocket
+    socket.current = io('http://localhost:8080');
+    //pobierz historię czatu
+    socket.current.on('chatHistory', (history) => {
+      setMessages(history);
+    });
+
+    // Obsługa odbioru nowej wiadomości
+    socket.current.on('newMessage',(message) =>
+    {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    return () => {
+      socket.current.disconnect(); //rozłącz websocket przy odmontowaniu
+    };
+  }, []);
+
+  useEffect(() => {
+    chatRef.current?.scrollIntoView({ behavior: 'smooth'});
   }, [messages]);
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       const message = {
         id: Date.now(),
+        userId: data._id,
         text: newMessage,
         sender: currentUser, // wiadomość od użytkownika
       };
-      setMessages((prevMessages) => [...prevMessages, message]);
+      socket.current.emit('newMessage',message);
       setNewMessage('');
     }
   };

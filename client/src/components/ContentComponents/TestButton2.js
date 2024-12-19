@@ -1,6 +1,6 @@
 import React, { useState } from "react";  // Importujemy React oraz useState do obsługi stanów.
 
-function TestButton2() {
+function TestButton2({data}) {
   // Zbiór obrazów dla różnych stworzeń
   const divs = [
     "/images/testobrazka.png",
