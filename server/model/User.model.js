@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'; // Importowanie mongoose do obsługi bazy danych MongoDB
 import ItemSchema from '../model/Item.js';
-import CreatureSchema from './Creature.js';
+import {CreatureSchema} from './Creature.js';
 // Definicja schematu użytkownika
 export const UserSchema = new mongoose.Schema({
 
@@ -40,7 +40,7 @@ export const UserSchema = new mongoose.Schema({
     items:{
         type:[ItemSchema],
         default:[],
-        alidate: {
+        validate: {
             validator: function (value) {
                 return Array.isArray(value) && value.length <= 15; // Maksymalnie 15 rzeczy
             },

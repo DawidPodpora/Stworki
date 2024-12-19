@@ -3,11 +3,15 @@ import Options from './Options.js'; // Import komponentu Options
 import Content from './Content.js'; // Import komponentu Content
 import FirstOrb from './FirstOrb.js';
 import React, { useState, useEffect } from 'react'; // Import React i hooka useState do zarządzania stanem
+import NewCreatureWindow from './NewCreatureWindow.js';
 
 // Główny komponent strony
 function MainPage() {
   const [username, setUsername] = useState(null);
   const [firstChoice, setFirstChoice] = useState(false);
+  const [newCreature, setNewCreature] = useState(false);
+  const [creatureData, setNewCreatureData] = useState();
+
     useEffect(() => {
       const fetchUserData = async () => {
           const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
@@ -64,7 +68,14 @@ function MainPage() {
     console.log("zmiana na co innego");
     setFirstChoice((firstChoice) => !firstChoice);
   }
-
+  const nameForCreatureSwitch = () =>{
+    setNewCreature((newCreature) => !newCreature);
+  }
+  const NewCreatureActiveButton = (creatureData) =>{
+    console.log("zmiana na co innego");
+    setNewCreatureData(creatureData);
+    nameForCreatureSwitch();
+  }
   // Wygląd strony
   return (
     <div className="bg-maincolor1 absolute h-screen w-screen flex">
@@ -83,7 +94,10 @@ function MainPage() {
         <Options toogleOptions={toggleOptionVisibility} /> // Przekazanie funkcji zamykania opcji
       )}
       {firstChoice && (
-      <FirstOrb firsOrbActiveButton={firsOrbActiveButton}/>
+      <FirstOrb firsOrbActiveButton={firsOrbActiveButton} NewCreatureActiveButton={NewCreatureActiveButton}/>
+      )}
+      {newCreature &&(
+        <NewCreatureWindow newCreatureData={creatureData} windowSwicher={nameForCreatureSwitch}/>
       )}
     </div>
   );

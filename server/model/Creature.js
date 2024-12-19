@@ -6,15 +6,14 @@ const CreatureSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
       },
       staty:{
         type: [Number],
-        required: true
+        default:[0,0,0,0,0]
       },
       level:{
         type: Number,
-        required : true
+        default: 1
       },
       species: {
         type: String,
@@ -22,10 +21,15 @@ const CreatureSchema = new mongoose.Schema({
       },
       energy:{
         type: Number,
-        require : true
+        default: 100
+      },
+      exp:{
+        type: Number,
+        default: 0
       },
       items: {
-        type: [ItemSchema], // Tablica obiektów zgodnych z ItemSchema
+        type: [ItemSchema],
+        default: [],// Tablica obiektów zgodnych z ItemSchema
         validate: {
             validator: function (value) {
                 return Array.isArray(value) && value.length <= 3; // Maksymalnie 3 rzeczy
@@ -37,5 +41,5 @@ const CreatureSchema = new mongoose.Schema({
 });
 
 const Creatures = mongoose.model('Creatures', CreatureSchema);
-
-export default CreatureSchema;
+export { CreatureSchema };
+export default Creatures;
