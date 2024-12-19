@@ -4,6 +4,7 @@ import StartPage from './ContentComponents/StartPage.js'; // Import komponentu S
 
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
 function Content({ selectedButton, data}) {
+  console.log("towjastara2", data);
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
