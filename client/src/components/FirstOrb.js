@@ -2,7 +2,7 @@ import React, { useState } from 'react'; // Import biblioteki React
 import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation` z biblioteki do obsługi tłumaczeń
 
 // Komponent `Options`, który obsługuje wybór języka i posiada przycisk zamykający okno opcji
-function FirstOrb({firsOrbActiveButton}) {
+function FirstOrb({firsOrbActiveButton,  NewCreatureActiveButton}) {
   const { i18n } = useTranslation(); // Inicjalizacja tłumaczeń z `react-i18next`
   const [choice, setChoice] = useState(null);
   const [responseMessage, setResponseMessage] = useState('');
@@ -29,7 +29,7 @@ function FirstOrb({firsOrbActiveButton}) {
     console.log("cos");
     try{
         console.log("cos1");
-        const response = await fetch('http://localhost:8080/api/firstOrb',{
+        const response = await fetch('http://localhost:8080/api/OrbDraw',{
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json',
@@ -42,19 +42,24 @@ function FirstOrb({firsOrbActiveButton}) {
             throw new Error(`Błąd ${response.status}: ${response.statusText}`);
           }
         const data = await response.json();
-
+        return data;
     }catch(error){
         console.error('Błąd podczas wysyłania danych:', error);
         setResponseMessage('Wystąpił błąd podczas wysyłania danych.');
     }
+    
   };
   const doubleFunctionClick = () =>
   {
     if(choice)
     {
         console.log("działa");
-        sendFirstOrb();
+       
         firsOrbActiveButton();
+        sendFirstOrb().then((response)=>{
+          console.log(response, "dupa dupa");
+          NewCreatureActiveButton(response.NewCreature);
+        })
     }
   }
   // Wygląd i logika komponentu

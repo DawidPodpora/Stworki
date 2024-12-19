@@ -11,7 +11,9 @@ import { createNewSpecies } from "../middleware/newSpecies.js";
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
 
-router.route('/firstOrb').post(Auth, controller.firstOrb);
+router.route('/OrbDraw').post(Auth, controller.OrbDraw);
+router.route('/speciesPhoto').get(Auth, controller.creatureNewPhoto);
+router.route('/setNewName').post(Auth,controller.newNameForCreature);
 // Ścieżka do wysyłania e-maila rejestracyjnego
 router.route('/registerMail').post(registerMail); // wysyłanie e-maila
 
