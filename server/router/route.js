@@ -10,9 +10,14 @@ import { createNewSpecies } from "../middleware/newSpecies.js";
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
-
+//Wybor pierwszego orba
 router.route('/OrbDraw').post(Auth, controller.OrbDraw);
+//wysłanie zdjęcia wylosowanego stworka
 router.route('/speciesPhoto').get(Auth, controller.creatureNewPhoto);
+//Pobranie nazwy dla nowego stworka
+
+router.route('/usersCreaturesAndItemsData').get(Auth, controller.fullDataForAllCreatures);
+
 router.route('/setNewName').post(Auth,controller.newNameForCreature);
 // Ścieżka do wysyłania e-maila rejestracyjnego
 router.route('/registerMail').post(registerMail); // wysyłanie e-maila
