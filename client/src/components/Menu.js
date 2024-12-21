@@ -8,13 +8,13 @@ function Menu({ toogleOptions, onButtonClick, username }) {
   const { t } = useTranslation(); // Funkcja `t` służy do tłumaczeń w `react-i18next`
   // Lista etykiet dla przycisków menu, przetłumaczona za pomocą `t`
   const buttonLabels = [
-    t('Strona główna'), // Tłumaczenie dla "Strona główna"
-    t('Moje stworki'),  // Tłumaczenie dla "Moje stworki"
-    t('Sklep'),         // Tłumaczenie dla "Sklep"
-    t('optionD'),       // Tłumaczenie dla dodatkowej opcji D
-    t('optionE'),       // Tłumaczenie dla dodatkowej opcji E
-    t('optionF'),       // Tłumaczenie dla dodatkowej opcji F
-    t('optionG')        // Tłumaczenie dla dodatkowej opcji G
+    t('Strona główna'),       // Tłumaczenie dla "Strona główna"
+    t('Moje stworki'),        // Tłumaczenie dla "Moje stworki"
+    t('Sklep'),               // Tłumaczenie dla "Sklep"
+    t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
+    t('optionE'),             // Tłumaczenie dla dodatkowej opcji E
+    t('optionF'),             // Tłumaczenie dla dodatkowej opcji F
+    t('optionG')              // Tłumaczenie dla dodatkowej opcji G
   ];
   
   // Wygląd i logika komponentu
