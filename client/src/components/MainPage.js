@@ -50,7 +50,6 @@ function MainPage() {
   
       fetchUserData(); // Wywołanie funkcji
   }, []);
-console.log("tak",userFullData);
   // Stan dla widoczności panelu opcji
   const [isOptionsVisible, setOptionsVisible] = useState(false);
   
