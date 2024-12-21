@@ -439,3 +439,4 @@ export async function fullDataForAllCreatures(req, res)
         res.status(500).send({ error: 'Błąd serwera przy pobieraniu danych o stworkach' }); 
     }
 }
+
