@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const ItemBaseDataSchema = new mongoose.Schema({
     type:{
         type: String,
-        enum: ['equipable', 'unequipable', 'orb'],
+        enum: ['equipable', 'usable', 'orb'],
         required: true
     },
     photos:{

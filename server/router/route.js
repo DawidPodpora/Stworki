@@ -8,6 +8,7 @@ import Auth, { localVariables } from '../middleware/auth.js'; // Importowanie mi
 import { getCreaturesbyName } from "../controllers/creaturesFight.js";
 import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
+import { NewItem } from "../controllers/itemCreating.js";
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -55,5 +56,5 @@ router.route('/creaturesFight').get(getCreaturesbyName);
 router.route('/userData').get(Auth, controller.getUserData);
 router.route('/newSpecie').post(createNewSpecies);
 router.route('/newItemBaseData').post(createNewItemBaseData);
-
+router.route('/NewItem').get(NewItem);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

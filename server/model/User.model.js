@@ -73,7 +73,27 @@ export const UserSchema = new mongoose.Schema({
         type: String,
         enum: ["user", "admin", "moderator"], 
         defalut: "user",
+    },
+    itemsShop:{
+        type:[ItemSchema],
+        default:[],
+        validate: {
+            validator: function (value) {
+                return Array.isArray(value) && value.length <= 15; // Maksymalnie 15 rzeczy
+            },
+        }
+    },
+    itemShopReset:{
+        type: Date,
+        default: function () {
+            const now = new Date();
+            const nextDayMidnight = new Date(now);
+            nextDayMidnight.setDate(now.getDate() + 1); // Przejdź do następnego dnia
+            nextDayMidnight.setHours(0, 0, 0, 0); // Ustaw godzinę na północ
+            return nextDayMidnight;
     }
+}
+    
 });
 
 // Eksportowanie modelu User, który będzie używał zdefiniowanego schematu

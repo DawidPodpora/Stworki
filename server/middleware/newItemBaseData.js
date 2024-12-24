@@ -6,10 +6,10 @@ export async function createNewItemBaseData(req, res)
 {
     try {
         const itemBase = new ItemBaseData({
-            type:"equipable",
-            photos:["photo1","photo2","photo3"],
-            names:["name1","name2","name3"],
-            section:"strenght"      
+            type:"orb",
+            photos:["waterorb","fireorb","natureorb","lightorb","darkorb"],
+            names:["Water Orb","Fire Orb","Nature Orb","Light Orb","Dark Orb"],
+            section:"orb"      
         });
 
         await itemBase.save();

@@ -58,6 +58,14 @@ const ItemSchema = new mongoose.Schema({
         type: String,
         enum: ['fire','water','nature','light','dark'],
         require: true,
+    },
+    price:
+    {
+        type: Number,
+        require: true
+    },
+    levelRequired:{
+        type: Number
     }
 });
 
