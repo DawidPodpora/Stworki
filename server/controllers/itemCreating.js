@@ -13,7 +13,7 @@ const Stats =[  'strenght',
     'power',
     'vitality',
     'armor'];
-const elements = ['fire', 'water', 'nature', 'light', 'dark'];
+const elements = ['water', 'fire', 'nature', 'light', 'dark'];
 const getRandomNumberFrom0toX = (x) => Math.floor(Math.random() * (x+1));
 
 const elementOfItemRoll =(elements)=>
@@ -24,11 +24,8 @@ const elementOfItemRoll =(elements)=>
 
 const equipableRoll = async(playerLevel)=>{
     const itemStatisticNumber = 5 + playerLevel*5;
-    console.log(itemStatisticNumber, 'itemStatisticNumber')
-    const percentBonusStats = 1 + (getRandomNumberFrom0toX(60) - 30)/100;
-    console.log(percentBonusStats,"percentBonusStats");
+    const percentBonusStats = 1 + (getRandomNumberFrom0toX(60) - 30)/100; // od 0.7 do 1.3
     const itemStatisticNumberFinal = Math.round(itemStatisticNumber * percentBonusStats);
-    console.log(itemStatisticNumberFinal, "itemStatisticNumberFinal");
     const numberofstats=[1,2,3,5];
     const  howManyStatsFromTab = numberofstats[getRandomNumberFrom0toX(3)];
     let  statsNames = [];
@@ -45,31 +42,31 @@ const equipableRoll = async(playerLevel)=>{
         }
         if(howManyStatsFromTab == 1)
         {
-            console.log('1 staty');
+            
             statsNumbers.push(itemStatisticNumberFinal);
         }else if(howManyStatsFromTab == 2 ){
-            console.log('2 staty');
+            
             const statsSplit = (getRandomNumberFrom0toX(80) + 10)/100;
             console.log(statsSplit, 'statSplit');
             const firstStat = Math.round(itemStatisticNumberFinal * statsSplit);
-            console.log('firstStat', firstStat)
+            
             const secondStat = itemStatisticNumberFinal - firstStat; 
-            console.log('secondStat', secondStat);
+            
             statsNumbers.push(firstStat);
             statsNumbers.push(secondStat);
         }else if(howManyStatsFromTab == 3)
         {
-            console.log('3 staty');
+            
             const statsSplit1 = getRandomNumberFrom0toX(40) + 20;
-            console.log('statsSplit1', statsSplit1);
+            
             const statsSplit2 = getRandomNumberFrom0toX(100 - statsSplit1 - 10);
-            console.log('statsSplit2', statsSplit2);
+           
             const firstStat = Math.round(itemStatisticNumberFinal * (statsSplit1/100));
-            console.log('firstStat',firstStat)
+            
             const secondStat = Math.round(itemStatisticNumber * (statsSplit2/100));
-            console.log('secondStat', secondStat);
+            
             const thirdStat = itemStatisticNumberFinal - firstStat - secondStat;
-            console.log('thirdStat', thirdStat)
+            
             statsNumbers.push(firstStat);
             statsNumbers.push(secondStat);
             statsNumbers.push(thirdStat);
@@ -102,11 +99,8 @@ const equipableRoll = async(playerLevel)=>{
         }
     });
     const element = elementOfItemRoll(elements);
-    console.log(element, "element")
     const rollForStatName = getRandomNumberFrom0toX(statsNames.length - 1);
-    console.log(statsNames[rollForStatName], 'rolka');
     const ItemBaseDataBasedOnRoll = await ItemBaseData.findOne({section: statsNames[rollForStatName]});
-    console.log(ItemBaseDataBasedOnRoll, ' baseitem');
     const photoAndNameRoll = getRandomNumberFrom0toX(2);
     const photoBasedOnRoll = ItemBaseDataBasedOnRoll.photos[photoAndNameRoll];
     const nameBasedOnRoll = ItemBaseDataBasedOnRoll.names[photoAndNameRoll];
@@ -122,34 +116,88 @@ const equipableRoll = async(playerLevel)=>{
         levelRequired: playerLevel,
         photo: photoBasedOnRoll
     }
-    console.log(item,'item wylosowany');
-    return item;
+    return{ item};
     
 }
 const usableRoll = async()=>{
-
+    const elementNumber = getRandomNumberFrom0toX(elements.length - 1);
+    const element = elements[elementNumber];
+    const usabeItemBaseFromDataBase = await ItemBaseData.findOne({section: 'usable'}).lean();
+    const usableItemName = usabeItemBaseFromDataBase.names[elementNumber];
+    const usableItemPhoto = usabeItemBaseFromDataBase.photos[elementNumber];
+    const statNameNr = getRandomNumberFrom0toX(baseSections.length - 1);
+    const statName = baseSections[statNameNr];
+    const stats = {
+        power: 0,
+        vitality: 0,
+        strenght: 0,
+        dexterity: 0,
+        intelligence: 0,
+    }
+    const price = 1000;
+    stats[statName] = 1;
+    console.log(statName);
+    const item = {
+        name: usableItemName,
+        type: 'usable',
+        ...stats,
+        armor: 0,
+        pasive: 'Random Pasive',
+        description: 'Random description',
+        element: element,
+        price: price,
+        levelRequired: 1,
+        photo: usableItemPhoto
+    }
+    return {item};
 }
 const orbRoll = async()=>{
-
+    const elementNumber = getRandomNumberFrom0toX(elements.length - 1);
+    const element = elements[elementNumber];
+    const OrbBaseData = await ItemBaseData.findOne({section: 'orb'}).lean();
+    const photo = OrbBaseData.photos[elementNumber];
+    const OrbName = OrbBaseData.names[elementNumber];
+    const price = 4000; 
+    const item = {
+        name: OrbName,
+        type: 'orb',
+        power: 0,
+        vitality: 0,
+        strenght: 0,
+        dexterity: 0,
+        intelligence: 0,
+        armor: 0,
+        pasive: 'Random Pasive',
+        description: 'Random description',
+        element: element,
+        price: price,
+        levelRequired: 1,
+        photo: photo
+    }
+    
+    return {item};
 }
 const typeOfItemRoll = async(playerLevel)=>{
     const chanceForItem = getRandomNumberFrom0toX(100);
+    let newItem;
     if(chanceForItem < 70){
-
+        newItem = await equipableRoll(playerLevel);
     }else if(chanceForItem >= 70 && chanceForItem <= 90 ){
-
+        newItem = await usableRoll();
     }else{
-
+        newItem = await orbRoll();
     }
+    const item = newItem.item;
+
+    return {item};
 }
 
 export async function NewItem(req, res)
 {
     try{
-        const a = equipableRoll(20);
-        console.log(a.item);
-        res.status(200).send({   
-        });
+        const a = await typeOfItemRoll(20);
+        console.log(a.item, "cos");
+        res.status(200).send({});
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy pobieraniu danych o stworkach' }); 
     }
