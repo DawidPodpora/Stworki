@@ -42,7 +42,7 @@ useEffect(() => {
        console.log(creatures, "creatures");
        console.log(species, "species");
        console.log(itemsFromUser, " items");
-       setVisibleCreature(`images/${species[0].photos[0]}.png`);
+       //setVisibleCreature(`images/${species[0].photos[0]}.png`);
         // Wywołanie funkcji
 
       };
@@ -196,7 +196,8 @@ useEffect(() => {
         </div>
       </div>
       </>
-): (
+)
+: (
   <div>Loading...</div> // Wyświetlanie komunikatu ładowania
 )}
     </div>
