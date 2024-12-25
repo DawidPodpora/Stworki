@@ -9,7 +9,7 @@ const ItemSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['equipable', 'unequipable', 'orb'], 
+        enum: ['equipable', 'usable', 'orb'], 
         required: true
     },
     power: {
@@ -32,7 +32,7 @@ const ItemSchema = new mongoose.Schema({
         required: true,
         default: 0    
     },
-    inteligence: { 
+    intelligence: { 
         type: Number,
         required: true,
         default: 0
@@ -57,15 +57,20 @@ const ItemSchema = new mongoose.Schema({
     element:{
         type: String,
         enum: ['fire','water','nature','light','dark'],
-        require: true,
+        required: true
     },
     price:
     {
         type: Number,
-        require: true
+        required: true
     },
     levelRequired:{
-        type: Number
+        type: Number,
+        default: 1
+    },
+    photo:{
+        type: String,
+        required: true
     }
 });
 
