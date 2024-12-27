@@ -59,4 +59,6 @@ router.route('/newItemBaseData').post(createNewItemBaseData);
 router.route('/ItemsToShop').get(items.ItemsToShop);
 router.route('/ItemToEq').post(items.ItemToEq);
 router.route('/ItemShop').get(Auth, items.ItemsToShop);
+router.route('/BuyItem').get(Auth, items.BuyItem);
+router.route('/SellItem').get(Auth, items.SellItem);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

@@ -216,7 +216,7 @@ export async function ItemToEq(req, res) {
     
 }
 
-
+//tworzenie nowych rzeczy do sklepu
 export async function ItemsToShop(req, res)
 {
     try{
@@ -227,10 +227,10 @@ export async function ItemsToShop(req, res)
         console.log(user.itemShopReset);
         console.log(user.itemShopReset instanceof Date);
         console.log(new Date());
-        if((user.itemShopReset < new Date()) || newShopForMoney === 'true')
+        if((user.itemShopReset < new Date()) || newShopForMoney === 'true' )
         {
             user.itemsShop = [];
-            for (let i = 0; i < 15; i++){
+            for (let i = 0; i < 16; i++){
                 console.log("dala ", i);
                 const item = await typeOfItemRoll(user.level);
                 user.itemsShop.push(item.item);
@@ -242,14 +242,80 @@ export async function ItemsToShop(req, res)
             nextDayMidnight.setDate(now.getDate() + 1);
             nextDayMidnight.setHours(0, 0, 0, 0);
             user.itemShopReset = nextDayMidnight;
+            
         await user.save();
         console.log("zapis");
         }
-        
+        console.log(user.items);
         res.status(200).send({
-            ShopItems: user.itemsShop
+            ShopItems: user.itemsShop,
+            userItems: user.items
         });
     }catch(error){
+        res.status(500).send({ error: 'Błąd przy tworzeniu rzeczy do sklepu' }); 
+    }
+}
+
+//kupowanie rzeczy ze sklepu
+
+
+export async function BuyItem(req, res){
+    try{
+        const userId = req.user.userId;
+        const {itemId} = req.query;
+        console.log(userId, "user ID");
+        console.log(itemId, "item ID");
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
+        }
+        const item = user.itemsShop.find((item) => item._id.toString() === itemId);
+        user.items.push(item);
+        console.log(item._id, "itemek");
+        if (!item) {
+            return res.status(404).send({ error: 'Przedmiot nie znaleziony w sklepie użytkownika' });
+        }
+        if(item.price > user.money){
+            return res.status(404).send({ error: 'nie można kupić przedmiotu'});
+        }
+        user.money = user.money - item.price;
+        user.itemsShop = user.itemsShop.filter((item) => item._id.toString() !== itemId);
+        await user.save();
+        res.status(200).send({
+            ShopItems: user.itemsShop,
+            userItems: user.items
+        });
+    }catch(error)
+    {
+        res.status(500).send({ error: 'Błąd przy tworzeniu rzeczy do sklepu' }); 
+    }
+}
+
+export async function SellItem(req, res){
+    try{
+        const userId = req.user.userId;
+        const {itemId} = req.query;
+        console.log(userId, "user ID");
+        console.log(itemId, "item ID");
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
+        }
+        const item = user.items.find((item) => item._id.toString() === itemId);
+        
+        console.log(item._id, "itemek");
+        if (!item) {
+            return res.status(404).send({ error: 'Przedmiot nie znaleziony w sklepie użytkownika' });
+        }
+        user.money = user.money + Math.round(item.price / 3);
+        user.items = user.items.filter((item) => item._id.toString() !== itemId);
+        await user.save();
+        res.status(200).send({
+            ShopItems: user.itemsShop,
+            userItems: user.items
+        });
+    }catch(error)
+    {
         res.status(500).send({ error: 'Błąd przy tworzeniu rzeczy do sklepu' }); 
     }
 }
