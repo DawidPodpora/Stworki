@@ -173,7 +173,9 @@ useEffect(() => {
             <div
               key={index}
               className="w-[6vw] h-[6vw] min-h-[70px] min-w-[70px] bg-black1 bg-opacity-50 rounded-xl border-maincolor4 border-2"
-            ></div>
+            >
+              
+            </div>
           ))}
         </div>
       </div>

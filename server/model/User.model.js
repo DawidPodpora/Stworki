@@ -79,7 +79,7 @@ export const UserSchema = new mongoose.Schema({
         default:[],
         validate: {
             validator: function (value) {
-                return Array.isArray(value) && value.length <= 15; // Maksymalnie 15 rzeczy
+                return Array.isArray(value) && value.length <= 16; // Maksymalnie 15 rzeczy
             },
         }
     },
