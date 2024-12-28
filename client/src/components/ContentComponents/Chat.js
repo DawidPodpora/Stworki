@@ -37,7 +37,7 @@ function Chat({data}) {
         id: Date.now(),
         userId: data._id,
         text: newMessage,
-        sender: currentUser, // wiadomość od użytkownika
+        sender: currentUser, // wiadomość od użytkownika<-wysyłaćtoken
       };
       socket.current.emit('newMessage',message);
       setNewMessage('');

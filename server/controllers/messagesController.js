@@ -1,11 +1,14 @@
 import Messages from "../model/Messages.js";
-import User from "../model/User.model.js";
+import UserModel from "../model/User.model.js"
 
 //Pobierz wiadomości zalogowanego użytkownika
 export const getuserMessages = async (req, res) => {
-    const userId = req.user._id;
+    const userId = req.user.userId;
+    console.log('Wiadomości dla użytkownika: ', userId);
     try{
-        const messages = await Messages.find({receiverId: userId}).sort({createdAt: -1});
+        const messages = await Messages.find({receiverId: userId})
+        .populate('senderId', 'username')
+        .sort({createdAt: -1 });
         res.status(200).json(messages);
     } catch (error){
         res.status(500).json({error: 'Nie udało się pobrać wiadomości.'});
@@ -14,31 +17,37 @@ export const getuserMessages = async (req, res) => {
 
 //Wysyłanie nowej wiadomości
 export const sendMessage = async (req,res) => {
-    const {receiverUsername, title, content } = req.body;
-    const senderId = req.user._id;
-
+    const {receiver, title, content } = req.body;
+    const senderId = req.user.userId;
     try{
-        const receiver = await User.findOne({username: receiverUsername});
-        if(!receiver){
+        const fullReceiver = await UserModel.findOne({username: receiver});
+        if(!fullReceiver){
             return res.status(404).json({error: 'Odbiorca nie istnieje.' })
         }
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
         const newMessage = new Messages({
             senderId,
-            receiverId: receiver._id,
+            receiverId: fullReceiver._id,
             title,
             content,
+            expiresAt,
         });
+        console.log('test');
         await newMessage.save();
+        
         res.status(201).json({message: 'Wiadomość wysłana.'});
     } catch(error){
+        console.log(error);
         res.status(500).json({error:'Nie udało się wysłać wiadomosci.'});
     }
 };
 
+
 //Usuwanie wiadomości
 export const deleteMessage = async (req, res) => {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     try{
         const message = await Messages.findOneAndDelete({_id: id, receiverId: userId});
@@ -56,7 +65,7 @@ export const deleteMessage = async (req, res) => {
 //Oznaczanie wiadomości jako przeczytana
 export const markMessageAsReaded = async (req, res) => {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     try{
         const message = await Messages.findByIdAndUpdate(

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { setExpiresAt } from '../middleware/messagesMiddleware.js';
 
 const MessagesSchema = new mongoose.Schema({
     senderId: {
@@ -35,7 +34,7 @@ const MessagesSchema = new mongoose.Schema({
       },
 });
 
-MessagesSchema.pre('save',setExpiresAt);
+
 MessagesSchema.index({expiresAt: 1}, {expireAfterSeconds: 0});
 
 const Messages = mongoose.model('Messages', MessagesSchema);
