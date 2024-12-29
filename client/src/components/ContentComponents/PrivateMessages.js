@@ -18,7 +18,7 @@ function PrivateMessages() {
                 });
                 if (response.ok){
                     const data = await response.json();
-                    console.log('Pobrane wiadomości: ',data);
+                    console.log('Pobrane wiadomości: ')
                     setMessages(data);//Ustawienie wiadomości
                 }else{
                     console.error('Błąd podczas pobierania wiadomości');
@@ -74,6 +74,17 @@ function PrivateMessages() {
             console.error('Błąd serwera:', error);
         }
     };
+
+
+/*
+    return(
+        <div className="w-full h-screen bg-black flex flex-col p-5 justify-center text-maincolor4">
+            {/*Zielony komponent na czarnym tle/}
+            <div className="w-full h-full bg-maincolor1 p-5 rounded-xl"></div>
+        </div>
+    );
+*/
+
 
     return (
         <div className="p-6 bg-gray-100 h-screen">
@@ -175,6 +186,7 @@ function PrivateMessages() {
           </div>
         </div>
       );
+      
     }
     
     export default PrivateMessages;
