@@ -5,6 +5,8 @@ function TestButton2({data}) {
   const [species, setSpecies] = useState(null);
   const [itemsFromUser, setItemsFromUser] = useState(null);
   const [visibleCreature, setVisibleCreature] = useState(0);
+  const [itemActionVisible, setItemActionVisible] = useState(false);
+  const [actualItem, setActualItem] = useState([]);
   const fetchUserData = async () => {
     const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
     if (!token) {
@@ -36,6 +38,42 @@ function TestButton2({data}) {
     }
 
 };
+
+
+
+
+const equipeItem = async (itemId, creatureId) => {
+  const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
+  if (!token) {
+      console.warn('Brak tokenu w localStorage');
+      return;
+  }
+
+  try {
+      const response = await fetch(`http://localhost:8080/api/equipeItem?itemId=${itemId}&creatureId=${creatureId} `, {
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
+          },
+      });
+
+      if (!response.ok) {
+          console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+          return;
+      }
+      
+      const data = await response.json();
+      console.log(data);
+      
+      
+  } catch (error) {
+      console.error('Błąd podczas pobierania danych użytkownika:', error);
+  }
+
+};
+
+
+
 useEffect(() => {
       const loadCreaturesAndItemData = async () =>{
        await fetchUserData();
@@ -76,7 +114,20 @@ useEffect(() => {
   const makePanelVisible = () => {
     setPanelVisible(!panelVisible);
   };
+  const makeItemPanelVisible =(itemData)=>{
+    setItemActionVisible(!itemActionVisible);
+    console.log("panel widoczny", itemData);
+    setActualItem(itemData);
+    
+  };
+//zakladanie przedmiotu
 
+const equiqeItemClick = async (itemId, creatureId)=>{
+  await equipeItem(itemId, creatureId);
+  setItemActionVisible(!itemActionVisible);
+  
+    await fetchUserData(); 
+}
   return (
     <div className="w-full h-full bg-black1 flex justify-center p-5 flex-col space-y-4 relative">
       {console.log(itemsFromUser, "items")}
@@ -91,7 +142,7 @@ useEffect(() => {
             className="w-full h-full object-cover rounded-xl"
           />
         </div>
-
+        
         {/* Panel aktywnych przedmiotów */}
         <div className="w-1/6 h-full">
           {itemsActive.map((_, index) => (
@@ -119,6 +170,7 @@ useEffect(() => {
                 {statsNames.map((_, index) => (
                   <div key={index} className="w-full h-1/5 text-center">
                     {console.log(species[visibleCreature].baseStats[index])}
+                    {console.log(creatures[visibleCreature])}
                     {creatures[visibleCreature].staty[index] + species[visibleCreature].baseStats[index] + ((creatures[visibleCreature].level -1) * species[visibleCreature].statsAfterLevel[index])} 
                   </div>
                 ))}
@@ -169,21 +221,38 @@ useEffect(() => {
         </div>
 
         {/* Panel z przedmiotami */}
-        <div className="w-1/2 h-full bg-maincolor1 rounded-xl flex flex-wrap justify-center gap-4 p-4 overflow-y-auto max-h-[60vh]">
+        <div className=" relative w-1/2 h-full bg-maincolor1 rounded-xl flex flex-wrap justify-center gap-4 p-4 overflow-y-auto max-h-[60vh]">
           {items.map((_, index) => (
             <div
               key={index}
               className="w-[6vw] h-[6vw] min-h-[70px] min-w-[70px] bg-black1 bg-opacity-50 rounded-xl border-maincolor4 border-2"
             >
               {itemsFromUser[index] &&(
-                <img src={`images/${itemsFromUser[index].photo}.png`}></img>)
+                <button onClick={()=>makeItemPanelVisible(itemsFromUser[index])}><img src={`images/${itemsFromUser[index].photo}.png` }></img></button>)
               }
              
             </div>
           ))}
+          {itemActionVisible &&(
+        <div className="absolute top-0 left-0 w-full h-full bg-black1 bg-opacity-90 z-10 flex justify-center items-center">
+        <div className="w-[80%] h-[80%] bg-maincolor1 text-maincolor4 p-4 rounded-xl border border-maincolor5 shadow-lg flex justify-center items-center">
+          <p>{actualItem.name}</p>
+          <img className="w-1/2" src={`images/${actualItem.photo}.png`}></img>
+          <button onClick={()=>equiqeItemClick(actualItem._id, creatures[visibleCreature]._id)}>Equipe</button>
+          <button
+            className="absolute top-4 right-4 text-maincolor4 font-bold"
+            onClick={() => setItemActionVisible(false)}
+          >
+            X
+          </button>
         </div>
       </div>
+      )
 
+      }
+        </div>
+      </div>
+      
       {/* Przesuwany panel */}
       <div
         className={`fixed top-[-1vw] right-0 w-[79vw] h-1/2 bg-black1 text-maincolor4 transform transition-transform duration-500 rounded-xl 

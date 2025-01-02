@@ -1,5 +1,5 @@
-import UserModel from "../model/User.model";
-
+import UserModel from "../model/User.model.js";
+import Species from '../model/Species.js';
 export async function EquipItem(req, res) {
     try{
         //do dodania system losujący czy losować item czy nie 
@@ -17,13 +17,32 @@ export async function EquipItem(req, res) {
         if (!creature) {
             return res.status(404).send({ error: 'Stworzenie nie znalezione' });
         }
+        const species = await Species.findOne({ name: creature.species });
         console.log(item, 'Znaleziony przedmiot');
         console.log(creature, 'Znalezione stworzenie');
-        
-
+        console.log(species,'Znaleziony gatunek');
+        if(item.type != 'equipable')
+        {
+            console.log("nie da sie");
+            return res.status(404).send({ error: 'nie można założyć' });
+            
+        }
+        if(creature.items.length >= 3)
+        {
+            return res.status(404).send({ error: 'nie można założyć rzeczy za dużo przedmiotów' });
+        }
+        if(species.element != item.element)
+        {
+            return res.status(404).send({ error: 'nie można założyć rzeczy niewlaściwy element' });
+        }
+        if(user.level < item.levelRequired)
+        {
+            return res.status(404).send({ error: 'za niski poziom' });
+        }
+        creature.items.push(item);
+        user.items = user.items.filter((item) => item._id.toString() !== itemId);
         await user.save();
-        res.status(200).json({
-        });
+        res.status(200).json({message: 'Przedmiot został pomyślnie założony na stworzenie'});
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 
     }
