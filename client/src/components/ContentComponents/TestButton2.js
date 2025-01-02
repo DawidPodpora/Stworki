@@ -79,6 +79,7 @@ useEffect(() => {
 
   return (
     <div className="w-full h-full bg-black1 flex justify-center p-5 flex-col space-y-4 relative">
+      {console.log(itemsFromUser, "items")}
       {creatures ?(<>
       {/* Górny panel (stwór, aktywne przedmioty, statystyki) */}
       <div className="w-full h-1/2 bg-maincolor1 rounded-xl p-4 flex items-center z-0">
@@ -156,8 +157,8 @@ useEffect(() => {
                   className="absolute w-full h-full object-cover rounded-xl"
                 />
                 <div className="p-3 flex flex-col absolute bg-black1 text-maincolor4 w-full h-full text-opacity-0 bg-opacity-0 hover:bg-opacity-70 hover:text-opacity-100 rounded-xl">
-                  {statsNames.map((a, index) =>(
-                    <p>{a}  {creatures[visibleCreature].staty[index] + species[visibleCreature].baseStats[index] + ((creatures[visibleCreature].level -1) * species[visibleCreature].statsAfterLevel[index])}</p>
+                  {statsNames.map((a, ind) =>(
+                    <p>{a} {creatures[index].staty[ind] + species[index].baseStats[ind] + ((creatures[index].level -1) * species[index].statsAfterLevel[ind])}</p>
                   ))
                   }
                   
@@ -174,7 +175,10 @@ useEffect(() => {
               key={index}
               className="w-[6vw] h-[6vw] min-h-[70px] min-w-[70px] bg-black1 bg-opacity-50 rounded-xl border-maincolor4 border-2"
             >
-              
+              {itemsFromUser[index] &&(
+                <img src={`images/${itemsFromUser[index].photo}.png`}></img>)
+              }
+             
             </div>
           ))}
         </div>
