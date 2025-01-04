@@ -13,45 +13,43 @@ function MainPage() {
   const [creatureData, setNewCreatureData] = useState();
   const [userFullData, setUserFullData] = useState(null);
 
-
-  const fetchUserData = async () => {
-    const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
-    if (!token) {
-        console.warn('Brak tokenu w localStorage');
-        return;
-    }
-
-    try {
-        const response = await fetch('http://localhost:8080/api/userData', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
-            },
-        });
-
-        if (!response.ok) {
-            console.error('Błąd pobierania danych użytkownika:', response.statusText);
-            return;
-        }
-        
-        const data = await response.json();
-        setUserFullData(data);
-        setUsername(data.username); // Aktualizacja stanu z nazwą użytkownika
-        if(data.isFirstLog === true)
-        {
-          setFirstChoice(true);
-          
-        }
-    } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
-    }
-
-};
     useEffect(() => {
+      const fetchUserData = async () => {
+          const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
+          if (!token) {
+              console.warn('Brak tokenu w localStorage');
+              return;
+          }
+  
+          try {
+              const response = await fetch('http://localhost:8080/api/userData', {
+                  method: 'GET',
+                  headers: {
+                      'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
+                  },
+              });
+  
+              if (!response.ok) {
+                  console.error('Błąd pobierania danych użytkownika:', response.statusText);
+                  return;
+              }
+              
+              const data = await response.json();
+              setUserFullData(data);
+              setUsername(data.username); // Aktualizacja stanu z nazwą użytkownika
+              if(data.isFirstLog === true)
+              {
+                setFirstChoice(true);
+                
+              }
+          } catch (error) {
+              console.error('Błąd podczas pobierania danych użytkownika:', error);
+          }
+
+      };
+  
       fetchUserData(); // Wywołanie funkcji
   }, []);
-
-console.log("tak",userFullData);
   // Stan dla widoczności panelu opcji
   const [isOptionsVisible, setOptionsVisible] = useState(false);
   
@@ -78,9 +76,6 @@ console.log("tak",userFullData);
     console.log("zmiana na co innego");
     setNewCreatureData(creatureData);
     nameForCreatureSwitch();
-  }
-  const downloadDataByClick =()=>{
-    fetchUserData();
   }
   // Wygląd strony
   return (

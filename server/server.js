@@ -60,7 +60,7 @@ io.on('connection', (socket) => {
     socket.on('newMessage', (message) => {
         console.log('New message received:', message);
         io.emit('newMessage', message); // Wysyłanie wiadomości do wszystkich
-      });
+    });
     //obsługa rozłączenia użytkownika
     socket.on('disconnect', () => {
         console.log('Użytkownik rozłączony:', socket.id);

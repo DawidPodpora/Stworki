@@ -9,6 +9,8 @@ import { getCreaturesbyName } from "../controllers/creaturesFight.js";
 import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
 import * as items  from "../controllers/itemCreating.js";
+import * as messagesController from '../controllers/messagesController.js';
+
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -61,4 +63,9 @@ router.route('/ItemToEq').post(items.ItemToEq);
 router.route('/ItemShop').get(Auth, items.ItemsToShop);
 router.route('/BuyItem').get(Auth, items.BuyItem);
 router.route('/SellItem').get(Auth, items.SellItem);
+//Wiadomości
+router.route('/messages').get(Auth, messagesController.getuserMessages);
+router.route('/message').post(Auth, messagesController.sendMessage);
+router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
+router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
