@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-function PrivateMessages() {
+function PrivateMessages({data}) {
     const [messages, setMessages] = useState([]); //Przechowywanie wiadomości użytkownika
     const [newMessage, setNewMessage] = useState({receiver: '', title: '', content: ''});//Nowa wiadomość
     const [selectedMessage, setSelectedMessage] = useState(null); //wybrana wiadomość
     const token = localStorage.getItem('token');
+    const [showSendModal, setShowSendModal] = useState(false);
+    const currentUser = data.username;
 
     //Pobieranie wiadomości po załadowaniu komponentu
     useEffect(() => {
@@ -36,6 +38,10 @@ function PrivateMessages() {
             alert('Wszystkie pola są wymagane!');
             return;
         }
+        if(newMessage.receiver === currentUser) {
+            alert('Nie możesz wysłać wiadomości do samego siebie.');
+            return;
+        }
         try{
             const response = await fetch('http://localhost:8080/api/message', {
                 method: 'POST',
@@ -48,8 +54,10 @@ function PrivateMessages() {
             if(response.ok){
                 alert('Wiadomość wysłana!');
                 setNewMessage({receiver: '', title: '', content: ''}); //reset formularza
+                setShowSendModal(false);
             } else {
-                console.error('Błąd podczas wysyłania wiadomości');
+                const errorData = await response.json();
+                alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
             }
         } catch (error) {
             console.error('Błąd serwera:', error);
@@ -75,118 +83,131 @@ function PrivateMessages() {
         }
     };
 
+    //Oznaczanie wiadomości jako przeczytana
+    const markMessageAsReaded = async (messageId) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/messages/${messageId}/read`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (!response.ok) 
+            {
+                throw new Error('Nie udało się oznaczyć wiadomości jako przeczytanej.');
+            }
+            console.log(`Wiadomość ${messageId} oznaczona jako przeczytana.`);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
 
-/*
+
     return(
         <div className="w-full h-screen bg-black flex flex-col p-5 justify-center text-maincolor4">
-            {/*Zielony komponent na czarnym tle/}
-            <div className="w-full h-full bg-maincolor1 p-5 rounded-xl"></div>
+            {/*Zielony komponent na czarnym tle*/}
+            <div className="w-full h-full bg-maincolor1 p-5 rounded-xl">
+                <div className="flex justify-between items-center mb-b">
+                    <h1 className="text-2xl font-bold">Wiadomości prywatne</h1>
+                    <button
+                    onClick={() => setShowSendModal(true)}
+                    className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
+                    >
+                        Wyślij wiadomość
+                    </button>
+                </div>
+                {/*Lista wiadomości */}
+                <div className="p-4 rounded-xl overflow-y-auto space-y-4 h-[90vh]">
+                    {messages.length > 0 ? (
+                        messages.map((msg) => (
+                            <div
+                            key={msg._id}
+                            className={`p-4 rounded-lg shadow-md border ${
+                                msg.isRead ? "border-maincolor2" : "border-maincolor5"
+                            }`}
+                            >
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <p className="font-bold">{msg.title}</p>
+                                        <p className="text-sm">Od: {msg.senderId.username}</p>
+                                        <p className="text-xs">{new Date(msg.createdAt).toLocaleString()}</p>
+                                    </div>
+                                    <button
+                                    onClick={() => deleteMessage(msg._id)}
+                                    className="text-red-500 hover:text-red-700 text-sm"
+                                    >
+                                        Usuń
+                                    </button>
+                                </div>
+                                <button
+                                onClick={() => {
+                                    setSelectedMessage(selectedMessage === msg ? null : msg);
+                                    if (!msg.isRead) markMessageAsReaded(msg._id);
+                                }}
+                                className="mt-2 text-blue-500 hover:underline"
+                                >
+                                    {selectedMessage === msg ? "Zwiń" : "Zobacz szczegóły"}
+                                </button>
+                                {selectedMessage === msg && (
+                                    <div className="mt-4">
+                                        <p className="text-sm">{msg.content}</p>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center">Brak wiadomości</p>
+                    )}
+                </div>
+            </div>
+            
+            {/*Modal do wysyłania wiadomości*/}
+            {showSendModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+                    <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/2">
+                        <h2 className="text-lg font-bold mb-4">Wyślij wiadomość</h2>
+                        <input
+                        type="text"
+                        placeholder="Odbiorca"
+                        value={newMessage.receiver}
+                        onChange={(e) => setNewMessage({...newMessage, receiver: e.target.value})}
+                        className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                        />
+                        <input
+                        type="text"
+                        placeholder="Tytuł"
+                        value={newMessage.title}
+                        onChange={(e) => setNewMessage({...newMessage, title: e.target.value})}
+                        className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                        />
+                        <textarea
+                        type="text"
+                        placeholder="Treść"
+                        value={newMessage.content}
+                        onChange={(e) => setNewMessage({...newMessage, content: e.target.value})}
+                        className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                        />
+                        <div className="flex justify-end space-x-2">
+                            <button
+                            onClick={() => {
+                                setShowSendModal(false);
+                                setNewMessage({receiver:'', title:'', content:''});
+                            }}
+                            className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                            onClick={sendMessage}
+                            className="bg-maincolor4 text-black px-4 py-2 rounded shadow hover:bg-opacity-80"
+                            >
+                                Wyślij
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
-*/
-
-
-    return (
-        <div className="p-6 bg-gray-100 h-screen">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Wiadomości prywatne</h2>
-    
-          {/* Lista wiadomości */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Twoje wiadomości</h3>
-            {messages.length > 0 ? (
-              <ul className="space-y-4">
-                {messages.map((msg) => (
-                  <li
-                    key={msg._id}
-                    className={`p-4 rounded-lg shadow-md border ${
-                      msg.isRead ? 'bg-white' : 'bg-blue-50'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-gray-800">{msg.title}</span>
-                      <button
-                        onClick={() => deleteMessage(msg._id)}
-                        className="text-red-500 hover:text-red-700 text-sm"
-                      >
-                        Usuń
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">Od: {msg.senderId.username}</p>
-                    <button
-                      onClick={() => setSelectedMessage(msg)}
-                      className="text-blue-500 hover:underline mt-2"
-                    >
-                      Zobacz szczegóły
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-600">Brak wiadomości</p>
-            )}
-          </div>
-    
-          {/* Wyświetlanie szczegółów wiadomości */}
-          {selectedMessage && (
-            <div className="mb-8 bg-white shadow-md rounded-lg p-6 border">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">Szczegóły wiadomości</h3>
-              <p>
-                <strong>Od:</strong> {selectedMessage.senderUsername}
-              </p>
-              <p>
-                <strong>Tytuł:</strong> {selectedMessage.title}
-              </p>
-              <p>
-                <strong>Treść:</strong> {selectedMessage.content}
-              </p>
-              <button
-                onClick={() => setSelectedMessage(null)}
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-              >
-                Zamknij
-              </button>
-            </div>
-          )}
-    
-          {/* Formularz wysyłania nowej wiadomości */}
-          <div className="bg-white shadow-md rounded-lg p-6 border">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Wyślij nową wiadomość</h3>
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Odbiorca"
-                value={newMessage.receiver}
-                onChange={(e) => setNewMessage({ ...newMessage, receiver: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Tytuł"
-                value={newMessage.title}
-                onChange={(e) => setNewMessage({ ...newMessage, title: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <textarea
-                placeholder="Treść"
-                value={newMessage.content}
-                onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={sendMessage}
-              className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
-            >
-              Wyślij
-            </button>
-          </div>
-        </div>
-      );
-      
-    }
-    
-    export default PrivateMessages;
+}
+export default PrivateMessages;
