@@ -51,10 +51,26 @@ export async function EquipItem(req, res) {
 
 export async function UnEquipItem(req, res) {
     try{
+        console.log('aaaaaaaaa');
         //do dodania system losujący czy losować item czy nie 
         const userId = req.user.userId;
+        const {itemId, creatureId} = req.query;
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
+        }
+        const creature = user.creatures.find((creature) => creature._id.toString() === creatureId);
+        const item = creature.items.find((item)=> item._id.toString() === itemId);
+        console.log(creature);
+        console.log(item);
+        if(user.items.length >= 15)
+        {
+            return res.status(404).send({ error: 'brak miejsca w eq' });
+        }
+        user.items.push(item);
+        creature.items = creature.items.filter((item) => item._id.toString() !== itemId);
         await user.save();
-        res.status(200).json({
+        res.status(200).json({message: 'Przedmiot został pomyślnie założony na stworzenie'
         });
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 

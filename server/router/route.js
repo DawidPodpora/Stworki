@@ -63,4 +63,5 @@ router.route('/ItemShop').get(Auth, items.ItemsToShop);
 router.route('/BuyItem').get(Auth, items.BuyItem);
 router.route('/SellItem').get(Auth, items.SellItem);
 router.route('/equipeItem').get(Auth, itemsActions.EquipItem);
+router.route('/unequipeItem').get(Auth, itemsActions.UnEquipItem);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
