@@ -78,10 +78,51 @@ export async function UnEquipItem(req, res) {
     
 }
 
-export async function GiveUnequipableItem(req, res) {
+export async function UseUsableItem(req, res) {
     try{
         //do dodania system losujący czy losować item czy nie 
         const userId = req.user.userId;
+        const {itemId, creatureId} = req.query;
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
+        }
+        const item = user.items.find((item) => item._id.toString() === itemId);
+        if (!item) {
+            return res.status(404).send({ error: 'Przedmiot nie znaleziony' });
+        }
+        const creature = user.creatures.find((creature) => creature._id.toString() === creatureId);
+        if (!creature) {
+            return res.status(404).send({ error: 'Stworzenie nie znalezione' });
+        }
+        const species = await Species.findOne({ name: creature.species });
+        console.log(item, 'Znaleziony przedmiot');
+        console.log(creature, 'Znalezione stworzenie');
+        console.log(species,'Znaleziony gatunek');
+        if(species.element !== item.element)
+        {
+            return res.status(404).send({error: 'Niepasujace typy '});
+        }
+        if(item.power === 1){
+            creature.staty[0] += 1;
+        }
+        if(item.vitality === 1)
+        {
+            creature.staty[1] += 1;
+        }
+        if(item.strength === 1)
+        {
+            creature.staty[2] += 1;
+        }
+        if(item.dexterity === 1)
+        {
+            creature.staty[3] += 1;
+        }
+        if(item.intelligence === 1)
+        {
+            creature.staty[4] += 1;
+        }
+        user.items = user.items.filter((item) => item._id.toString() !== itemId);
         await user.save();
         res.status(200).json({
         });

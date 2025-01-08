@@ -74,6 +74,34 @@ function TestButton2({data}) {
     }
   };
 
+  const useItem = async (itemId, creatureId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.warn('Brak tokenu w localStorage');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/useItem?itemId=${itemId}&creatureId=${creatureId} `, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log(data);
+        
+    } catch (error) {
+        console.error('Błąd podczas pobierania danych użytkownika:', error);
+    }
+  };
+
   const unequipeItem = async (itemId, creatureId) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -100,6 +128,37 @@ function TestButton2({data}) {
     } catch (error) {
         console.error('Błąd podczas pobierania danych użytkownika:', error);
     }
+  };
+
+
+  const sendOrb = async (choice) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.warn('Brak tokenu w localStorage');
+        return;
+    }
+    console.log("cos");
+    try{
+        console.log("cos1");
+        const response = await fetch('http://localhost:8080/api/OrbDraw',{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({orb: choice}),
+        });
+        console.log("cos2");
+        if (!response.ok) {
+            throw new Error(`Błąd ${response.status}: ${response.statusText}`);
+          }
+        const data = await response.json();
+        return data;
+    }catch(error){
+        console.error('Błąd podczas wysyłania danych:', error);
+        setResponseMessage('Wystąpił błąd podczas wysyłania danych.');
+    }
+    
   };
 
   useEffect(() => {
@@ -153,6 +212,11 @@ function TestButton2({data}) {
     await fetchUserData(); 
   };
 
+  const useItemClick = async (itemId, creatureId)=>{
+    await useItem(itemId, creatureId);
+    setItemActionVisible(!itemActionVisible);
+    await fetchUserData(); 
+  };
   // DODANE (2) – Funkcje do obsługi zdarzeń myszy (hover) dla tooltipa
   const handleMouseEnter = (event, item, type) => {
     // Ustaw pozycję tooltipa
@@ -306,7 +370,18 @@ function TestButton2({data}) {
                   <div className="w-[80%] h-[80%] bg-maincolor1 text-maincolor4 p-4 rounded-xl border border-maincolor5 shadow-lg flex justify-center items-center relative">
                     <p>{actualItem.name}</p>
                     <img className="w-1/2" src={`images/${actualItem.photo}.png`} alt="" />
-                    <button onClick={() => equiqeItemClick(actualItem._id, creatures[visibleCreature]._id)}>Equipe</button>
+                    {
+                      console.log(actualItem.type)
+                    }
+                    {actualItem.type === "orb" &&(
+                      <button onClick={() => equiqeItemClick(actualItem._id, creatures[visibleCreature]._id)}>Use</button>)
+                    }
+                    {actualItem.type === "equipable" &&
+                       (<button onClick={() => equiqeItemClick(actualItem._id, creatures[visibleCreature]._id)}>Equipe</button>)
+                    }
+                    {actualItem.type === "usable" &&
+                       (<button onClick={() => useItemClick(actualItem._id, creatures[visibleCreature]._id)}>Use</button>)
+                    }
                     <button
                       className="absolute top-4 right-4 text-maincolor4 font-bold"
                       onClick={() => setItemActionVisible(false)}

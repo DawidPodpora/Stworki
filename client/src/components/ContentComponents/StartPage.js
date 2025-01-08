@@ -3,7 +3,7 @@ import Chat from './Chat';
 import Notice from './Notice'; // Komponent do wyświetlania ogłoszeń
 
 function StartPage({data}) {
-  console.log('towjastara',data);
+  
   // Treści ogłoszeń
   const notices = [
     {
