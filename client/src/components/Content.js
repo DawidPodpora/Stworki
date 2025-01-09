@@ -1,9 +1,10 @@
 import TestButton2 from './ContentComponents/TestButton2.js'; // Import komponentu TestButton2
 import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponentu TestButton3
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
+import PrivateMessages from './ContentComponents/PrivateMessages.js';
 
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
-function Content({ selectedButton }) {
+function Content({ selectedButton, data}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
@@ -18,6 +19,9 @@ function Content({ selectedButton }) {
     case 3:
       ComponentToRender = TestButton3; // Wybrany komponent: TestButton3
       break;
+    case 4:
+      ComponentToRender = PrivateMessages;
+      break;
     default:
       // Domyślny przypadek, gdy `selectedButton` nie pasuje do żadnej wartości
       ComponentToRender = () => <div>Brak komponentu do renderowania</div>;
@@ -28,7 +32,7 @@ function Content({ selectedButton }) {
   return (
     <div className="absolute w-4/5 bg-black1 h-screen right-0">
       {/* Renderowanie wybranego komponentu */}
-      <ComponentToRender />
+      <ComponentToRender data = {data}/>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'; // Importowanie biblioteki jwt do obsługi tokenów JWT
-import ENV from '../config.js' // Importowanie zmiennych środowiskowych z pliku konfiguracyjnego
+import ENV from '../config.js'; // Importowanie zmiennych środowiskowych z pliku konfiguracyjnego
+import User from '../model/User.model.js';
 
 /** Middleware autoryzacji */
 export default async function Auth(req, res, next){
@@ -33,4 +34,21 @@ export function localVariables(req, res, next){
 
     // Przekazanie kontroli do kolejnego middleware lub trasy
     next()
+}
+/** Middleware do sprawdzania uprawnień administratora */
+
+export async function verifyAdmin(req, res, next) {
+    try{
+        //Pobranie użytkownika z bazy danych na podstawie ID zdekodowanego tokenu
+        const user = await User.findById(req.user.id);
+
+        if(user && user.isAdmin){
+            next();
+        } else{
+            res.status(403).json({ error: "Access Denied: Admins only!"});
+        }
+    } catch(error){
+        res.status(500).json({error: "Server Error"});
+    }
+    
 }

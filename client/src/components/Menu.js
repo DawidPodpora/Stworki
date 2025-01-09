@@ -1,27 +1,29 @@
-import React from 'react'; // Import biblioteki React
+import React, { useState, useEffect } from 'react' // Import biblioteki React
 import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation` z biblioteki do obsługi tłumaczeń
 
 // Komponent Menu
 // `toogleOptions` - funkcja do przełączania opcji
 // `onButtonClick` - funkcja obsługująca kliknięcia przycisków w menu
-function Menu({ toogleOptions, onButtonClick }) {
+function Menu({ toogleOptions, onButtonClick, username }) {
   const { t } = useTranslation(); // Funkcja `t` służy do tłumaczeń w `react-i18next`
-  
   // Lista etykiet dla przycisków menu, przetłumaczona za pomocą `t`
   const buttonLabels = [
-    t('Strona główna'), // Tłumaczenie dla "Strona główna"
-    t('Moje stworki'),  // Tłumaczenie dla "Moje stworki"
-    t('Sklep'),         // Tłumaczenie dla "Sklep"
-    t('optionD'),       // Tłumaczenie dla dodatkowej opcji D
-    t('optionE'),       // Tłumaczenie dla dodatkowej opcji E
-    t('optionF'),       // Tłumaczenie dla dodatkowej opcji F
-    t('optionG')        // Tłumaczenie dla dodatkowej opcji G
+    t('Strona główna'),       // Tłumaczenie dla "Strona główna"
+    t('Moje stworki'),        // Tłumaczenie dla "Moje stworki"
+    t('Sklep'),               // Tłumaczenie dla "Sklep"
+    t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
+    t('optionE'),             // Tłumaczenie dla dodatkowej opcji E
+    t('optionF'),             // Tłumaczenie dla dodatkowej opcji F
+    t('optionG')              // Tłumaczenie dla dodatkowej opcji G
   ];
   
   // Wygląd i logika komponentu
   return (
     <div className="relative flex flex-col items-center bg-maincolor1 text-maincolor4 space-y-4 w-1/5 h-screen rounded-xl pt-10 border-r-2 border-maincolor5">
       {/* Przyciski menu */}
+      <div>
+            {username ? <h1>Witaj, {username}!</h1> : <p>Ładowanie danych użytkownika...</p>}
+        </div>
       {buttonLabels.map((label, index) => (
         <button
           key={index} // Unikalny klucz dla każdego przycisku

@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt'; // Importowanie biblioteki bcrypt do haszowania has
 import jwt from 'jsonwebtoken'; // Importowanie biblioteki jsonwebtoken do generowania tokenów JWT
 import ENV from '../config.js' // Importowanie pliku konfiguracyjnego z ustawieniami środowiskowymi
 import otpGenerator from 'otp-generator' // Importowanie biblioteki do generowania jednorazowych haseł (OTP)
-
+import Species from '../model/Species.js';
+import Creatures from '../model/Creature.js';
 /** middleware do weryfikacji użytkownika */
 export async function verifyUser(req, res, next){
     try {
@@ -184,7 +185,7 @@ export async function updateUser(req, res) {
             // Dodanie pola selectedEgg do danych użytkownika
             const updatedData = {
                 ...body,
-                selectedEgg: body.selectedEgg || undefined // Jeśli selectedEgg nie jest podane, nie zmieniać
+                selectedEgg: body.selectedEgg || undefined // Jeśli selectedEgg nie jest podane, nie
             };
 
             // Aktualizacja danych użytkownika w bazie danych
@@ -270,6 +271,172 @@ export async function resetPassword(req,res){
 
     } catch (error) {
         return res.status(401).send({ error })
+    }
+}
+
+export async function getUserData(req,res)
+{
+    try {
+        const userId = req.user.userId; // Pobranie userId z middleware
+        const user = await UserModel.findById(userId).select('-password'); // Znalezienie użytkownika
+        if (!user) {
+            return res.status(404).send({ error: 'Użytkownik nie znaleziony!' });
+        }
+        res.status(200).send(user); // Zwrócenie danych użytkownika
+    } catch (error) {
+        res.status(500).send({ error: 'Błąd serwera' });
+    }
+}
+// losowanie potworków na podstawie elementu
+const drawWithElement = async(element) =>
+{
+    try{
+    const species = await Species.find({element: element});
+    if (species.length === 0) {
+        console.log(`Nie znaleziono gatunków o elemencie: ${element}`);
+        return null;
+
+    }
+    console.log(species);
+    const randomIndex = Math.floor(Math.random() * species.length);
+    const randomSpecies = species[randomIndex];
+    console.log(randomIndex);
+    console.log(randomSpecies);
+    console.log(randomSpecies.name,"bbbbbbb");
+    return randomSpecies.name;
+    }catch(error){
+        console.error('Błąd podczas losowania gatunku:', error);
+        throw error;
+    }
+}
+
+export async function OrbDraw(req,res) {
+    try{
+        const {orb} = req.body;
+        if(!orb)
+        {
+            return res.status(400).json({ error: 'Nie podano orb' });
+        }
+        console.log(orb);
+        console.log("aaaaaa");
+        const userId = req.user.userId;
+        const user = await UserModel.findById(userId);
+        console.log("bbbbbb");
+        if(!user)
+        {
+            return res.status(404).json({ error: 'Użytkownik nie został znaleziony' });
+        }
+        console.log("ccccccc");
+        if(user.isFirstLog)
+        {
+            user.isFirstLog = false;  
+        }
+        else{
+            if(user.creature.lenght > 0)
+            {
+                return res.status(404).json({ error: 'nie można wykonać akcji' });
+            }
+        }
+        console.log("dddddd");
+        if(user.isFirstLog)
+        {
+            return res.status(404).json({ error: 'nie można wykonać akcji' });
+        }
+        
+        console.log("eeeeee");
+        const newSpeciesName = await drawWithElement(orb);
+        console.log(newSpeciesName, "aaaaaaaaa");
+        console.log("fffffff");
+        const newCreature = {
+            name: newSpeciesName,
+            staty:[0,0,0,0,0],
+            level:1,
+            species: newSpeciesName,
+            energy: 100,
+            exp: 0,
+            items:[]
+        };
+        console.log(newCreature);
+        console.log("hhhhhh");
+        user.creatures.push(newCreature);
+        console.log(user);
+        await user.save();
+        const createdCreature = user.creatures[user.creatures.length - 1];
+        res.status(200).json({
+            message: `Pole isFirstLog zmienione na false dla użytkownika ${user.username}`,
+            NewCreature: createdCreature
+        });
+    }catch(error)
+    {
+        res.status(500).send({ error: 'Błąd serwera' });
+    }
+    
+}
+export async function creatureNewPhoto(req, res){
+    try{
+        console.log("aaaaaa");
+        const {speciesName} = req.query;
+        console.log(speciesName);
+        const species = await Species.findOne({name: speciesName});
+        console.log("bbbbbb");
+        console.log(species);
+        console.log(species.photos[0]);
+        console.log(species.photos[0]);
+        const photo = species.photos[0];
+        console.log(photo);
+        res.status(200).send({photoName: photo});
+    }catch(error){
+        res.status(500).send({ error: 'Błąd serwera przy pobieraniu zdjęcia' });
+    }
+    
+}
+export async function newNameForCreature(req, res)
+{
+    try{
+        const userId = req.user.userId; // Pobranie userId z middleware
+        const user = await UserModel.findById(userId).select('-password');
+        const { newName, creatureid } = req.body; // Pobranie nowej nazwy i ID stworzenia z żądania
+        if (!newName || !creatureid) {
+            return res.status(400).send({ error: 'Brak wymaganych danych: newName lub creatureid' });
+        }
+        const creature = user.creatures.find(creature => creature._id.toString() === creatureid);
+        if (!creature) {
+            return res.status(404).send({ error: 'Nie znaleziono stworzenia o podanym ID' });
+        }
+        creature.name = newName;
+        await user.save();
+    }catch(error){
+        res.status(500).send({ error: 'Błąd serwera przy nadawaniu nowej nazwy' }); 
+    }
+}
+
+
+export async function fullDataForAllCreatures(req, res)
+{
+    try{
+        console.log("pobieranie stworkow");
+        const userId = req.user.userId;
+        const creaturesanditems = await UserModel.findById(userId).select('creatures items',);
+        const creatures = creaturesanditems.creatures;
+        const items = creaturesanditems.items;
+        const speciesData = [];
+        for(let i = 0; i < creatures.length; i++){
+            const creatureName = creatures[i].species;
+            const species = await Species.findOne({name:creatureName});
+            if(species){
+                speciesData.push(species);
+            }else{
+                console.log(`Nie znaleziono stworzenia o nazwie: ${species}`);
+            }
+
+        }
+        res.status(200).send({
+            species: speciesData, 
+            creatures: creatures,
+            items: items
+        });
+    }catch(error){
+        res.status(500).send({ error: 'Błąd serwera przy pobieraniu danych o stworkach' }); 
     }
 }
 

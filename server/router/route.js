@@ -4,13 +4,26 @@ const router = Router();
 /** import wszystkich kontrolerów */
 import * as controller from '../controllers/appController.js'; // Importowanie wszystkich kontrolerów aplikacji
 import { registerMail } from '../controllers/mailer.js'; // Importowanie funkcji do wysyłania e-maili
-import Auth, { localVariables } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
-
+import Auth, { localVariables, verifyAdmin } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
+import { getCreaturesbyName } from "../controllers/creaturesFight.js";
+import { createNewSpecies } from "../middleware/newSpecies.js";
+import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
+import * as items  from "../controllers/itemCreating.js";
+import * as messagesController from '../controllers/messagesController.js';
+import { getAllNotices, createNotice, deleteNotice } from "../controllers/noticeController.js";
 
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
+//Wybor pierwszego orba
+router.route('/OrbDraw').post(Auth, controller.OrbDraw);
+//wysłanie zdjęcia wylosowanego stworka
+router.route('/speciesPhoto').get(Auth, controller.creatureNewPhoto);
+//Pobranie nazwy dla nowego stworka
 
+router.route('/usersCreaturesAndItemsData').get(Auth, controller.fullDataForAllCreatures);
+
+router.route('/setNewName').post(Auth,controller.newNameForCreature);
 // Ścieżka do wysyłania e-maila rejestracyjnego
 router.route('/registerMail').post(registerMail); // wysyłanie e-maila
 
@@ -42,5 +55,22 @@ router.route('/updateuser').put(Auth, controller.updateUser); // aktualizacja pr
 // Ścieżka do resetowania hasła użytkownika
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); // resetowanie hasła
 
-
+router.route('/creaturesFight').get(getCreaturesbyName);
+router.route('/userData').get(Auth, controller.getUserData);
+router.route('/newSpecie').post(createNewSpecies);
+router.route('/newItemBaseData').post(createNewItemBaseData);
+router.route('/ItemsToShop').get(items.ItemsToShop);
+router.route('/ItemToEq').post(items.ItemToEq);
+router.route('/ItemShop').get(Auth, items.ItemsToShop);
+router.route('/BuyItem').get(Auth, items.BuyItem);
+router.route('/SellItem').get(Auth, items.SellItem);
+//Wiadomości
+router.route('/messages').get(Auth, messagesController.getuserMessages);
+router.route('/message').post(Auth, messagesController.sendMessage);
+router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
+router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
+//Ogłoszenia
+router.route('/notices').get(getAllNotices);
+router.route('/notices').post(verifyAdmin, createNotice);
+router.route('/notices/:id').delete(verifyAdmin, deleteNotice);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

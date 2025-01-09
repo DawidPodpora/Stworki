@@ -1,11 +1,26 @@
 import express from 'express'; // Importowanie frameworka Express
 import cors from 'cors'; // Importowanie middleware dla obsługi CORS
 import morgan from 'morgan'; // Importowanie middleware dla logowania HTTP
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import connect from './database/conn.js'; // Importowanie funkcji do połączenia z bazą danych
 import router from './router/route.js'; // Importowanie tras (routes) aplikacji
 
+
+
+
 const app = express(); // Tworzenie instancji aplikacji Express
 const port = 8080; // Ustawienie portu, na którym serwer będzie nasłuchiwał
+const httpServer = createServer(app); //Stworzenie serwera HTTP na podstawie aplikacji Express
+
+//Stworzenie instancji Socket.IO i połączenie z serwerem HTTP
+const io = new Server(httpServer, {
+    cors: {
+        origin: 'http://localhost:3000',
+        methods: ['GET', 'POST'],
+    },
+});
+
 
 /** Middlewares */
 app.use(cors({ origin: 'http://localhost:3000' })); 
@@ -33,11 +48,30 @@ app.get('/', (req, res) => {
 app.use('/api', router); 
 // Przypisanie tras API (importowanych z router/route.js) do ścieżki '/api'. Wszystkie trasy będą zaczynały się od '/api'
 
+// Przechowywanie wiadomości czatu w pamięci (tymczasowe)
+let chatMessages = []; //<---------------------------------------
+
+//Socket.IO Communication
+io.on('connection', (socket) => {
+    console.log('Nowe połącznie: ', socket.id);
+    //wysyłanie historii czatu do nowego użytkownika
+    socket.emit('chatHistory', chatMessages);
+    //obsługa odbioru nowej wiadomości
+    socket.on('newMessage', (message) => {
+        console.log('New message received:', message);
+        io.emit('newMessage', message); // Wysyłanie wiadomości do wszystkich
+    });
+    //obsługa rozłączenia użytkownika
+    socket.on('disconnect', () => {
+        console.log('Użytkownik rozłączony:', socket.id);
+    });
+});
+
 /** Start server only when we have valid connection */
 connect().then(() => {
     try {
         // Jeśli połączenie z bazą danych uda się, uruchomienie serwera
-        app.listen(port, () => {
+        httpServer.listen(port, () => {
             console.log(`Server connected to http://localhost:${port}`); 
             // Logowanie komunikatu o udanym uruchomieniu serwera
         });
