@@ -10,6 +10,8 @@ import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
 import * as items  from "../controllers/itemCreating.js";
 import * as itemsActions from "../controllers/itemsActions.js";
+import * as messagesController from '../controllers/messagesController.js';
+
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -66,4 +68,9 @@ router.route('/equipeItem').get(Auth, itemsActions.EquipItem);
 router.route('/unequipeItem').get(Auth, itemsActions.UnEquipItem);
 router.route('/useItem').get(Auth,itemsActions.UseUsableItem);
 router.route('/useOrb').get(Auth, itemsActions.OrbUse);
+//Wiadomości
+router.route('/messages').get(Auth, messagesController.getuserMessages);
+router.route('/message').post(Auth, messagesController.sendMessage);
+router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
+router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
