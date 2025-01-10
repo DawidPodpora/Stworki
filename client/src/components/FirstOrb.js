@@ -57,7 +57,6 @@ function FirstOrb({firsOrbActiveButton,  NewCreatureActiveButton}) {
        
         firsOrbActiveButton();
         sendFirstOrb().then((response)=>{
-          console.log(response, "dupa dupa");
           NewCreatureActiveButton(response.NewCreature);
         })
     }

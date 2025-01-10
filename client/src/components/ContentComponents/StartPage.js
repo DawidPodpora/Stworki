@@ -3,6 +3,7 @@ import Chat from './Chat';
 import Notice from './Notice'; // Komponent do wyświetlania ogłoszeń
 
 function StartPage({data}) {
+  
   // Treści ogłoszeń
   const notices = [
     {

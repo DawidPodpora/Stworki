@@ -9,13 +9,14 @@ import { getCreaturesbyName } from "../controllers/creaturesFight.js";
 import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
 import * as items  from "../controllers/itemCreating.js";
+import * as itemsActions from "../controllers/itemsActions.js";
 import * as messagesController from '../controllers/messagesController.js';
 
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
 //Wybor pierwszego orba
-router.route('/OrbDraw').post(Auth, controller.OrbDraw);
+router.route('/OrbDraw').post(Auth, itemsActions.OrbDraw);
 //wysłanie zdjęcia wylosowanego stworka
 router.route('/speciesPhoto').get(Auth, controller.creatureNewPhoto);
 //Pobranie nazwy dla nowego stworka
@@ -63,6 +64,10 @@ router.route('/ItemToEq').post(items.ItemToEq);
 router.route('/ItemShop').get(Auth, items.ItemsToShop);
 router.route('/BuyItem').get(Auth, items.BuyItem);
 router.route('/SellItem').get(Auth, items.SellItem);
+router.route('/equipeItem').get(Auth, itemsActions.EquipItem);
+router.route('/unequipeItem').get(Auth, itemsActions.UnEquipItem);
+router.route('/useItem').get(Auth,itemsActions.UseUsableItem);
+router.route('/useOrb').get(Auth, itemsActions.OrbUse);
 //Wiadomości
 router.route('/messages').get(Auth, messagesController.getuserMessages);
 router.route('/message').post(Auth, messagesController.sendMessage);
