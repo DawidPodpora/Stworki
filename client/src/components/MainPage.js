@@ -93,7 +93,7 @@ console.log("tak",userFullData);
       />
 
       {/* Komponent treści, wyświetlający zawartość na podstawie wybranego przycisku */}
-      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} />)}
+      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} NewCreatureActiveButton={NewCreatureActiveButton}/>)}
 
       {/* Warunkowe wyświetlanie panelu opcji */}
       {isOptionsVisible && (

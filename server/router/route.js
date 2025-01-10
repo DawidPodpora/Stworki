@@ -14,7 +14,7 @@ import * as itemsActions from "../controllers/itemsActions.js";
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
 //Wybor pierwszego orba
-router.route('/OrbDraw').post(Auth, controller.OrbDraw);
+router.route('/OrbDraw').post(Auth, itemsActions.OrbDraw);
 //wysłanie zdjęcia wylosowanego stworka
 router.route('/speciesPhoto').get(Auth, controller.creatureNewPhoto);
 //Pobranie nazwy dla nowego stworka
@@ -65,4 +65,5 @@ router.route('/SellItem').get(Auth, items.SellItem);
 router.route('/equipeItem').get(Auth, itemsActions.EquipItem);
 router.route('/unequipeItem').get(Auth, itemsActions.UnEquipItem);
 router.route('/useItem').get(Auth,itemsActions.UseUsableItem);
+router.route('/useOrb').get(Auth, itemsActions.OrbUse);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

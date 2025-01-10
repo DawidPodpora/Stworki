@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";  // Importujemy React oraz useState do obsługi stanów.
 
-function TestButton2({data}) {
+function TestButton2({data, NewCreatureActiveButton}) {
   const [creatures, setCreatures] = useState(null);
   const [species, setSpecies] = useState(null);
   const [itemsFromUser, setItemsFromUser] = useState(null);
@@ -74,7 +74,7 @@ function TestButton2({data}) {
     }
   };
 
-  const useItem = async (itemId, creatureId) => {
+  const ItemUse = async (itemId, creatureId) => {
     const token = localStorage.getItem('token');
     if (!token) {
         console.warn('Brak tokenu w localStorage');
@@ -123,43 +123,42 @@ function TestButton2({data}) {
         }
         
         const data = await response.json();
-        console.log(data);
         
     } catch (error) {
         console.error('Błąd podczas pobierania danych użytkownika:', error);
     }
   };
 
-
-  const sendOrb = async (choice) => {
+  const OrbUse = async (itemId) => {
     const token = localStorage.getItem('token');
     if (!token) {
         console.warn('Brak tokenu w localStorage');
         return;
     }
-    console.log("cos");
-    try{
-        console.log("cos1");
-        const response = await fetch('http://localhost:8080/api/OrbDraw',{
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json',
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/useOrb?itemId=${itemId} `, {
+            method: 'GET',
+            headers: {
                 'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify({orb: choice}),
         });
-        console.log("cos2");
+
         if (!response.ok) {
-            throw new Error(`Błąd ${response.status}: ${response.statusText}`);
-          }
+            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            return;
+        }
+        
         const data = await response.json();
+        console.log(data);
         return data;
-    }catch(error){
-        console.error('Błąd podczas wysyłania danych:', error);
-        setResponseMessage('Wystąpił błąd podczas wysyłania danych.');
+        
+    } catch (error) {
+        console.error('Błąd podczas pobierania danych użytkownika:', error);
     }
-    
   };
+
+  
 
   useEffect(() => {
     const loadCreaturesAndItemData = async () =>{
@@ -203,7 +202,7 @@ function TestButton2({data}) {
   // Zakładanie i zdejmowanie przedmiotu
   const equiqeItemClick = async (itemId, creatureId)=>{
     await equipeItem(itemId, creatureId);
-    setItemActionVisible(!itemActionVisible);
+    setItemActionVisible(false);
     await fetchUserData(); 
   };
 
@@ -212,11 +211,18 @@ function TestButton2({data}) {
     await fetchUserData(); 
   };
 
-  const useItemClick = async (itemId, creatureId)=>{
-    await useItem(itemId, creatureId);
-    setItemActionVisible(!itemActionVisible);
+  const handleItemClick = async (itemId, creatureId)=>{
+    await ItemUse(itemId, creatureId);
+    setItemActionVisible(false);
     await fetchUserData(); 
   };
+  const handleOrbClick = async(itemId)=>{
+    await OrbUse(itemId).then((response)=>{
+      NewCreatureActiveButton(response.NewCreature);
+    });
+    setItemActionVisible(false);
+    await fetchUserData(); 
+  }
   // DODANE (2) – Funkcje do obsługi zdarzeń myszy (hover) dla tooltipa
   const handleMouseEnter = (event, item, type) => {
     // Ustaw pozycję tooltipa
@@ -374,13 +380,13 @@ function TestButton2({data}) {
                       console.log(actualItem.type)
                     }
                     {actualItem.type === "orb" &&(
-                      <button onClick={() => equiqeItemClick(actualItem._id, creatures[visibleCreature]._id)}>Use</button>)
+                      <button onClick={() => handleOrbClick(actualItem._id)}>Use</button>)
                     }
                     {actualItem.type === "equipable" &&
                        (<button onClick={() => equiqeItemClick(actualItem._id, creatures[visibleCreature]._id)}>Equipe</button>)
                     }
                     {actualItem.type === "usable" &&
-                       (<button onClick={() => useItemClick(actualItem._id, creatures[visibleCreature]._id)}>Use</button>)
+                       (<button onClick={() => handleItemClick(actualItem._id, creatures[visibleCreature]._id)}>Use</button>)
                     }
                     <button
                       className="absolute top-4 right-4 text-maincolor4 font-bold"

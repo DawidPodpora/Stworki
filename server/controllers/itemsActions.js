@@ -131,3 +131,126 @@ export async function UseUsableItem(req, res) {
     }
     
 }
+
+const drawWithElement = async(element) =>
+    {
+        try{
+        const species = await Species.find({element: element});
+        if (species.length === 0) {
+            console.log(`Nie znaleziono gatunków o elemencie: ${element}`);
+            return null;
+    
+        }
+        const randomIndex = Math.floor(Math.random() * species.length);
+        const randomSpecies = species[randomIndex];
+        return randomSpecies.name;
+        }catch(error){
+            console.error('Błąd podczas losowania gatunku:', error);
+            throw error;
+        }
+    }
+    
+    export async function OrbDraw(req,res) {
+        try{
+            const {orb} = req.body;
+            if(!orb)
+            {
+                return res.status(400).json({ error: 'Nie podano orb' });
+            }
+            console.log(orb);
+            console.log("aaaaaa");
+            const userId = req.user.userId;
+            const user = await UserModel.findById(userId);
+            if(!user)
+            {
+                return res.status(404).json({ error: 'Użytkownik nie został znaleziony' });
+            }
+            if(user.isFirstLog)
+            {
+                user.isFirstLog = false;  
+            }
+            else{
+                if(user.creature.lenght > 0)
+                {
+                    return res.status(404).json({ error: 'nie można wykonać akcji' });
+                }
+            }
+            if(user.isFirstLog)
+            {
+                return res.status(404).json({ error: 'nie można wykonać akcji' });
+            }
+            
+           
+            const newSpeciesName = await drawWithElement(orb);
+            const newCreature = {
+                name: newSpeciesName,
+                staty:[0,0,0,0,0],
+                level:1,
+                species: newSpeciesName,
+                energy: 100,
+                exp: 0,
+                items:[]
+            };
+            console.log(newCreature);
+            user.creatures.push(newCreature);
+            console.log(user);
+            await user.save();
+            const createdCreature = user.creatures[user.creatures.length - 1];
+            res.status(200).json({
+                message: `Pole isFirstLog zmienione na false dla użytkownika ${user.username}`,
+                NewCreature: createdCreature
+            });
+        }catch(error)
+        {
+            res.status(500).send({ error: 'Błąd serwera' });
+        }
+        
+    }
+
+    export async function OrbUse(req,res)
+    {
+        
+        try{
+            const userId = req.user.userId;
+            const {itemId} = req.query
+            const user = await UserModel.findById(userId);
+            
+            if (!user) {
+                return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
+            }
+            const item = user.items.find((item) => item._id.toString() === itemId);
+            if (!item) {
+                return res.status(404).send({ error: 'Przedmiot nie znaleziony' });
+            }
+            if(item.type !== "orb")
+            {
+                return res.status(404).send({ error: 'Przedmiot to nei orb' });
+            }
+            if(user.creatures.lenght >= 6)
+            {
+                return res.status(404).send({error: 'za dużo stworkow'});
+            }
+            const newSpeciesName = await drawWithElement(item.element);  
+            const newCreature = {
+                name: newSpeciesName,
+                staty:[0,0,0,0,0],
+                level:1,
+                species: newSpeciesName,
+                energy: 100,
+                exp: 0,
+                items:[]
+            };
+            console.log(newCreature);
+            user.creatures.push(newCreature);
+            user.items = user.items.filter((item) => item._id.toString() !== itemId);
+            await user.save();
+            const createdCreature = user.creatures[user.creatures.length - 1];
+            res.status(200).json({
+                message: `Pole isFirstLog zmienione na false dla użytkownika ${user.username}`,
+                NewCreature: createdCreature
+            });
+        }catch(error)
+        {
+            res.status(500).send({ error: 'Błąd serwera' });
+        }
+    }
