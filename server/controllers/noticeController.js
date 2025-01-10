@@ -21,10 +21,14 @@ export const createNotice = async (req, res) => {
     }
 
     try{
+        console.log('Odebrano dane:', {title, content});
         const newNotice = new Notice({title,content});
+        console.log('Tworzenie nowego ogłoszenia: ',newNotice);
         await newNotice.save();
+        console.log('ogłoszenie zapisane w bazie: ', newNotice);
         res.status(201).json(newNotice);
     } catch(error) {
+        console.error('Szczegóły błędu:', error.message);
         res.status(500).json({error: 'Błąd serwera podczas dodawania ogłószenia'});
     }
 };
