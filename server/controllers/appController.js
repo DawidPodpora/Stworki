@@ -331,6 +331,12 @@ export async function OrbDraw(req,res) {
         {
             user.isFirstLog = false;  
         }
+        else{
+            if(user.creature.lenght > 0)
+            {
+                return res.status(404).json({ error: 'nie można wykonać akcji' });
+            }
+        }
         console.log("dddddd");
         if(user.isFirstLog)
         {
@@ -403,3 +409,34 @@ export async function newNameForCreature(req, res)
         res.status(500).send({ error: 'Błąd serwera przy nadawaniu nowej nazwy' }); 
     }
 }
+
+
+export async function fullDataForAllCreatures(req, res)
+{
+    try{
+        console.log("pobieranie stworkow");
+        const userId = req.user.userId;
+        const creaturesanditems = await UserModel.findById(userId).select('creatures items',);
+        const creatures = creaturesanditems.creatures;
+        const items = creaturesanditems.items;
+        const speciesData = [];
+        for(let i = 0; i < creatures.length; i++){
+            const creatureName = creatures[i].species;
+            const species = await Species.findOne({name:creatureName});
+            if(species){
+                speciesData.push(species);
+            }else{
+                console.log(`Nie znaleziono stworzenia o nazwie: ${species}`);
+            }
+
+        }
+        res.status(200).send({
+            species: speciesData, 
+            creatures: creatures,
+            items: items
+        });
+    }catch(error){
+        res.status(500).send({ error: 'Błąd serwera przy pobieraniu danych o stworkach' }); 
+    }
+}
+

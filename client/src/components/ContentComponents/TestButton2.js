@@ -1,14 +1,54 @@
-import React, { useState } from "react";  // Importujemy React oraz useState do obsługi stanów.
+import React, { useEffect, useState } from "react";  // Importujemy React oraz useState do obsługi stanów.
 
 function TestButton2({data}) {
+  const [creatures, setCreatures] = useState(null);
+  const [species, setSpecies] = useState(null);
+  const [itemsFromUser, setItemsFromUser] = useState(null);
+  const [visibleCreature, setVisibleCreature] = useState(0);
+  const fetchUserData = async () => {
+    const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
+    if (!token) {
+        console.warn('Brak tokenu w localStorage');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8080/api/usersCreaturesAndItemsData ', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku
+            },
+        });
+
+        if (!response.ok) {
+            console.error('Błąd pobierania danych użytkownika:', response.statusText);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log(data);
+        setCreatures(data.creatures);
+        setSpecies(data.species);
+        setItemsFromUser(data.items);
+        
+    } catch (error) {
+        console.error('Błąd podczas pobierania danych użytkownika:', error);
+    }
+
+};
+useEffect(() => {
+      const loadCreaturesAndItemData = async () =>{
+       await fetchUserData();
+       console.log(creatures, "creatures");
+       console.log(species, "species");
+       console.log(itemsFromUser, " items");
+       //setVisibleCreature(`images/${species[0].photos[0]}.png`);
+        // Wywołanie funkcji
+
+      };
+      loadCreaturesAndItemData();
+  }, []);
   // Zbiór obrazów dla różnych stworzeń
-  const divs = [
-    "/images/testobrazka.png",
-    "/images/testobrzka2.png",
-    "/images/testobrazka3.png",
-    "/images/testobrazka4.png",
-    "/images/testobrazka6.png"
-  ];
   
   // Nazwy statystyk postaci
   const statsNames = ["POW", "VIT", "STR", "DEX", "INT"];
@@ -21,11 +61,12 @@ function TestButton2({data}) {
   const itemsActive = Array(3).fill("");
 
   // Stan do zarządzania widocznością stworzenia
-  const [visibleCreature, setVisibleCreature] = useState(divs[0]);
+  
 
   // Funkcja zmieniająca widocznego stwora
   const newCreature = (buttonNumber) => {
-    setVisibleCreature(divs[buttonNumber]);
+    setVisibleCreature(buttonNumber);
+
   };
 
   // Stan do zarządzania widocznością panelu (przesuwany panel)
@@ -38,12 +79,13 @@ function TestButton2({data}) {
 
   return (
     <div className="w-full h-full bg-black1 flex justify-center p-5 flex-col space-y-4 relative">
+      {creatures ?(<>
       {/* Górny panel (stwór, aktywne przedmioty, statystyki) */}
       <div className="w-full h-1/2 bg-maincolor1 rounded-xl p-4 flex items-center z-0">
         {/* Obrazek stwora */}
         <div className="h-[45vh] aspect-square bg-maincolor4 rounded-xl border-2 border-maincolor5">
           <img
-            src={visibleCreature} // Źródło obrazu widocznego stwora
+            src={`images/${species[visibleCreature].photos[0]}.png` || `images/${species[0].photos[0]}.png`} // Źródło obrazu widocznego stwora 
             alt="Displayed Creature" // Alt dla obrazka
             className="w-full h-full object-cover rounded-xl"
           />
@@ -75,14 +117,15 @@ function TestButton2({data}) {
               <div className="w-1/5 h-full flex flex-col items-start">
                 {statsNames.map((_, index) => (
                   <div key={index} className="w-full h-1/5 text-center">
-                    20
+                    {console.log(species[visibleCreature].baseStats[index])}
+                    {creatures[visibleCreature].staty[index] + species[visibleCreature].baseStats[index] + ((creatures[visibleCreature].level -1) * species[visibleCreature].statsAfterLevel[index])} 
                   </div>
                 ))}
               </div>
 
               <div className="w-4/5 h-full">
                 <p className="w-full h-1/4 text-center">NAME</p>
-                <div className="w-full h-3/4 text-center"></div>
+                <div className="w-full h-3/4 text-center">{creatures[visibleCreature].name}</div>
               </div>
             </div>
           </div>
@@ -91,8 +134,7 @@ function TestButton2({data}) {
           <div className="w-full h-1/3 p-2">
             <p className="h-1/6 text-maincolor4 text-[2vh] flex items-center justify-center">PASIVE</p>
             <div className="border-2 border-maincolor5 bg-black1 bg-opacity-50 w-full h-5/6 rounded-xl text-maincolor4 p-2">
-              asdasdasdasdasdasda<br />
-              dasdasdasd
+              MIEJSCE NA UMIEJĘTNOSĆ PASYWNĄ
             </div>
           </div>
         </div>
@@ -102,23 +144,23 @@ function TestButton2({data}) {
       <div className="w-full h-1/2 flex gap-4">
         {/* Obrazy potworów */}
         <div className="w-1/2 h-full bg-maincolor1 rounded-xl flex flex-wrap justify-center">
-          {divs.map((a, index) => (
+          {species.map((a, index) => (
             <div key={index} className="w-1/3 h-1/2 grid place-items-center">
               <div
                 onClick={() => newCreature(index)} // Po kliknięciu zmienia stwora
                 className="relative h-[20vh] aspect-square bg-black1 rounded-xl border-black1 border-2"
               >
                 <img
-                  src={a}
+                  src={`images/${a.photos[0]}.png`}
                   alt={`Monster ${index + 1}`}
                   className="absolute w-full h-full object-cover rounded-xl"
                 />
                 <div className="p-3 flex flex-col absolute bg-black1 text-maincolor4 w-full h-full text-opacity-0 bg-opacity-0 hover:bg-opacity-70 hover:text-opacity-100 rounded-xl">
-                  <p>POW</p>
-                  <p>VIT</p>
-                  <p>STR</p>
-                  <p>DEX</p>
-                  <p>INT</p>
+                  {statsNames.map((a, index) =>(
+                    <p>{a}  {creatures[visibleCreature].staty[index] + species[visibleCreature].baseStats[index] + ((creatures[visibleCreature].level -1) * species[visibleCreature].statsAfterLevel[index])}</p>
+                  ))
+                  }
+                  
                 </div>
               </div>
             </div>
@@ -131,7 +173,9 @@ function TestButton2({data}) {
             <div
               key={index}
               className="w-[6vw] h-[6vw] min-h-[70px] min-w-[70px] bg-black1 bg-opacity-50 rounded-xl border-maincolor4 border-2"
-            ></div>
+            >
+              
+            </div>
           ))}
         </div>
       </div>
@@ -153,8 +197,15 @@ function TestButton2({data}) {
           </div>
         </div>
       </div>
+      </>
+)
+: (
+  <div>Loading...</div> // Wyświetlanie komunikatu ładowania
+)}
     </div>
   );
 }
+
+
 
 export default TestButton2;  // Eksportujemy komponent
