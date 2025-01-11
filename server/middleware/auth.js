@@ -49,15 +49,6 @@ export async function verifyAdmin(req, res, next) {
         console.log('Token JWT zdekodowany:', decodedToken);
         req.user = decodedToken;
         next();
-        /*//Pobranie użytkownika z bazy danych na podstawie ID zdekodowanego tokenu
-        const user = await User.findById(req.user.id);
-        console.log('Sprawdzenie uprawnień admina: ',user);
-
-        if(user && user.isAdmin){
-            next();
-        } else{
-            res.status(403).json({ error: "Access Denied: Admins only!"});
-        }*/
     } catch(error){
         console.error('Błąd przy weryfikacji czy admin: ',error.message);
         res.status(500).json({error: "Server Error"});

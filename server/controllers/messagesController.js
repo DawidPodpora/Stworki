@@ -94,7 +94,6 @@ export const sendMessageToAll = async (req, res) => {
 
         // Pobierz wszystkich użytkowników z bazy danych
         const users = await UserModel.find({}, '_id'); // Pobieramy tylko `_id`
-
         // Utwórz wiadomość dla każdego użytkownika
         const messages = users.map(user => ({
             senderId: req.user.userId, // Administrator wysyła wiadomość

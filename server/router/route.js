@@ -12,6 +12,7 @@ import * as items  from "../controllers/itemCreating.js";
 import * as itemsActions from "../controllers/itemsActions.js";
 import * as messagesController from '../controllers/messagesController.js';
 import { getAllNotices, createNotice, deleteNotice } from "../controllers/noticeController.js";
+import * as marketController from "../controllers/marketController.js";
 
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
@@ -79,4 +80,9 @@ router.route('/messageToAll').post(verifyAdmin, messagesController.sendMessageTo
 router.route('/notices').get(getAllNotices);
 router.route('/notices').post(verifyAdmin, createNotice);
 router.route('/notices/:id').delete(verifyAdmin, deleteNotice);
+
+//market
+router.route('/add').post(Auth, marketController.addItemToMarket);
+router.route('/').get(marketController.getMarketItems);
+router.route('/bid').post(Auth, marketController.placeBid);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

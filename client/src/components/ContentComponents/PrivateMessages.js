@@ -10,27 +10,28 @@ function PrivateMessages({data}) {
     const token = localStorage.getItem('token');
     const currentUser = data.username;
 
+    const fetchMessages = async () => {
+        try{
+            const response = await fetch('http://localhost:8080/api/messages', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (response.ok){
+                const data = await response.json();
+                console.log('Pobrane wiadomości: ')
+                setMessages(data);//Ustawienie wiadomości
+            }else{
+                console.error('Błąd podczas pobierania wiadomości');
+            }
+        } catch(error){
+            console.error('Błąd serwera:',error);
+        }
+    };
+
     //Pobieranie wiadomości po załadowaniu komponentu
     useEffect(() => {
-        const fetchMessages = async () => {
-            try{
-                const response = await fetch('http://localhost:8080/api/messages', {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (response.ok){
-                    const data = await response.json();
-                    console.log('Pobrane wiadomości: ')
-                    setMessages(data);//Ustawienie wiadomości
-                }else{
-                    console.error('Błąd podczas pobierania wiadomości');
-                }
-            } catch(error){
-                console.error('Błąd serwera:',error);
-            }
-        };
         fetchMessages();
     }, [token]);
     //Wysyłanie wiadomości do wszystkich
@@ -162,33 +163,6 @@ function PrivateMessages({data}) {
         }
     }
 
-    //Wysyłanie odpowiedzi
-    const sendReplyMessage = async () => {
-        if(!newMessage.title || !newMessage.content) {
-            alert('Tytuł i treść są wymagane!');
-            return;
-        }
-        try{
-            const response = await fetch('http://localhost:8080/api/message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type' : 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(newMessage),
-            });
-            if(response.ok){
-                alert('Wiadomość wysłąna!');
-                setNewMessage({receiver: '', title: '', content: ''});
-                setShowReplyModal(false)
-            }else{
-                const errorData = await response.json();
-                alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
-            }
-        }catch(error){
-            console.error('Błąd serwera', error);
-        }
-    }
 
     return (
         <div className="w-full h-screen bg-black flex flex-col p-5 justify-center text-maincolor4">
@@ -196,6 +170,12 @@ function PrivateMessages({data}) {
             <div className="w-full h-full bg-maincolor1 p-5 rounded-xl flex flex-col">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Wiadomości prywatne</h1>
+                    <button
+                        onClick={() => fetchMessages()}
+                        className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
+                    >
+                        Odśwież
+                    </button>
                     <button
                         onClick={() => setShowSendModal(true)}
                         className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
@@ -225,7 +205,7 @@ function PrivateMessages({data}) {
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <p className="font-bold">{msg.title}</p>
-                                        <p className="text-sm">Od: {msg.senderId.username}</p>
+                                        <p className="text-sm">Od: {msg.senderId ? msg.senderId.username : "Nieznany użytkownik"}</p>
                                         <p className="text-xs">{new Date(msg.createdAt).toLocaleString()}</p>
                                     </div>
                                     <button
@@ -285,7 +265,7 @@ function PrivateMessages({data}) {
                         />
                         <div className="flex justify-end space-x-2">
                             <button
-                                onClick={() => setShowSendToAllModal(false)}
+                                onClick={() => setShowReplyModal(false)}
                                 className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
                             >
                                 Anuluj
