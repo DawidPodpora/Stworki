@@ -29,10 +29,6 @@ function PrivateMessages({data}) {
             console.error('Błąd serwera:',error);
         }
     };
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     //Pobieranie wiadomości po załadowaniu komponentu
     useEffect(() => {
         fetchMessages();
@@ -87,6 +83,7 @@ function PrivateMessages({data}) {
                 alert('Wiadomość wysłana!');
                 setNewMessage({receiver: '', title: '', content: ''}); //reset formularza
                 setShowSendModal(false);
+                setShowReplyModal(false);
             } else {
                 const errorData = await response.json();
                 alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
@@ -147,13 +144,8 @@ function PrivateMessages({data}) {
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Wiadomości prywatne</h1>
                     <button
-<<<<<<< HEAD
-                        onClick={() => fetchMessages()}
-                        className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
-=======
                     onClick={() => fetchMessages()}
                     className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
->>>>>>> master
                     >
                         Odśwież
                     </button>
@@ -254,7 +246,7 @@ function PrivateMessages({data}) {
                                 Anuluj
                             </button>
                             <button
-                                onClick={sendReplyMessage}
+                                onClick={sendMessage}
                                 className="bg-maincolor4 text-black px-4 py-2 rounded shadow hover:bg-opacity-80"
                             >
                                 Wyślij
