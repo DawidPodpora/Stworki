@@ -101,21 +101,21 @@ function StartPage({data}) {
 
       {/* Modal do tworzenia ogłoszenia */}
       {showModal &&(
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-            <h2 className="text-xl font-bold mb-4">Dodaj nowe ogłoszenie</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+          <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/2">
+            <h2 className="text-white text-xl font-bold mb-4">Dodaj nowe ogłoszenie</h2>
             <input
               type="text"
               placeholder="Tytuł"
               value={newNotice.title}
               onChange={(e) => setNewNotice({...newNotice, title: e.target.value})}
-              className="w-full mb-4 p-2 border rounded"
+              className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
             />
             <textarea
               placeholder="Treść"
               value={newNotice.content}
               onChange={(e) => setNewNotice({...newNotice, content: e.target.value})}
-              className="w-full mb-4 p-2 border rounded"
+              className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
             />
             <div className="flex justify-end space-x-2">
               <button
