@@ -2,7 +2,7 @@ import TestButton2 from './ContentComponents/TestButton2.js'; // Import komponen
 import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponentu TestButton3
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
 import PrivateMessages from './ContentComponents/PrivateMessages.js';
-
+import Misions from './ContentComponents/Misions.js';
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
 function Content({ selectedButton, data, NewCreatureActiveButton}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
@@ -21,6 +21,9 @@ function Content({ selectedButton, data, NewCreatureActiveButton}) {
       break;
     case 4:
       ComponentToRender = PrivateMessages;
+      break;
+    case 5:
+      ComponentToRender = Misions;
       break;
     default:
       // Domyślny przypadek, gdy `selectedButton` nie pasuje do żadnej wartości
