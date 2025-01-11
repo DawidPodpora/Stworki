@@ -10,27 +10,27 @@ function PrivateMessages({data}) {
     const token = localStorage.getItem('token');
     const currentUser = data.username;
 
+    const fetchMessages = async () => {
+        try{
+            const response = await fetch('http://localhost:8080/api/messages', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (response.ok){
+                const data = await response.json();
+                console.log('Pobrane wiadomości: ')
+                setMessages(data);//Ustawienie wiadomości
+            }else{
+                console.error('Błąd podczas pobierania wiadomości');
+            }
+        } catch(error){
+            console.error('Błąd serwera:',error);
+        }
+    };
     //Pobieranie wiadomości po załadowaniu komponentu
     useEffect(() => {
-        const fetchMessages = async () => {
-            try{
-                const response = await fetch('http://localhost:8080/api/messages', {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (response.ok){
-                    const data = await response.json();
-                    console.log('Pobrane wiadomości: ')
-                    setMessages(data);//Ustawienie wiadomości
-                }else{
-                    console.error('Błąd podczas pobierania wiadomości');
-                }
-            } catch(error){
-                console.error('Błąd serwera:',error);
-            }
-        };
         fetchMessages();
     }, [token]);
     //Wysyłanie wiadomości do wszystkich
@@ -134,33 +134,6 @@ function PrivateMessages({data}) {
         setShowReplyModal(true);
     };
 
-    //Wysyłanie odpowiedzi
-    const sendReplyMessage = async () => {
-        if(!newMessage.title || !newMessage.content) {
-            alert('Tytuł i treść są wymagane!');
-            return;
-        }
-        try{
-            const response = await fetch('http://localhost:8080/api/message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type' : 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(newMessage),
-            });
-            if(response.ok){
-                alert('Wiadomość wysłąna!');
-                setNewMessage({receiver: '', title: '', content: ''});
-                setShowReplyModal(false)
-            }else{
-                const errorData = await response.json();
-                alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
-            }
-        }catch(error){
-            console.error('Błąd serwera', error);
-        }
-    }
 
     //Wysyłanie odpowiedzi
     const sendReplyMessage = async () => {
@@ -197,6 +170,12 @@ function PrivateMessages({data}) {
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Wiadomości prywatne</h1>
                     <button
+                    onClick={() => fetchMessages()}
+                    className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
+                    >
+                        Odśwież
+                    </button>
+                    <button
                         onClick={() => setShowSendModal(true)}
                         className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
                     >
@@ -214,8 +193,9 @@ function PrivateMessages({data}) {
     
                 {/* Lista wiadomości */}
                 <div className="p-4 rounded-xl overflow-y-auto space-y-4 flex-grow">
-                    {messages.length > 0 ? (
-                        messages.map((msg) => (
+                {messages.length > 0 ? (
+                    messages.map((msg) => (
+                        msg.senderId ? (
                             <div
                                 key={msg._id}
                                 className={`p-4 rounded-lg shadow-md border ${
@@ -246,22 +226,23 @@ function PrivateMessages({data}) {
                                         {selectedMessage === msg ? "Zwiń" : "Zobacz szczegóły"}
                                     </button>
                                     <button
-                                    onClick={() => openReplyModal(msg.senderId.username)}
-                                    className="text-green-500 hover:underline"
+                                        onClick={() => openReplyModal(msg.senderId.username)}
+                                        className="text-green-500 hover:underline"
                                     >
                                         Odpowiedz
                                     </button>
-                                    </div>
+                                </div>
                                 {selectedMessage === msg && (
                                     <div className="mt-4">
                                         <p className="text-sm">{msg.content}</p>
                                     </div>
                                 )}
                             </div>
-                        ))
-                    ) : (
-                        <p className="text-center">Brak wiadomości</p>
-                    )}
+                        ) : null // Dodaj odpowiednie zachowanie, gdy senderId jest null
+                    ))
+                ) : (
+                    <p className="text-center">Brak wiadomości</p>
+                )}
                 </div>
             </div>
     
@@ -285,7 +266,7 @@ function PrivateMessages({data}) {
                         />
                         <div className="flex justify-end space-x-2">
                             <button
-                                onClick={() => setShowSendToAllModal(false)}
+                                onClick={() => setShowReplyModal(false)}
                                 className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
                             >
                                 Anuluj
