@@ -69,6 +69,7 @@ router.route('/messages').get(Auth, messagesController.getuserMessages);
 router.route('/message').post(Auth, messagesController.sendMessage);
 router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
 router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
+router.route('/messageToAll').post(verifyAdmin, messagesController.sendMessageToAll);
 //Ogłoszenia
 router.route('/notices').get(getAllNotices);
 router.route('/notices').post(verifyAdmin, createNotice);

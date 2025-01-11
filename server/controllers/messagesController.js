@@ -82,3 +82,34 @@ export const markMessageAsReaded = async (req, res) => {
         res.status(500).json({error: 'Nie udało się oznaczyć wiadomości jako przeczytana,'});
     }
 };
+
+// Wysyłanie wiadomości do wszystkich użytkowników
+export const sendMessageToAll = async (req, res) => {
+    try {
+        const { title, content } = req.body;
+
+        if (!title || !content) {
+            return res.status(400).json({ error: 'Tytuł i treść są wymagane!' });
+        }
+
+        // Pobierz wszystkich użytkowników z bazy danych
+        const users = await UserModel.find({}, '_id'); // Pobieramy tylko `_id`
+
+        // Utwórz wiadomość dla każdego użytkownika
+        const messages = users.map(user => ({
+            senderId: req.user.userId, // Administrator wysyła wiadomość
+            receiverId: user._id,
+            title,
+            content,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Wiadomość wygaśnie po 7 dniach
+        }));
+
+        // Zapisz wszystkie wiadomości w bazie danych
+        await Messages.insertMany(messages);
+
+        res.status(201).json({ message: 'Wiadomość została wysłana do wszystkich graczy.' });
+    } catch (error) {
+        console.error('Błąd serwera podczas wysyłania wiadomości do wszystkich:', error);
+        res.status(500).json({ error: 'Błąd serwera podczas wysyłania wiadomości do wszystkich.' });
+    }
+};
