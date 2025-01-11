@@ -4,8 +4,10 @@ function PrivateMessages({data}) {
     const [messages, setMessages] = useState([]); //Przechowywanie wiadomości użytkownika
     const [newMessage, setNewMessage] = useState({receiver: '', title: '', content: ''});//Nowa wiadomość
     const [selectedMessage, setSelectedMessage] = useState(null); //wybrana wiadomość
-    const token = localStorage.getItem('token');
     const [showSendModal, setShowSendModal] = useState(false);
+    const [showSendToAllModal, setShowSendToAllModal] = useState(false);
+    const [showReplyModal, setShowReplyModal] = useState(false);
+    const token = localStorage.getItem('token');
     const currentUser = data.username;
 
     //Pobieranie wiadomości po załadowaniu komponentu
@@ -102,6 +104,39 @@ function PrivateMessages({data}) {
         }
     };
 
+    //Otwieranie modala do odpowiedzi
+    const openReplyModal = (senderUsername) => {
+        setNewMessage({receiver: senderUsername, title: '', content: ''});
+        setShowReplyModal(true);
+    };
+
+    //Wysyłanie odpowiedzi
+    const sendReplyMessage = async () => {
+        if(!newMessage.title || !newMessage.content) {
+            alert('Tytuł i treść są wymagane!');
+            return;
+        }
+        try{
+            const response = await fetch('http://localhost:8080/api/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(newMessage),
+            });
+            if(response.ok){
+                alert('Wiadomość wysłąna!');
+                setNewMessage({receiver: '', title: '', content: ''});
+                setShowReplyModal(false)
+            }else{
+                const errorData = await response.json();
+                alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
+            }
+        }catch(error){
+            console.error('Błąd serwera', error);
+        }
+    }
 
     return(
         <div className="w-full h-screen bg-black flex flex-col p-5 justify-center text-maincolor4">
@@ -139,15 +174,23 @@ function PrivateMessages({data}) {
                                         Usuń
                                     </button>
                                 </div>
-                                <button
-                                onClick={() => {
-                                    setSelectedMessage(selectedMessage === msg ? null : msg);
-                                    if (!msg.isRead) markMessageAsReaded(msg._id);
-                                }}
-                                className="mt-2 text-blue-500 hover:underline"
-                                >
-                                    {selectedMessage === msg ? "Zwiń" : "Zobacz szczegóły"}
-                                </button>
+                                <div className="space-x-4 mt-2">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedMessage(selectedMessage === msg ? null : msg);
+                                            if (!msg.isRead) markMessageAsReaded(msg._id);
+                                        }}
+                                        className="mt-2 text-blue-500 hover:underline"
+                                    >
+                                        {selectedMessage === msg ? "Zwiń" : "Zobacz szczegóły"}
+                                    </button>
+                                    <button
+                                    onClick={() => openReplyModal(msg.senderId.username)}
+                                    className="text-green-500 hover:underline"
+                                    >
+                                        Odpowiedz
+                                    </button>
+                                    </div>
                                 {selectedMessage === msg && (
                                     <div className="mt-4">
                                         <p className="text-sm">{msg.content}</p>
@@ -160,8 +203,83 @@ function PrivateMessages({data}) {
                     )}
                 </div>
             </div>
-            
-            {/*Modal do wysyłania wiadomości*/}
+    
+            {/*Modal do odpowiedzi */}
+            {showReplyModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+                    <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/2">
+                        <h2 className="text-lg font-bold mb-4"> Odpowiedź do {newMessage.receiver}</h2>
+                        <input
+                            type="text"
+                            placeholder="Tytuł"
+                            value={newMessage.title}
+                            onChange={(e) => setNewMessage({...newMessage, title: e.target.value})}
+                            className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                            />
+                            <textarea
+                            placeholder="Treść"
+                            value={newMessage.content}
+                            onChange={(e) => setNewMessage({...newMessage, content: e.target.value})}
+                            className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                        />
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                onClick={() => setShowSendToAllModal(false)}
+                                className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={sendReplyMessage}
+                                className="bg-maincolor4 text-black px-4 py-2 rounded shadow hover:bg-opacity-80"
+                            >
+                                Wyślij
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal do wysyłania wiadomości do wszystkich */}
+            {showSendToAllModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+                    <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/2">
+                        <h2 className="text-lg font-bold mb-4">Wyślij wiadomość do wszystkich</h2>
+                        <input
+                            type="text"
+                            placeholder="Tytuł"
+                            value={newMessageToAll.title}
+                            onChange={(e) => setNewMessageToAll({...newMessageToAll, title: e.target.value})}
+                            className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                        />
+                        <textarea
+                            placeholder="Treść"
+                            value={newMessageToAll.content}
+                            onChange={(e) => setNewMessageToAll({...newMessageToAll, content: e.target.value})}
+                            className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
+                        />
+                        <div className="flex justify-end space-x-2">
+                            <button
+                                onClick={() => {
+                                    setShowSendToAllModal(false);
+                                    setNewMessageToAll({title: '', content: ''});
+                                }}
+                                className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={sendMessageToAll}
+                                className="bg-maincolor4 text-black px-4 py-2 rounded shadow hover:bg-opacity-80"
+                            >
+                                Wyślij
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+    
+            {/* Modal do wysyłania wiadomości */}
             {showSendModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
                     <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/2">
