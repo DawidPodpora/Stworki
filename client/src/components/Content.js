@@ -4,7 +4,7 @@ import StartPage from './ContentComponents/StartPage.js'; // Import komponentu S
 import PrivateMessages from './ContentComponents/PrivateMessages.js';
 
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
-function Content({ selectedButton, data}) {
+function Content({ selectedButton, data, NewCreatureActiveButton}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
@@ -32,7 +32,7 @@ function Content({ selectedButton, data}) {
   return (
     <div className="absolute w-4/5 bg-black1 h-screen right-0">
       {/* Renderowanie wybranego komponentu */}
-      <ComponentToRender data = {data}/>
+      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton}/>
     </div>
   );
 }

@@ -87,16 +87,11 @@ export const UserSchema = new mongoose.Schema({
         type: Date,
         default: function () {
             const now = new Date();
-            const nextDayMidnight = new Date(now);
-            nextDayMidnight.setDate(now.getDate() + 1); // Przejdź do następnego dnia
-            nextDayMidnight.setHours(0, 0, 0, 0); // Ustaw godzinę na północ
-            return nextDayMidnight;
+            const todayMidnight = new Date(now);
+            todayMidnight.setHours(0, 0, 0, 0); // Ustaw godzinę na północ
+            return todayMidnight;
     }
-    },
-    isAdmin:{
-        type: Boolean,
-        default: false
-    }
+}
     
 });
 

@@ -38,7 +38,6 @@ function Chat({data}) {
         userId: data._id,
         text: newMessage,
         sender: currentUser, // wiadomość od użytkownika<-wysyłaćtoken
-        isAdmin: data.isAdmin,
       };
       socket.current.emit('newMessage',message);
       setNewMessage('');
@@ -61,17 +60,10 @@ function Chat({data}) {
               message.sender === currentUser
                 ? 'ml-auto bg-maincolor1 text-white bg-opacity-70'
                 : 'mr-auto bg-maincolor2 text-white bg-opacity-70'
-            } &{
-              message.isAdmin ? 'border-2 border-maincolor5' : '' 
             }`}
           >
-            <span 
-              className={`font-semibold ${
-                message.isAdmin ? 'text-maincolor5' :'text-white'
-
-              }`}
-              >
-                {message.sender}:
+            <span className="font-semibold">
+              {message.sender}:
             </span>{" "}
             {message.text}
           </div>
