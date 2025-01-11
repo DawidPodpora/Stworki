@@ -29,6 +29,10 @@ function PrivateMessages({data}) {
             console.error('Błąd serwera:',error);
         }
     };
+<<<<<<< HEAD
+
+=======
+>>>>>>> master
     //Pobieranie wiadomości po załadowaniu komponentu
     useEffect(() => {
         fetchMessages();
@@ -135,33 +139,6 @@ function PrivateMessages({data}) {
     };
 
 
-    //Wysyłanie odpowiedzi
-    const sendReplyMessage = async () => {
-        if(!newMessage.title || !newMessage.content) {
-            alert('Tytuł i treść są wymagane!');
-            return;
-        }
-        try{
-            const response = await fetch('http://localhost:8080/api/message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type' : 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(newMessage),
-            });
-            if(response.ok){
-                alert('Wiadomość wysłąna!');
-                setNewMessage({receiver: '', title: '', content: ''});
-                setShowReplyModal(false)
-            }else{
-                const errorData = await response.json();
-                alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
-            }
-        }catch(error){
-            console.error('Błąd serwera', error);
-        }
-    }
 
     return (
         <div className="w-full h-screen bg-black flex flex-col p-5 justify-center text-maincolor4">
@@ -170,8 +147,13 @@ function PrivateMessages({data}) {
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-2xl font-bold">Wiadomości prywatne</h1>
                     <button
+<<<<<<< HEAD
+                        onClick={() => fetchMessages()}
+                        className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
+=======
                     onClick={() => fetchMessages()}
                     className="bg-maincolor1 text-maincolor4 border-maincolor2 border px-4 py-2 rounded shadow hover:bg-opacity-80"
+>>>>>>> master
                     >
                         Odśwież
                     </button>
@@ -205,7 +187,7 @@ function PrivateMessages({data}) {
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <p className="font-bold">{msg.title}</p>
-                                        <p className="text-sm">Od: {msg.senderId.username}</p>
+                                        <p className="text-sm">Od: {msg.senderId ? msg.senderId.username : "Nieznany użytkownik"}</p>
                                         <p className="text-xs">{new Date(msg.createdAt).toLocaleString()}</p>
                                     </div>
                                     <button

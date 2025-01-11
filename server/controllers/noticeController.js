@@ -1,4 +1,5 @@
 import Notice from  '../model/Notice.js';
+import UserModel from "../model/User.model.js"
 
 /** Pobieranie wszystkich ogłoszeń */
 
