@@ -162,6 +162,34 @@ function PrivateMessages({data}) {
         }
     }
 
+    //Wysyłanie odpowiedzi
+    const sendReplyMessage = async () => {
+        if(!newMessage.title || !newMessage.content) {
+            alert('Tytuł i treść są wymagane!');
+            return;
+        }
+        try{
+            const response = await fetch('http://localhost:8080/api/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(newMessage),
+            });
+            if(response.ok){
+                alert('Wiadomość wysłąna!');
+                setNewMessage({receiver: '', title: '', content: ''});
+                setShowReplyModal(false)
+            }else{
+                const errorData = await response.json();
+                alert(`Błąd: ${errorData.error || 'Nie udało się wysłać wiadomości.'}`);
+            }
+        }catch(error){
+            console.error('Błąd serwera', error);
+        }
+    }
+
     return (
         <div className="w-full h-screen bg-black flex flex-col p-5 justify-center text-maincolor4">
             {/* Zielony komponent na czarnym tle */}
@@ -207,7 +235,6 @@ function PrivateMessages({data}) {
                                         Usuń
                                     </button>
                                 </div>
-                                
                                 <div className="space-x-4 mt-2">
                                     <button
                                         onClick={() => {
@@ -237,7 +264,7 @@ function PrivateMessages({data}) {
                     )}
                 </div>
             </div>
-
+    
             {/*Modal do odpowiedzi */}
             {showReplyModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
