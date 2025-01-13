@@ -81,7 +81,7 @@ export async function SendAndCheckMissionInfo(req,res) {
 export async function SendOnMission(req, res) {
     try{
         const userId = req.user.userId;
-        
+        console.log("dziala :D")
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 
     }

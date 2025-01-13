@@ -8,6 +8,7 @@ function Misions({ data }) {
   const [spiecesPhotos, setSpeciesPhoto] = useState(null);
   const [creaturesData, setCreaturesData] = useState(null);
   const [activeCreature, setActiveCreature] = useState(0);
+  const [missionChoose, setMissionChoose] = useState(null);
   useEffect(() => {
     const timers = timeLeftTable.map((time, index) => {
       if (time > 0) {
@@ -61,15 +62,65 @@ function Misions({ data }) {
       console.error('Błąd podczas pobierania danych użytkownika:', error);
   }
   }
+
+
+
+
   // Formatowanie czasu w minutach i sekundach
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
+  const sendCreatureOnMission = async(creature, mission)=>
+  {
+    const token = localStorage.getItem('token');
+      if (!token) {
+          console.warn('Brak tokenu w localStorage');
+          return;
+      }
+      try {
+        if(!creature)
+        {
+          console.warn('Creature not choosed');
+          return;
+        }
+        if(!mission)
+          {
+            console.warn('Mission not choosed');
+            return;
+          }
+        const creatureId = creature._id;
+        const missionId = mission._id; 
+        const response = await fetch(`http://localhost:8080/api/SendOnMission?missionId${missionId}&creatureId=${creatureId} `, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
+        if (!response.ok) {
+            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            return;
+        }
+        const data = await response.json();
+        
+    } catch (error) {
+        console.error('Błąd podczas pobierania danych użytkownika:', error);
+    }
+  }
   const changeCreature = (number)=>{
     setActiveCreature(number);
+    setMissionChoose(null);
+  }
+  const changedMission = (number)=>{
+    setMissionChoose(number);
+  }
+  const acceptMissionClick = async(creature) =>{
+    const mission = creature.misions[missionChoose];
+    console.log(mission,"AAAAAAAAAAAAAAAAAAAAAAAA");
+    await sendCreatureOnMission(creature, mission);
+    await fetchData();
   }
   const placeForMissions = Array(6).fill("");
   const missions = Array(3).fill("");
@@ -107,7 +158,8 @@ function Misions({ data }) {
           <div className=" grid place-items-center  ">
             <div className="relative h-[14vh] aspect-square bg-maincolor1 rounded-2xl outline outline-4 outline-maincolor4">
               {creaturesData[index]?(
-              <div onClick={()=>changeCreature(index)}><img src={`images/${spiecesPhotos[index][0]}.png`} className="rounded-2xl"></img></div>):(<div></div>)
+              <div onClick={()=>changeCreature(index)}><img src={`images/${spiecesPhotos[index][0]}.png`}
+                                                                   className={`rounded-2xl ${activeCreature === index? "border-4 border-maincolor5":""}`}></img></div>):(<div></div>)
               }
             </div>
           </div>
@@ -118,17 +170,16 @@ function Misions({ data }) {
       </div>
         <div className="w-[22vw] h-[45vh] bg-maincolor1 absolute right-0 bottom-0 m-[1vw] rounded-3xl ">
             {missions.map((_,index)=>(
-              <div className="w-[22] h-[11vh] m-[1.5vh]  bg-gradient-to-r from-black to-maincolor5 p-2 rounded-3xl ">
+              <div className={`w-[22] h-[11vh] m-[1.5vh] p-2 rounded-3xl ${missionChoose === index?"bg-gradient-to-r from-maincolor4 to-maincolor5":"bg-gradient-to-r from-black to-maincolor5"}`} onClick={()=>changedMission(index)}>
                 <div className="w-full h-full bg-maincolor1 rounded-2xl p-[0.5vw] relative">
-                  MISSION {index + 1}
-                  <div className="absolute right-1 bottom-1">gold:{creaturesData[activeCreature].misions[index].goldForMission}</div>
-                  <div className="absolute left-1 bottom-1">exp:{creaturesData[activeCreature].misions[index].expForMission}</div>
+                  <div className="absolute right-0 bottom-1"><img src="images/money.png" className="w-[2vw]"></img>{creaturesData[activeCreature].misions[index].goldForMission}</div>
+                  <div className="absolute left-1 bottom-1"><img src="images/experience.png" className="w-[2vw]"></img>{creaturesData[activeCreature].misions[index].expForMission}</div>
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl font-extrabold"><p>{creaturesData[activeCreature].misions[index].timeOfMission} MINUTES</p></div>
                 </div>
               </div>
             ))}
           <div className="w-full h-[4vh] flex justify-center items-center">
-            <button className="w-[6vw] h-[4vh] bg-gradient-to-r from-maincolor2 to-maincolor5 text-black text-2xl font-extrabold rounded-3xl border-2 border-maincolor4 hover:text-maincolor4">ACCEPT</button>
+            <button onClick={()=>acceptMissionClick(creaturesData[activeCreature])} className="w-[6vw] h-[4vh] bg-gradient-to-r from-maincolor2 to-maincolor5 text-black text-2xl font-extrabold rounded-3xl border-2 border-maincolor4 hover:text-maincolor4">ACCEPT</button>
           </div>
           </div>
           </>):(<div>LOADING</div>)}

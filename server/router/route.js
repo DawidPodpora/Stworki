@@ -77,4 +77,5 @@ router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
 router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
 //Misje
 router.route('/missionsInfo').get(Auth, missionsControler.SendAndCheckMissionInfo);
+router.route('/SendOnMission').get(Auth, missionsControler.SendOnMission);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
