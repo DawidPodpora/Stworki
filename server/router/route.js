@@ -11,6 +11,7 @@ import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
 import * as items  from "../controllers/itemCreating.js";
 import * as itemsActions from "../controllers/itemsActions.js";
 import * as messagesController from '../controllers/messagesController.js';
+import * as missionsControler from '../controllers/missionControler.js'
 
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
@@ -59,6 +60,7 @@ router.route('/creaturesFight').get(getCreaturesbyName);
 router.route('/userData').get(Auth, controller.getUserData);
 router.route('/newSpecie').post(createNewSpecies);
 router.route('/newItemBaseData').post(createNewItemBaseData);
+//Przedmioty
 router.route('/ItemsToShop').get(items.ItemsToShop);
 router.route('/ItemToEq').post(items.ItemToEq);
 router.route('/ItemShop').get(Auth, items.ItemsToShop);
@@ -73,4 +75,6 @@ router.route('/messages').get(Auth, messagesController.getuserMessages);
 router.route('/message').post(Auth, messagesController.sendMessage);
 router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
 router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
+//Misje
+router.route('/missionsInfo').get(Auth, missionsControler.SendAndCheckMissionInfo);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

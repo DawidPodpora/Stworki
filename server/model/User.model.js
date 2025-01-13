@@ -90,8 +90,12 @@ export const UserSchema = new mongoose.Schema({
             const todayMidnight = new Date(now);
             todayMidnight.setHours(0, 0, 0, 0); // Ustaw godzinę na północ
             return todayMidnight;
-    }
-}
+        }
+    },
+    expToNextLevel:{
+        type: Number,
+        default: 500
+    },
     
 });
 
