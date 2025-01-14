@@ -26,14 +26,13 @@ const createMission = (creature, userLevel) =>
 
 export async function SendAndCheckMissionInfo(req,res) {
     try{
-        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+       
         let speciesPhotos = [];
         const userId = req.user.userId;
-        console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        
         const user = await UserModel.findById(userId);
-        console.log(user);
         const creatures = user.creatures;
-        console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+        
         
         if (!user) {
             return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
@@ -55,16 +54,15 @@ export async function SendAndCheckMissionInfo(req,res) {
                     const newMission = {
                         goldForMission: mission.finalGold,
                         expForMission: mission.finalExp,
-                        timeOfMission: mission.timeOfMissionInMinutes
+                        timeOfMission: mission.timeOfMissionInMinutes,
+                        isThisMissionActive:false
                     };
-                    console.log(newMission, "misjaaaaaaaaaaaaaaaaaaa");
                     creature.misions.push(newMission); // Upewnij się, że pole nazywa się "missions", a nie "misions"
                 }
             }
         }
        await user.save();
-       console.log(speciesPhotos,"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-       console.log(creatures,"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        
 
        res.status(200).send({
             speciesPhotos: speciesPhotos,
@@ -82,6 +80,25 @@ export async function SendOnMission(req, res) {
     try{
         const userId = req.user.userId;
         console.log("dziala :D")
+        const {missionId, creatureId} = req.query;
+        const user = await UserModel.findById(userId);
+        const creature = user.creatures.find((creature) => creature._id.toString() === creatureId);
+        const mission = creature.misions.find((mission) => mission._id.toString() === missionId);
+        const time = mission.timeOfMission; 
+        console.log(creature);
+        console.log(creature.timeOfEndOfMission,"koniec misjii");
+        if(!creature.timeOfEndOfMission){
+        mission.isThisMissionActive = true;
+        const currentTime = new Date();
+        const endTime = new Date(currentTime.getTime() + time * 60 * 1000);
+        console.log(endTime,"konie misji1");
+        creature.timeOfEndOfMission =  endTime;
+        console.log(creature.timeOfEndOfMission,"konie misji2");
+        }
+        await user.save();
+        res.status(200).json({
+            
+       });
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 
     }

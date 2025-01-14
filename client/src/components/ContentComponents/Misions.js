@@ -5,26 +5,34 @@ function Misions({ data }) {
 
   const initialTimes = [10, 50, 70, 90, 300];
   const [timeLeftTable, setTimeLeftTable] = useState(initialTimes);
+  const [remainingTimes, setRemainingTimes] = useState([]);
   const [spiecesPhotos, setSpeciesPhoto] = useState(null);
   const [creaturesData, setCreaturesData] = useState(null);
   const [activeCreature, setActiveCreature] = useState(0);
   const [missionChoose, setMissionChoose] = useState(null);
-  useEffect(() => {
-    const timers = timeLeftTable.map((time, index) => {
-      if (time > 0) {
-        return setInterval(() => {
-          setTimeLeftTable((prev) => {
-            const newTimeLeft = [...prev];
-            newTimeLeft[index] = Math.max(newTimeLeft[index] - 1, 0); // Uniknięcie ujemnych wartości
-            return newTimeLeft;
-          });
-        }, 1000);
-      }
-      return null;
-    });
-    // Wyczyść timery po odmontowaniu komponentu
-    return () => timers.forEach((timer) => timer && clearInterval(timer));
-  }, []); // Efekt uruchamia się tylko raz przy montowaniu
+  const [creaturesOnMission, setCreaturesOnMission] = useState([]);
+  const [creaturesOnMissionPhotos, setCreaturesOnMissionPhotos] = useState([]);
+  const [missionsFullTime, setMissionsFullTime] = useState([]);
+ 
+
+useEffect(() => {
+  if (remainingTimes.length === 0) return; // Jeśli brak danych, nie uruchamiaj timera
+
+  const timer = setInterval(() => {
+    setRemainingTimes((prevTimes) =>
+      prevTimes.map((time) => Math.max(time - 1, 0)) // Zmniejsz czas o 1 sekundę, ale nie poniżej 0
+    );
+  }, 1000);
+
+  return () => clearInterval(timer); // Wyczyść timer przy odmontowaniu
+}, [remainingTimes]);
+
+
+
+
+
+
+
 
 
   useEffect(()=>{
@@ -58,6 +66,36 @@ function Misions({ data }) {
       console.log(data);
       setSpeciesPhoto(data.speciesPhotos)
       setCreaturesData(data.creatures);
+      const creaturesOnMission = data.creatures.filter(
+        (creature) => creature.timeOfEndOfMission !== null
+      );
+      setCreaturesOnMission(creaturesOnMission);
+      const photosOnMission = data.creatures.reduce((result, creature, index) => {
+        if (creature.timeOfEndOfMission !== null) {
+          result.push(data.speciesPhotos[index]); // Dodaj zdjęcie odpowiadające indeksowi stworka
+        }
+        return result;
+      }, []);
+      console.log(creaturesOnMission);
+      setCreaturesOnMissionPhotos(photosOnMission);
+      const times = creaturesOnMission.map((creature) => {
+        const endTime = new Date(creature.timeOfEndOfMission);
+        const currentTime = new Date();
+        const diffInSeconds = Math.max(Math.floor((endTime - currentTime) / 1000), 0); // Pozostały czas w sekundach
+        return diffInSeconds;
+      });
+      console.log(times,"times");
+      setRemainingTimes(times);
+      const activeMissionTimes = creaturesOnMission.flatMap((creature) =>
+        creature.misions
+          .filter((mission) => mission.isThisMissionActive) // Filtruj tylko aktywne misje
+          .map((mission) => mission.timeOfMission)         // Pobierz timeOfMission
+      );
+      
+      console.log(activeMissionTimes, "Czasy aktywnych misji");
+      setMissionsFullTime(activeMissionTimes);
+    
+
   } catch (error) {
       console.error('Błąd podczas pobierania danych użytkownika:', error);
   }
@@ -91,8 +129,9 @@ function Misions({ data }) {
             return;
           }
         const creatureId = creature._id;
-        const missionId = mission._id; 
-        const response = await fetch(`http://localhost:8080/api/SendOnMission?missionId${missionId}&creatureId=${creatureId} `, {
+        const missionId = mission._id;
+        console.log(missionId,"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+        const response = await fetch(`http://localhost:8080/api/SendOnMission?missionId=${missionId}&creatureId=${creatureId} `, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -133,21 +172,24 @@ function Misions({ data }) {
           key={index} // Dodanie klucza
           className="w-[55vw] bg-gradient-to-r from-black to-maincolor1 h-[15vh] m-[1.5vh] rounded-3xl p-[1vh] border-2 border-maincolor2"
         >
-          {initialTimes[index] ?(
+          {creaturesOnMission[index] ?(
 
           
           <div className="w-full h-full bg-gradient-to-r from-maincolor1 to-black border border-maincolor1 rounded-3xl border-1 flex items-center justify-between px-4">
             
             <div className="ml-[1vh] mr-[3vh] w-[10vh] h-[10vh] rounded-full">
-              <img src="images/water1-3.png" className="rounded-full" alt="Mission" />
+              <img src={`images/${creaturesOnMissionPhotos[index][0]}.png`} className="rounded-full" alt="Mission" />
             </div>
             <div className="bg-gradient-to-r from-black to-maincolor5 w-4/5 h-2/5  rounded border-maincolor4 border-4 relative">
               <div
                 className={`h-full bg-maincolor1 absolute right-0  border-maincolor4 `}
-                style={{ width: `${(timeLeftTable[index] / initialTimes[index]) * 100 }%` }}
+                style={{ width: `${(remainingTimes[index] / (missionsFullTime[index]*60)) * 100 }%` }}
               ></div>
             </div>
-            <div className="text-white ml-auto text-[1.5vw] w-[6vh] ml-[3vh]">{formatTime(timeLeftTable[index])}</div>
+            {remainingTimes[index] / (missionsFullTime[index]*60) > 0 ?
+            (<div className="text-white ml-auto text-[1.5vw] w-[6vh] ml-[3vh]">{formatTime(remainingTimes[index])}</div>):(
+            <div className=" w-[6vh] h-[3vh] ml-[3vh]"><button className="bg-gradient-to-r from-maincolor3 to-maincolor5 w-full h-[4vh] rounded-2xl text-black font-extrabold border-2">CLAIM</button></div>) 
+            }
           </div>
 ):(<div></div>)}
         </div>

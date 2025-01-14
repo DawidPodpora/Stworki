@@ -12,6 +12,10 @@ const MissionSchema = new mongoose.Schema({
     timeOfMission:{
         type:Number,
         default: 0
+    },
+    isThisMissionActive:{
+        type: Boolean,
+        default: false
     }
 });
 
