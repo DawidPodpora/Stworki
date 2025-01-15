@@ -5,7 +5,7 @@ import toast, { Toaster } from 'react-hot-toast'; // Biblioteka do wyświetlania
 import { useFormik } from 'formik'; // Biblioteka do zarządzania formularzami w React
 import { registerValidation } from '../helper/validate'; // Funkcja walidująca dane wejściowe formularza
 import { registerUser } from '../helper/helper'; // Funkcja wysyłająca żądanie rejestracji użytkownika do API
-
+import { RedirectIfLoggedIn } from '../components/RedirectIfLoggedIn';
 import styles from '../styles/Username.module.css'; // Import stylów CSS
 
 export default function Register() {
@@ -40,6 +40,7 @@ export default function Register() {
   });
 
   return (
+    <RedirectIfLoggedIn>
     <div className="container mx-auto h-screen flex flex-col justify-center items-center">
       {/* Sekcja obsługi powiadomień */}
       <Toaster position="top-center" reverseOrder={false} />
@@ -92,5 +93,6 @@ export default function Register() {
         </form>
       </div>
     </div>
+    </RedirectIfLoggedIn>
   );
 }

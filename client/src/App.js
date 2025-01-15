@@ -11,7 +11,7 @@ import Reset from './components/Reset'; // Komponent resetowania hasła
 import PageNotFound from './components/PageNotFound'; // Komponent strony 404 (nie znaleziono)
 import StartPage from './components/ContentComponents/StartPage'; // Komponent strony powitalnej
 import MainPage from './components/MainPage'; // Komponent głównej strony aplikacji
-
+import RequireAuth from './components/RequireAuth'; // Komponent do wymuszania autoryzacji
 /** middleware do autentykacji */
 import { AuthorizeUser, ProtectRoute } from './middleware/auth' // Import middleware, które sprawdzają uprawnienia użytkownika
 
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
     },
     {
         path:'/mainpage', // Strona główna (ścieżka '/mainpage')
-        element:<MainPage></MainPage> // Wyświetlanie komponentu MainPage
+        element:<RequireAuth><MainPage></MainPage></RequireAuth> // Wyświetlanie komponentu MainPage
     }
 ])
 

@@ -29,3 +29,4 @@ export const ProtectRoute = ({ children }) => {
     // Jeśli użytkownik jest zalogowany, wyświetlamy dzieci komponentu
     return children;
 }
+

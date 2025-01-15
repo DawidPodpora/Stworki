@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react' // Import biblioteki React
 import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation` z biblioteki do obsługi tłumaczeń
-
+import { useNavigate } from 'react-router-dom'; 
 // Komponent Menu
 // `toogleOptions` - funkcja do przełączania opcji
 // `onButtonClick` - funkcja obsługująca kliknięcia przycisków w menu
 function Menu({ toogleOptions, onButtonClick, username }) {
   const { t } = useTranslation(); // Funkcja `t` służy do tłumaczeń w `react-i18next`
+  const navigate = useNavigate(); // Hook do nawigacji
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Usuń token z `localStorage`
+    navigate('/'); // Przekieruj użytkownika na stronę logowania
+  };
+
   // Lista etykiet dla przycisków menu, przetłumaczona za pomocą `t`
   const buttonLabels = [
     t('Strona główna'),       // Tłumaczenie dla "Strona główna"
@@ -41,9 +48,10 @@ function Menu({ toogleOptions, onButtonClick, username }) {
           {t('options')} {/* Tłumaczenie dla "options" */}
         </button>
         
+       
         {/* Przycisk wylogowania */}
-        <button className="w-1/3 border-maincolor5 border rounded-full">
-          {t('logout')} {/* Tłumaczenie dla "logout" */}
+        <button onClick={handleLogout} className="w-1/3 border-maincolor5 border rounded-full">
+          {t('logout')}
         </button>
       </div>
     </div>

@@ -7,7 +7,7 @@ import useFetch from '../hooks/fetch.hook'; // Hook do pobierania danych z API
 import { useAuthStore } from '../store/store'; // Pobieranie globalnego stanu aplikacji
 import { verifyPassword } from '../helper/helper'; // Funkcja do weryfikacji hasła
 import styles from '../styles/Username.module.css'; // Import stylów CSS
-
+import { RedirectIfLoggedIn } from '../components/RedirectIfLoggedIn';
 export default function Password() {
   const navigate = useNavigate(); // Hook do nawigacji
   const { username } = useAuthStore(state => state.auth); // Pobieranie nazwy użytkownika z globalnego stanu
@@ -50,6 +50,7 @@ export default function Password() {
   if (serverError) return <h1 className="text-xl text-red-500">{serverError.message}</h1>;
 
   return (
+    <RedirectIfLoggedIn>
     <div className="container mx-auto">
       {/* Komponent Toaster do wyświetlania powiadomień */}
       <Toaster position="top-center" reverseOrder={false}></Toaster>
@@ -94,5 +95,6 @@ export default function Password() {
         </div>
       </div>
     </div>
+    </RedirectIfLoggedIn>
   );
 }
