@@ -101,7 +101,34 @@ useEffect(() => {
   }
   }
 
+  const ClaimMission = async (creatureId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.warn('Brak tokenu w localStorage');
+        return;
+    }
 
+    try {
+        const response = await fetch(`http://localhost:8080/api/ClaimMission?creatureId=${creatureId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            return;
+        }
+        
+        const data = await response.json();
+        console.log(data);
+        return data;
+        
+    } catch (error) {
+        console.error('Błąd podczas pobierania danych użytkownika:', error);
+    }
+  };
 
 
   // Formatowanie czasu w minutach i sekundach
@@ -161,6 +188,14 @@ useEffect(() => {
     await sendCreatureOnMission(creature, mission);
     await fetchData();
   }
+
+  const claimMissionClick = async(creature) =>{
+    const creatureId = creature._id;
+    
+    await ClaimMission(creatureId);
+    await fetchData();
+
+  }
   const placeForMissions = Array(6).fill("");
   const missions = Array(3).fill("");
   return (
@@ -188,7 +223,7 @@ useEffect(() => {
             </div>
             {remainingTimes[index] / (missionsFullTime[index]*60) > 0 ?
             (<div className="text-white ml-auto text-[1.5vw] w-[6vh] ml-[3vh]">{formatTime(remainingTimes[index])}</div>):(
-            <div className=" w-[6vh] h-[3vh] ml-[3vh]"><button className="bg-gradient-to-r from-maincolor3 to-maincolor5 w-full h-[4vh] rounded-2xl text-black font-extrabold border-2">CLAIM</button></div>) 
+            <div className=" w-[6vh] h-[3vh] ml-[3vh]"><button onClick={()=>claimMissionClick(creaturesOnMission[index])} className="bg-gradient-to-r from-maincolor3 to-maincolor5 w-full h-[4vh] rounded-2xl text-black font-extrabold border-2">CLAIM</button></div>) 
             }
           </div>
 ):(<div></div>)}
@@ -200,8 +235,11 @@ useEffect(() => {
           <div className=" grid place-items-center  ">
             <div className="relative h-[14vh] aspect-square bg-maincolor1 rounded-2xl outline outline-4 outline-maincolor4">
               {creaturesData[index]?(
-              <div onClick={()=>changeCreature(index)}><img src={`images/${spiecesPhotos[index][0]}.png`}
-                                                                   className={`rounded-2xl ${activeCreature === index? "border-4 border-maincolor5":""}`}></img></div>):(<div></div>)
+              <div onClick={()=>changeCreature(index)}>
+                {!creaturesData[index].timeOfEndOfMission ?(
+                <img src={`images/${spiecesPhotos[index][0]}.png`}className={`rounded-2xl ${activeCreature === index? "border-8 border-maincolor5":""}`}></img>
+                ):(<img src={`images/${spiecesPhotos[index][0]}.png`} className={`rounded-2xl grayscale ${activeCreature === index? "border-8 border-black":""}`}></img>)}
+                </div>):(<div></div>)
               }
             </div>
           </div>
@@ -211,8 +249,10 @@ useEffect(() => {
         </div>
       </div>
         <div className="w-[22vw] h-[45vh] bg-maincolor1 absolute right-0 bottom-0 m-[1vw] rounded-3xl ">
+          <div className="h-[5vh] m-[1.5vh] rounded-lg border-4 border-black flex items-center justify-center bg-gradient-to-r from-maincolor5 via-black to-maincolor2 relative"><span className="z-10">{creaturesData[activeCreature].energy}</span><div className="h-full bg-maincolor1 rounded-sm absolute top-0 right-0 z-0" style={{ width: `${100 - creaturesData[activeCreature].energy}%` }}></div></div>
+            {!creaturesData[activeCreature].timeOfEndOfMission ? (<div>
             {missions.map((_,index)=>(
-              <div className={`w-[22] h-[11vh] m-[1.5vh] p-2 rounded-3xl ${missionChoose === index?"bg-gradient-to-r from-maincolor4 to-maincolor5":"bg-gradient-to-r from-black to-maincolor5"}`} onClick={()=>changedMission(index)}>
+              <div className={`h-[9vh] m-[1.5vh] p-2 rounded-3xl ${missionChoose === index?"bg-gradient-to-r from-maincolor4 to-maincolor5":"bg-gradient-to-r from-black to-maincolor5"}`} onClick={()=>changedMission(index)}>
                 <div className="w-full h-full bg-maincolor1 rounded-2xl p-[0.5vw] relative">
                   <div className="absolute right-0 bottom-1"><img src="images/money.png" className="w-[2vw]"></img>{creaturesData[activeCreature].misions[index].goldForMission}</div>
                   <div className="absolute left-1 bottom-1"><img src="images/experience.png" className="w-[2vw]"></img>{creaturesData[activeCreature].misions[index].expForMission}</div>
@@ -220,9 +260,11 @@ useEffect(() => {
                 </div>
               </div>
             ))}
+            
           <div className="w-full h-[4vh] flex justify-center items-center">
             <button onClick={()=>acceptMissionClick(creaturesData[activeCreature])} className="w-[6vw] h-[4vh] bg-gradient-to-r from-maincolor2 to-maincolor5 text-black text-2xl font-extrabold rounded-3xl border-2 border-maincolor4 hover:text-maincolor4">ACCEPT</button>
           </div>
+          </div>):(<div className="ml-[2vh] mt-[12vh] w-[35vh] h-[6vh] bg-maincolor5 flex items-center justify-center text-black font-extrabold text-[3vh] rounded-xl">IS ON MISSION</div>)}
           </div>
           </>):(<div>LOADING</div>)}
     </div>

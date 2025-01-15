@@ -85,11 +85,16 @@ export async function SendOnMission(req, res) {
         const creature = user.creatures.find((creature) => creature._id.toString() === creatureId);
         const mission = creature.misions.find((mission) => mission._id.toString() === missionId);
         const time = mission.timeOfMission; 
+        if(creature.energy < time)
+        {
+            return res.status(404).send({ error: 'za malo energii' });
+        }
         console.log(creature);
         console.log(creature.timeOfEndOfMission,"koniec misjii");
         if(!creature.timeOfEndOfMission){
         mission.isThisMissionActive = true;
         const currentTime = new Date();
+        creature.energy -= time;
         const endTime = new Date(currentTime.getTime() + time * 60 * 1000);
         console.log(endTime,"konie misji1");
         creature.timeOfEndOfMission =  endTime;
@@ -103,5 +108,86 @@ export async function SendOnMission(req, res) {
         res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 
     }
     
+}
+
+export async function ClaimMission(req, res){
+    try{
+       console.log("dziala");
+        const userId = req.user.userId;
+        const {creatureId} = req.query;
+        const user = await UserModel.findById(userId);
+        if(!user){
+            return res.status(404).send({ error: 'blad nie ma usera' });
+        }
+        const creature = user.creatures.find((creature) => creature._id.toString() === creatureId);
+        if(!creature){
+            return res.status(404).send({error: 'blad nie ma stworka'});
+        }
+        const mission = creature.misions.find((mission)=>mission.isThisMissionActive === true);
+        if(!mission){
+            return res.status(404).send({ error: 'nie ma misji' });
+        }
+        
+        const currentTime = new Date();
+        const endTime = creature.timeOfEndOfMission;
+        const emptyArray = [];
+        if(endTime < currentTime){
+            console.log("dziala");
+            user.money += mission.goldForMission;
+            user.exp += mission.expForMission;
+            creature.exp += mission.expForMission;
+            
+            while(user.exp >= user.expToNextLevel)
+            {
+                console.log("bbbbbbbbb");
+                user.level += 1;
+                user.exp -= user.expToNextLevel
+                const newExpToNextLevel = Math.floor(user.expToNextLevel * 2.5);
+                user.expToNextLevel = newExpToNextLevel;
+            }
+            while(creature.exp >= creature.expToNextLevel){
+                console.log("aaaaaaaaaa");
+                creature.level += 1;
+                creature.exp -= creature.expToNextLevel
+                const newExpToNextLevel = Math.floor(creature.expToNextLevel * 2.25);
+                creature.expToNextLevel = newExpToNextLevel;
+            }
+            console.log("przeszlo1");
+            console.log(user.level,"userlevel");
+            console.log(creature.level,"creaturelevel");
+            console.log(user.expToNextLevel,"user.expToNextLevel");
+            console.log(user.exp,"user.exp");
+            console.log(creature.expToNextLevel,"creature.expToNextLevel");
+            console.log(creature.exp,"creature.exp");
+            console.log(user.money,"user.money");
+            
+            creature.misions = emptyArray;
+            console.log("przeszlo2");
+            creature.timeOfEndOfMission = null;
+            if (creature.misions.length === 0) {
+                console.log("przeszlo brak misji");
+                for (let i = 0; i < 3; i++) {
+                    const mission = createMission(creature, user.level);
+                    const newMission = {
+                        goldForMission: mission.finalGold,
+                        expForMission: mission.finalExp,
+                        timeOfMission: mission.timeOfMissionInMinutes,
+                        isThisMissionActive:false
+                    };
+                    creature.misions.push(newMission); // Upewnij się, że pole nazywa się "missions", a nie "misions"
+                }
+            }
+            
+        }else{
+            return res.status(404).send({ error: 'misja sie nie skonczyla'});
+        }
+        
+       await user.save();
+        res.status(200).json({
+            
+        });
+    }catch(error){
+        res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 
+    }
 }
 
