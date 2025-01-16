@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'; // Importowanie biblioteki jwt do obsługi tokenów JWT
-import ENV from '../config.js' // Importowanie zmiennych środowiskowych z pliku konfiguracyjnego
+import ENV from '../config.js'; // Importowanie zmiennych środowiskowych z pliku konfiguracyjnego
+import User from '../model/User.model.js';
 
 /** Middleware autoryzacji */
 export default async function Auth(req, res, next){
@@ -33,4 +34,24 @@ export function localVariables(req, res, next){
 
     // Przekazanie kontroli do kolejnego middleware lub trasy
     next()
+}
+/** Middleware do sprawdzania uprawnień administratora */
+
+export async function verifyAdmin(req, res, next) {
+    try{
+        const authHeader = req.headers.authorization;
+        if(!authHeader){
+            return res.status(401).json({error: 'Brak tokenu autoryzacyjnego'});
+        }
+        const token = authHeader.split(" ")[1];
+        const decodedToken = await jwt.verify(token, ENV.JWT_SECRET);
+
+        console.log('Token JWT zdekodowany:', decodedToken);
+        req.user = decodedToken;
+        next();
+    } catch(error){
+        console.error('Błąd przy weryfikacji czy admin: ',error.message);
+        res.status(500).json({error: "Server Error"});
+    }
+    
 }

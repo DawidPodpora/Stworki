@@ -7,7 +7,7 @@ import { usernameValidate } from '../helper/validate' // Funkcja walidacyjna dla
 import { useAuthStore } from '../store/store' // Hook do zarządzania stanem autoryzacji
 
 import styles from '../styles/Username.module.css'; // Import stylów dla komponentu
-
+import { RedirectIfLoggedIn } from '../components/RedirectIfLoggedIn';
 export default function Username() {
 
   const navigate = useNavigate(); // Hook do nawigacji między stronami
@@ -28,6 +28,7 @@ export default function Username() {
   })
 
   return (
+    <RedirectIfLoggedIn>
     <div className="container mx-auto"> {/* Kontener dla całego komponentu */}
 
       {/* Obsługa powiadomień */}
@@ -56,5 +57,6 @@ export default function Username() {
         </div>
       </div>
     </div>
+    </RedirectIfLoggedIn>
   )
 }

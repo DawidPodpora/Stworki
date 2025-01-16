@@ -4,7 +4,7 @@ const router = Router();
 /** import wszystkich kontrolerów */
 import * as controller from '../controllers/appController.js'; // Importowanie wszystkich kontrolerów aplikacji
 import { registerMail } from '../controllers/mailer.js'; // Importowanie funkcji do wysyłania e-maili
-import Auth, { localVariables } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
+import Auth, { localVariables, verifyAdmin } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
 import { getCreaturesbyName } from "../controllers/creaturesFight.js";
 import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
@@ -12,6 +12,8 @@ import * as items  from "../controllers/itemCreating.js";
 import * as itemsActions from "../controllers/itemsActions.js";
 import * as messagesController from '../controllers/messagesController.js';
 import * as missionsControler from '../controllers/missionControler.js'
+import { getAllNotices, createNotice, deleteNotice } from "../controllers/noticeController.js";
+import * as marketController from "../controllers/marketController.js";
 
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
@@ -79,4 +81,14 @@ router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsRea
 router.route('/missionsInfo').get(Auth, missionsControler.SendAndCheckMissionInfo);
 router.route('/SendOnMission').get(Auth, missionsControler.SendOnMission);
 router.route('/ClaimMission').get(Auth, missionsControler.ClaimMission);
+router.route('/messageToAll').post(verifyAdmin, messagesController.sendMessageToAll);
+//Ogłoszenia
+router.route('/notices').get(getAllNotices);
+router.route('/notices').post(verifyAdmin, createNotice);
+router.route('/notices/:id').delete(verifyAdmin, deleteNotice);
+
+//market
+router.route('/add').post(Auth, marketController.addItemToMarket);
+router.route('/').get(marketController.getMarketItems);
+router.route('/bid').post(Auth, marketController.placeBid);
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/store'; // Pobranie danych uwierzytelniaj
 import styles from '../styles/Username.module.css'; // Import stylów CSS
 import { generateOTP, verifyOTP } from '../helper/helper'; // Funkcje do generowania i weryfikacji OTP
 import { useNavigate } from 'react-router-dom'; // Hook do nawigacji między stronami
-
+import { RedirectIfLoggedIn } from '../components/RedirectIfLoggedIn';
 export default function Recovery() {
   // Pobieramy nazwę użytkownika z globalnego stanu
   const { username } = useAuthStore(state => state.auth);
@@ -65,6 +65,7 @@ export default function Recovery() {
   }
 
   return (
+    <RedirectIfLoggedIn>
     <div className="container mx-auto">
       {/* Komponent obsługujący powiadomienia */}
       <Toaster position="top-center" reverseOrder={false} />
@@ -114,5 +115,6 @@ export default function Recovery() {
         </div>
       </div>
     </div>
+    </RedirectIfLoggedIn>
   );
 }

@@ -105,6 +105,10 @@ export const UserSchema = new mongoose.Schema({
             return todayMidnight;
         }
     },
+    isAdmin:{
+        type: Boolean,
+        default: false
+    }
     
 });
 
