@@ -92,6 +92,19 @@ export const UserSchema = new mongoose.Schema({
             return todayMidnight;
         }
     },
+    expToNextLevel:{
+        type: Number,
+        default: 500
+    },
+    missionCreatureReset:{
+        type: Date,
+        default: function () {
+            const now = new Date();
+            const todayMidnight = new Date(now);
+            todayMidnight.setHours(0, 0, 0, 0); // Ustaw godzinę na północ
+            return todayMidnight;
+        }
+    },
     isAdmin:{
         type: Boolean,
         default: false

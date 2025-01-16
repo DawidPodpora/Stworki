@@ -189,7 +189,9 @@ const drawWithElement = async(element) =>
                 species: newSpeciesName,
                 energy: 100,
                 exp: 0,
-                items:[]
+                items:[],
+                expToNextLevel:100,
+                timeOfEndOfMission: null
             };
             console.log(newCreature);
             user.creatures.push(newCreature);
@@ -238,7 +240,10 @@ const drawWithElement = async(element) =>
                 species: newSpeciesName,
                 energy: 100,
                 exp: 0,
-                items:[]
+                items:[],
+                expToNextLevel:100,
+                timeOfEndOfMission: null
+                    
             };
             console.log(newCreature);
             user.creatures.push(newCreature);

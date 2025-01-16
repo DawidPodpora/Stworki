@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import ItemSchema from '../model/Item.js';
+import MissionSchema from '../model/mission.js';
+
 
 const CreatureSchema = new mongoose.Schema({
     name: {
@@ -36,6 +38,18 @@ const CreatureSchema = new mongoose.Schema({
             },
             message: 'Creature can have a maximum of 3 items.'
         }
+      },
+      expToNextLevel:{
+        type: Number,
+        default: 0
+      },
+      timeOfEndOfMission:{
+        type: Date,
+        default: null
+      },
+      misions:{
+          type:[MissionSchema],
+          default:[],
       }
       
 });

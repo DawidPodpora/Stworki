@@ -19,27 +19,38 @@ function Menu({ toogleOptions, onButtonClick, username }) {
     t('Moje stworki'),        // Tłumaczenie dla "Moje stworki"
     t('Sklep'),               // Tłumaczenie dla "Sklep"
     t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
-    t('optionE'),             // Tłumaczenie dla dodatkowej opcji E
+    t('Misje'),             // Tłumaczenie dla dodatkowej opcji E
     t('optionF'),             // Tłumaczenie dla dodatkowej opcji F
     t('optionG')              // Tłumaczenie dla dodatkowej opcji G
   ];
-  
+  const [buttonPressed, setButtonPressed] = useState(0);
+  const changeButton =(number)=>{
+    setButtonPressed(number);
+  }
   // Wygląd i logika komponentu
   return (
-    <div className="relative flex flex-col items-center bg-maincolor1 text-maincolor4 space-y-4 w-1/5 h-screen rounded-xl pt-10 border-r-2 border-maincolor5">
+    <div className="relative flex flex-col items-center bg-gradient-to-r from-maincolor1 via-black to-maincolor1 text-maincolor4 space-y-4 w-1/5 h-screen rounded-xl pt-10 border-r-2 border-maincolor5">
       {/* Przyciski menu */}
       <div>
             {username ? <h1>Witaj, {username}!</h1> : <p>Ładowanie danych użytkownika...</p>}
         </div>
-      {buttonLabels.map((label, index) => (
+      {buttonLabels.map((label, index) => (<>
+        {buttonPressed === index ?(
         <button
           key={index} // Unikalny klucz dla każdego przycisku
-          onClick={() => onButtonClick(index + 1)} // Wywołanie `onButtonClick` z numerem przycisku (indeks + 1)
-          className="border-maincolor2 rounded-xl border py-2 px-4 w-4/5 hover:border-maincolor5 hover:shadow-maincolor5 hover:bg-maincolor4 shadow-buttonshadow transition duration-300 hover:text-black1 hover:bg-opacity-75"
+          onClick={() => {onButtonClick(index + 1); changeButton(index)}} // Wywołanie `onButtonClick` z numerem przycisku (indeks + 1)
+          className=" rounded-xl border py-2 px-4 w-4/5 border-maincolor5 shadow-maincolor5 bg-maincolor4 shadow-buttonshadow transition duration-300 text-black1 bg-opacity-75"
         >
           {label} {/* Wyświetlana etykieta przycisku */}
         </button>
-      ))}
+      ):( <button
+        key={index} // Unikalny klucz dla każdego przycisku
+        onClick={() => {onButtonClick(index + 1); changeButton(index)} } // Wywołanie `onButtonClick` z numerem przycisku (indeks + 1)
+        className="border-maincolor2 rounded-xl border py-2 px-4 w-4/5 hover:border-maincolor5 hover:shadow-maincolor5 hover:bg-maincolor4 shadow-buttonshadow transition duration-300 hover:text-black1 hover:bg-opacity-75"
+      >
+        {label} {/* Wyświetlana etykieta przycisku */}
+      </button>)}
+      </>))}
       
       {/* Przyciski na dole menu */}
       <div className="flex justify-between absolute bottom-10 w-3/5">
