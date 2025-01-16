@@ -29,14 +29,23 @@ export async function SendAndCheckMissionInfo(req,res) {
        
         let speciesPhotos = [];
         const userId = req.user.userId;
-        
         const user = await UserModel.findById(userId);
-        const creatures = user.creatures;
-        
-        
         if (!user) {
             return res.status(404).send({ error: 'Użytkownik nie znaleziony' });
         }
+        const creatures = user.creatures;
+        if(user.missionCreatureReset < new Date())
+        {
+            for(let i = 0 ; i < creatures.length; i++)
+            {
+                creatures[i].energy = 100;
+            }
+            const nextDayMidnight = new Date();
+            nextDayMidnight.setDate(nextDayMidnight.getDate() + 1);
+            nextDayMidnight.setHours(0, 0, 0, 0);
+            user.missionCreatureReset = nextDayMidnight;
+        }
+        
         for (const creature of user.creatures) {
             const photoNameOfSpecie = await Species.findOne({
                 name: creature.species,
