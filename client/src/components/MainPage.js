@@ -2,6 +2,7 @@ import Menu from './Menu.js'; // Import komponentu Menu
 import Options from './Options.js'; // Import komponentu Options
 import Content from './Content.js'; // Import komponentu Content
 import FirstOrb from './FirstOrb.js';
+import FightScreen from './FightScreen.js';
 import React, { useState, useEffect } from 'react'; // Import React i hooka useState do zarządzania stanem
 import NewCreatureWindow from './NewCreatureWindow.js';
 
@@ -12,6 +13,7 @@ function MainPage() {
   const [newCreature, setNewCreature] = useState(false);
   const [creatureData, setNewCreatureData] = useState();
   const [userFullData, setUserFullData] = useState(null);
+  const [creatrureFight, setCreatureFight] = useState(false);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -100,6 +102,10 @@ function MainPage() {
       {newCreature &&(
         <NewCreatureWindow newCreatureData={creatureData} windowSwicher={nameForCreatureSwitch}/>
       )}
+      {creatrureFight &&(
+        <FightScreen>
+
+      </FightScreen>)}
     </div>
   );
 }

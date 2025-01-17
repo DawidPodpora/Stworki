@@ -5,7 +5,7 @@ const router = Router();
 import * as controller from '../controllers/appController.js'; // Importowanie wszystkich kontrolerów aplikacji
 import { registerMail } from '../controllers/mailer.js'; // Importowanie funkcji do wysyłania e-maili
 import Auth, { localVariables, verifyAdmin } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
-import { getCreaturesbyName } from "../controllers/creaturesFight.js";
+import * as creaturesFight from "../controllers/creaturesFight.js";
 import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
 import * as items  from "../controllers/itemCreating.js";
@@ -58,7 +58,7 @@ router.route('/updateuser').put(Auth, controller.updateUser); // aktualizacja pr
 // Ścieżka do resetowania hasła użytkownika
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); // resetowanie hasła
 
-router.route('/creaturesFight').get(getCreaturesbyName);
+router.route('/creaturesFight').get(creaturesFight.getCreaturesbyName);
 router.route('/userData').get(Auth, controller.getUserData);
 router.route('/newSpecie').post(createNewSpecies);
 router.route('/newItemBaseData').post(createNewItemBaseData);
