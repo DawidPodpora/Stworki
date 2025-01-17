@@ -3,6 +3,7 @@ import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponen
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
 import PrivateMessages from './ContentComponents/PrivateMessages.js';
 import Misions from './ContentComponents/Misions.js';
+import GuildView from './ContentComponents/GuildView.js';
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
 function Content({ selectedButton, data, NewCreatureActiveButton}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
@@ -24,6 +25,9 @@ function Content({ selectedButton, data, NewCreatureActiveButton}) {
       break;
     case 5:
       ComponentToRender = Misions;
+      break;
+    case 6:
+     ComponentToRender = GuildView; // Nowy widok gildii
       break;
     default:
       // Domyślny przypadek, gdy `selectedButton` nie pasuje do żadnej wartości

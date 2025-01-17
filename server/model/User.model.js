@@ -108,7 +108,12 @@ export const UserSchema = new mongoose.Schema({
     isAdmin:{
         type: Boolean,
         default: false
-    }
+    },
+    isOnline: { type: Boolean, default: false },
+    invitations: [{
+        guildId: { type: mongoose.Schema.Types.ObjectId, ref: 'Guild' },
+        status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' }
+    }],
     
 });
 
