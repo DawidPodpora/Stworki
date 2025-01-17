@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/store'; // Pobieranie globalnego stanu ap
 import { verifyPassword } from '../helper/helper'; // Funkcja do weryfikacji hasła
 import styles from '../styles/Username.module.css'; // Import stylów CSS
 import { RedirectIfLoggedIn } from '../components/RedirectIfLoggedIn';
+import jwt_decode from "jwt-decode"; 
 export default function Password() {
   const navigate = useNavigate(); // Hook do nawigacji
   const { username } = useAuthStore(state => state.auth); // Pobieranie nazwy użytkownika z globalnego stanu
@@ -37,8 +38,18 @@ export default function Password() {
 
       // Po pomyślnym zalogowaniu zapisanie tokena i przekierowanie na stronę główną
       loginPromise.then((res) => {
-        let { token } = res.data;
-        localStorage.setItem('token', token); // Zapis tokena w localStorage
+        const { token } = res.data; // Pobierz token z odpowiedzi
+        console.log('Otrzymany token:', token); // Debugowanie
+    
+        // Dekodowanie tokena JWT, aby uzyskać userId
+        const decodedToken = jwt_decode(token);
+        const userId = decodedToken.userId; // Wyciągnięcie userId z dekodowanego tokena
+        console.log('Otrzymany userId:', userId); // Debugowanie
+    
+        // Zapis tokena i userId w localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', userId);
+    
         navigate('/mainpage'); // Przekierowanie na stronę główną
       });
     },

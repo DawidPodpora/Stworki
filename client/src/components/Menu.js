@@ -7,11 +7,28 @@ import { useNavigate } from 'react-router-dom';
 function Menu({ toogleOptions, onButtonClick, username }) {
   const { t } = useTranslation(); // Funkcja `t` służy do tłumaczeń w `react-i18next`
   const navigate = useNavigate(); // Hook do nawigacji
+  
+  const handleLogout = async () => {
+    try {
+        const response = await fetch('http://localhost:8080/api/logout', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
 
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // Usuń token z `localStorage`
-    navigate('/'); // Przekieruj użytkownika na stronę logowania
-  };
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Nie udało się wylogować');
+
+        // Usuń token i userId z localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+
+        // Przekieruj użytkownika na stronę logowania lub główną
+        navigate('/');
+    } catch (error) {
+        console.error('Błąd podczas wylogowywania:', error.message);
+        alert('Nie udało się wylogować');
+    }
+};
 
   // Lista etykiet dla przycisków menu, przetłumaczona za pomocą `t`
   const buttonLabels = [
@@ -20,7 +37,7 @@ function Menu({ toogleOptions, onButtonClick, username }) {
     t('Sklep'),               // Tłumaczenie dla "Sklep"
     t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
     t('Misje'),             // Tłumaczenie dla dodatkowej opcji E
-    t('optionF'),             // Tłumaczenie dla dodatkowej opcji F
+    t('Gildie'),             // Tłumaczenie dla dodatkowej opcji F
     t('optionG')              // Tłumaczenie dla dodatkowej opcji G
   ];
   const [buttonPressed, setButtonPressed] = useState(0);
