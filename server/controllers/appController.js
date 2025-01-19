@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'; // Importowanie biblioteki jsonwebtoken do gener
 import ENV from '../config.js' // Importowanie pliku konfiguracyjnego z ustawieniami środowiskowymi
 import otpGenerator from 'otp-generator' // Importowanie biblioteki do generowania jednorazowych haseł (OTP)
 import Species from '../model/Species.js';
-import Creatures from '../model/Creature.js';
+
 /** middleware do weryfikacji użytkownika */
 export async function verifyUser(req, res, next){
     try {
@@ -99,44 +99,42 @@ export async function register(req, res) {
   "password" : "admin123"
 }
 */
-export async function login(req,res){
-   
+export async function login(req, res) {
     const { username, password } = req.body; // Pobieranie danych logowania z ciała żądania
 
     try {
+        const user = await UserModel.findOne({ username }); // Sprawdzanie, czy użytkownik istnieje
+        if (!user) return res.status(404).json({ error: "Nie znaleziono użytkownika" });
+
+        const passwordCheck = await bcrypt.compare(password, user.password); // Weryfikacja hasła
+        if (!passwordCheck) return res.status(400).json({ error: "Nieprawidłowe hasło" });
+
+        // Oznacz użytkownika jako online
+        user.isOnline = true;
+        await user.save();
+
+        // Tworzenie tokenu JWT
+        const token = jwt.sign(
+            {
+                userId: user._id,
+                username: user.username,
+            },
+            ENV.JWT_SECRET,
+            { expiresIn: "24h" }
+        );
+
+        return res.status(200).send({
+            msg: "Logowanie pomyślne",
+            username: user.username,
+            token,
+        });
         
-        UserModel.findOne({ username }) // Sprawdzanie, czy użytkownik o podanej nazwie użytkownika istnieje
-            .then(user => {
-                bcrypt.compare(password, user.password) // Sprawdzanie, czy hasło pasuje do zapisanych danych
-                    .then(passwordCheck => {
-
-                        if(!passwordCheck) return res.status(400).send({ error: "Nieprawidłowe hasło"}); // Jeśli hasło nie pasuje, zwróć błąd
-
-                        // Tworzenie tokenu JWT
-                        const token = jwt.sign({
-                                        userId: user._id,
-                                        username : user.username
-                                    }, ENV.JWT_SECRET , { expiresIn : "24h"}); // Token ważny przez 24 godziny
-
-                        return res.status(200).send({
-                            msg: "Logowanie pomyślne...!",
-                            username: user.username,
-                            token
-                        });                                    
-
-                    })
-                    .catch(error =>{
-                        return res.status(400).send({ error: "Hasło nie pasuje"})
-                    })
-            })
-            .catch( error => {
-                return res.status(404).send({ error : "Nie znaleziono użytkownika"});
-            })
-
     } catch (error) {
-        return res.status(500).send({ error}); // Obsługa ogólnych błędów
+        return res.status(500).send({ error: error.message }); // Obsługa błędów
     }
+    
 }
+
 
 
 /** GET: http://localhost:8080/api/user/example123 */
@@ -416,7 +414,7 @@ export async function fullDataForAllCreatures(req, res)
     try{
         console.log("pobieranie stworkow");
         const userId = req.user.userId;
-        const creaturesanditems = await UserModel.findById(userId).select('creatures items',);
+        const creaturesanditems = await UserModel.findById(userId).select('creatures items exp money username exp expToNextLevel level',);
         const creatures = creaturesanditems.creatures;
         const items = creaturesanditems.items;
         const speciesData = [];
@@ -433,8 +431,13 @@ export async function fullDataForAllCreatures(req, res)
         res.status(200).send({
             species: speciesData, 
             creatures: creatures,
-            items: items
-        });
+            items: items,
+            exp: creaturesanditems.exp,
+            gold: creaturesanditems.money,
+            username: creaturesanditems.username,
+            expToNextLevel :creaturesanditems.expToNextLevel,
+            level: creaturesanditems.level
+        })
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy pobieraniu danych o stworkach' }); 
     }

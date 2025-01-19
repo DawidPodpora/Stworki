@@ -14,7 +14,8 @@ import * as messagesController from '../controllers/messagesController.js';
 import * as missionsControler from '../controllers/missionControler.js'
 import { getAllNotices, createNotice, deleteNotice } from "../controllers/noticeController.js";
 import * as marketController from "../controllers/marketController.js";
-
+import * as guildController from "../controllers/guildController.js";
+import { enhanceUserWithGuildData } from '../middleware/enUserWithGuildData.js';
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -58,7 +59,7 @@ router.route('/updateuser').put(Auth, controller.updateUser); // aktualizacja pr
 // Ścieżka do resetowania hasła użytkownika
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); // resetowanie hasła
 
-router.route('/creaturesFight').get(creaturesFight.getCreaturesbyName);
+router.route('/creaturesFight').get(missionsControler.CreaturesFightArena);
 router.route('/userData').get(Auth, controller.getUserData);
 router.route('/newSpecie').post(createNewSpecies);
 router.route('/newItemBaseData').post(createNewItemBaseData);
@@ -91,4 +92,21 @@ router.route('/notices/:id').delete(verifyAdmin, deleteNotice);
 router.route('/add').post(Auth, marketController.addItemToMarket);
 router.route('/').get(marketController.getMarketItems);
 router.route('/bid').post(Auth, marketController.placeBid);
+
+// Gildie
+router.route('/userGuilds').get(Auth, guildController.getUserGuilds); 
+router.route('/createGuild').post(Auth, guildController.createGuild); 
+router.route('/onlineUsers').get(Auth, guildController.getOnlineUsers); 
+router.route('/leaveGuild').post(Auth, guildController.leaveGuild);
+router.route('/inviteToGuild').post(Auth, enhanceUserWithGuildData, guildController.inviteToGuild);
+router.route('/handleInvitation').post(Auth, guildController.handleGuildInvitation);
+router.route('/invitations').get(Auth, guildController.getUserInvitations);
+router.route('/removeMember/:guildId').delete(Auth, guildController.removeMember);
+router.route('/updateMaxMembers/:guildId').patch(Auth, guildController.updateMaxMembers);
+router.route('/deleteGuild/:guildId').delete(Auth, guildController.deleteGuild);
+router.route('/guilds/:guildId/members').get(Auth, guildController.getGuildMembersUsernames);
+
+//logout
+router.route('/logout').post(Auth, guildController.logout);
+
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

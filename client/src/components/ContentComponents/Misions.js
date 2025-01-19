@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function Misions({ data }) {
+function Misions({ data, creatureFightActiveButton }) {
 
 
   const initialTimes = [10, 50, 70, 90, 300];
@@ -13,6 +13,7 @@ function Misions({ data }) {
   const [creaturesOnMission, setCreaturesOnMission] = useState([]);
   const [creaturesOnMissionPhotos, setCreaturesOnMissionPhotos] = useState([]);
   const [missionsFullTime, setMissionsFullTime] = useState([]);
+  const [fightData, setFightData] = useState(null);
  
 
 useEffect(() => {
@@ -123,6 +124,7 @@ useEffect(() => {
         
         const data = await response.json();
         console.log(data);
+
         return data;
         
     } catch (error) {
@@ -192,7 +194,9 @@ useEffect(() => {
   const claimMissionClick = async(creature) =>{
     const creatureId = creature._id;
     
-    await ClaimMission(creatureId);
+    await ClaimMission(creatureId).then((response)=>{
+      creatureFightActiveButton(response);
+    })
     await fetchData();
 
   }
@@ -201,7 +205,7 @@ useEffect(() => {
   return (
     <div className="absolute w-full bg-black1 h-screen text-maincolor4">
     {creaturesData && spiecesPhotos?(
-      <>
+      <div>
       {placeForMissions.map((_, index) => (
         <div
           key={index} // Dodanie klucza
@@ -266,7 +270,7 @@ useEffect(() => {
           </div>
           </div>):(<div className="ml-[2vh] mt-[12vh] w-[35vh] h-[6vh] bg-maincolor5 flex items-center justify-center text-black font-extrabold text-[3vh] rounded-xl">IS ON MISSION</div>)}
           </div>
-          </>):(<div>LOADING</div>)}
+          </div>):(<div>LOADING</div>)}
     </div>
   );
 }

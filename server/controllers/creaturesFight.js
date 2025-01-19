@@ -258,31 +258,35 @@ const fightMechanism = async(creature1 , creature2) =>
         }
         
     }
+    let whoWon
     if(hpcreature1 <= 0)
     {
+        whoWon = "c2";
         console.log("wygrywa c2")
     }
     else if(hpcreature2 <= 0)
     {
+        whoWon = "c1";
         console.log("wygrywa c1")
     }
     return{
-        fightData
+        fightData,
+        whoWon
     }
 }
 
 export const getCreaturesbyName = async (req, res) => {
     try {
     console.log("aaaaaaaaaaaaaaaaaaaaaaaa");
-    const user1 = await UserModel.findById("6789032ee9320af600888e16");
-    const user2 = await UserModel.findById("678853fd0a59ce2d1276454c");
+    const user1 = await UserModel.findById("678ab941be7ae87a81ba1b39");
+    const user2 = await UserModel.findById("678a98c88bc707999dc627a2");
     console.log(user1.creatures);
     console.log(user2.creatures);
-    const creature1 = user1.creatures.find((creature)=> creature._id.toString() === "67890345e9320af600888e20");  
-    const creature2 = user2.creatures.find((creature)=> creature._id.toString() === "67885ea6a5ba840b18e87831"); 
+    const creature1 = user1.creatures.find((creature)=> creature._id.toString() === "678ab952be7ae87a81ba1b45");  
+    const creature2 = user2.creatures.find((creature)=> creature._id.toString() === "678a98d38bc707999dc627ad"); 
     const fight = await fightMechanism(creature1, creature2);
-    console.log(fight.fightData,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        res.status(200).json(creature1); // Odpowiadamy na żądanie z danymi stworków
+    console.log(fight);
+        res.status(200).json({fight}); // Odpowiadamy na żądanie z danymi stworków
     } 
     //po niepowodzeniu
     catch (error) {

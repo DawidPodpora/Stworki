@@ -7,7 +7,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
   const [visibleCreature, setVisibleCreature] = useState(0);
   const [itemActionVisible, setItemActionVisible] = useState(false);
   const [actualItem, setActualItem] = useState([]);
-
+  const [playerLevel, setPlayerLevel] = useState(0);
   // DODANE (1) – Stany związane z tooltipem:
   const maxHeight = window.innerHeight;
   const maxWidth = window.innerWidth;
@@ -15,6 +15,10 @@ function TestButton2({data, NewCreatureActiveButton}) {
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 }); // Pozycja tooltipa
   const [tooltipContent, setTooltipContent] = useState(null);           // Zawartość (item) tooltipa
   const [whatItemPanel, setWhatItemPanel] = useState(null);
+  const [exp, setExp] = useState(0);
+  const [gold, setGold] = useState(0);
+  const [name, setName] = useState(null);
+  const [expToNextLevel, setExpToNextLevel] = useState(0);
   const fetchUserData = async () => {
     const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
     if (!token) {
@@ -40,6 +44,11 @@ function TestButton2({data, NewCreatureActiveButton}) {
         setCreatures(data.creatures);
         setSpecies(data.species);
         setItemsFromUser(data.items);
+        setExp(data.exp);
+        setGold(data.gold);
+        setName(data.username);
+        setExpToNextLevel(data.expToNextLevel);
+        setPlayerLevel(data.level);
         
     } catch (error) {
         console.error('Błąd podczas pobierania danych użytkownika:', error);
@@ -247,7 +256,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
       {creatures ? (
         <>
           {/* Górny panel (stwór, aktywne przedmioty, statystyki) */}
-          <div className="w-full h-1/2 bg-maincolor1 rounded-xl p-4 flex items-center z-0">
+          <div className="w-full h-1/2 bg-gradient-to-r from-maincolor1 via-black to-maincolor1 rounded-xl p-4 flex items-center z-0 border-2 border-maincolor1">
             {/* Obrazek stwora */}
             <div className="h-[45vh] aspect-square bg-maincolor4 rounded-xl border-2 border-maincolor5">
               <img
@@ -304,8 +313,12 @@ function TestButton2({data, NewCreatureActiveButton}) {
                   </div>
 
                   <div className="w-4/5 h-full">
-                    <p className="w-full h-1/4 text-center">NAME</p>
-                    <div className="w-full h-3/4 text-center">{creatures[visibleCreature].name}</div>
+                    <div className="w-full h-3/4 text-center">{creatures[visibleCreature].name}
+                      <div className=" mt-[3vh] ml-[3vw] w-4/5 h-1/4 bg-gradient-to-r from-maincolor2 via-black to-maincolor5 border-4 relative" ><div className="bg-maincolor1 h-full absolute right-0" style={{width:`${(creatures[visibleCreature].expToNextLevel -creatures[visibleCreature].exp)/creatures[visibleCreature].expToNextLevel * 100}%`}}></div></div>
+                      <div className="mt-[2vh]">{creatures[visibleCreature].exp}/{creatures[visibleCreature].expToNextLevel}</div>
+                      <div className="mt-[2vh]">LEVEL: {creatures[visibleCreature].level}</div>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -323,7 +336,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
           {/* Panel z potworami i przedmiotami */}
           <div className="w-full h-1/2 flex gap-4">
             {/* Obrazy potworów */}
-            <div className="w-1/2 h-full bg-maincolor1 rounded-xl flex flex-wrap justify-center">
+            <div className="w-1/2 h-full bg-gradient-to-r from-maincolor1 to-black border-2 border-maincolor1 rounded-xl flex flex-wrap justify-center">
               {species.map((a, index) => (
                 <div key={index} className="w-1/3 h-1/2 grid place-items-center">
                   <div
@@ -351,7 +364,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
             </div>
 
             {/* Panel z przedmiotami */}
-            <div className="relative w-1/2 h-full bg-maincolor1 rounded-xl flex flex-wrap justify-center gap-4 p-4 overflow-y-auto max-h-[60vh]">
+            <div className="relative w-1/2 h-full bg-gradient-to-r from-black to-maincolor1 border-2 border-maincolor1 rounded-xl flex flex-wrap justify-center gap-4 p-4 overflow-y-auto max-h-[60vh]">
               {items.map((_, index) => (
                 <div
                   key={index}
@@ -407,6 +420,10 @@ function TestButton2({data, NewCreatureActiveButton}) {
               panelVisible ? "translate-x-0" : "translate-x-full"
             }`}
           >
+            <div className="text-[3vw] w-full flex items justify-center h-1/5">{name} LEVEL: {playerLevel}</div>
+            <div className="text-[1.5vw] flex justify-between m-[3vw] h-1/3 "><div className="w-1/6 flex justify-between relative"><img src="images/money.png" className="h-full"></img><div className="absolute top-1/2 left-[7vw]">{gold} </div></div>
+              <div className="relative w-1/2"><div className="absolute top-1/2">{exp}/{expToNextLevel}</div><div className="w-3/4 h-1/4 border-2 top-1/2 absolute ml-[8vw]"><div className = "bg-maincolor2 h-full" style={{width:`${exp/expToNextLevel*100}%`}}></div></div></div>
+            </div>
             <div
               className={`absolute h-[15vh] bg-maincolor1 top-[15.5vh] rounded flex justify-center -p-[5vh] border-maincolor5 border-2 ${
                 panelVisible ? "left-[-1vw]" : "left-[-2vw]"
