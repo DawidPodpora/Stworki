@@ -8,7 +8,7 @@ export const addItemToMarket = async (req, res) => {
         const { itemId, type, price, duration } = req.body;
         const userId = req.user.userId;
 
-        const user = await UserModel.findById(userId).lean(); // Pobierz użytkownika jako zwykły obiekt
+        const user = await UserModel.findById(userId); // Pobierz użytkownika jako zwykły obiekt
         const item = user.items.find(i => i._id.toString() === itemId);
 
         if (!item) {
@@ -19,6 +19,15 @@ export const addItemToMarket = async (req, res) => {
         if (price > maxPrice) {
             return res.status(400).json({ error: `Maksymalna cena sprzedaży to ${maxPrice}.` });
         }
+        //Prowizja
+        let commissionRate = duration === "2" ? 0.02 : duration === "8" ? 0.03 : 0.04;
+        let commissionFee = Math.floor(price * commissionRate);
+
+        if (user.money < commissionFee){
+            return res.status(400).json({error: "Nie masz wystarczających środków na pokrycie prowizji"})
+        }
+        user.money -= commissionFee;
+        await user.save();
 
         const endTime = new Date(Date.now() + duration * 60 * 60 * 1000);
 
@@ -117,43 +126,50 @@ export const placeBid = async (req, res) => {
 export const buyMarketItem = async (req, res) => {
     try {
         const { marketItemId } = req.body;
-        const buyerId = req.user.userId;
+        const userId = req.user.userId;
 
-        const marketItem = await MarketItem.findById(marketItemId).populate('seller');
-        if (!marketItem || marketItem.status !== 'active') {
-            return res.status(404).json({ error: 'Przedmiot nie jest dostępny.' });
+        if (!marketItemId) {
+            return res.status(400).json({ error: "Brak marketItemId" });
         }
 
-        if (marketItem.type !== 'fixed') {
-            return res.status(400).json({ error: 'Nie można wykupić przedmiotu wystawionego do licytacji.' });
+        // Pobranie przedmiotu z rynku i jego pełnych danych
+        const marketItem = await MarketItem.findById(marketItemId);
+
+        if (!marketItem) {
+            return res.status(404).json({ error: "Przedmiot nie został znaleziony." });
         }
 
-        const buyer = await UserModel.findById(buyerId);
-        if (buyer.money < marketItem.buyoutPrice) {
-            return res.status(400).json({ error: 'Nie masz wystarczająco dużo pieniędzy.' });
+        // Pobranie użytkownika
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "Użytkownik nie został znaleziony." });
         }
-        
-        buyer.money -= marketItem.buyoutPrice;
-        const seller = await UserModel.findById(marketItem.seller);
-        seller.money += marketItem.buyoutPrice;
 
-        const itemData = JSON.parse(JSON.stringify(marketItem.item));
+        // Sprawdzenie środków użytkownika
+        if (user.money < marketItem.buyoutPrice) {
+            return res.status(400).json({ error: "Nie masz wystarczających środków na koncie." });
+        }
 
-        console.log('Item data:', itemData);
-        console.log('User data:', buyer.items);
+        // Kopiowanie danych przedmiotu bez `_id`
+        const itemData = { ...marketItem.item.item };
+        delete itemData._id;
 
-        buyer.items.push(itemData);
+        // Dodanie przedmiotu do ekwipunku użytkownika
+        user.items.push(itemData);
 
-        marketItem.status = 'sold';
+        // Odjęcie pieniędzy
+        user.money -= marketItem.buyoutPrice;
+        marketItem.seller.money += marketItem.buyoutPrice;
+        // Aktualizacja użytkownika
+        await user.save();
 
-        await buyer.save();
-        await seller.save();
-        await marketItem.delete();
+        // Usunięcie przedmiotu z rynku
+        await MarketItem.findByIdAndDelete(marketItemId);
 
-        res.status(200).json({ message: 'Przedmiot został kupiony.' });
+        return res.status(200).json({ message: "Zakupiono przedmiot!", userItems: user.items });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Błąd serwera.' });
+        console.error("Błąd zakupu przedmiotu:", error);
+        return res.status(500).json({ error: "Wystąpił błąd podczas zakupu przedmiotu." });
     }
 };
 

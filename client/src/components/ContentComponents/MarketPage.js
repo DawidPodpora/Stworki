@@ -12,9 +12,12 @@ const Market = () => {
     const [sellData, setSellData] = useState({ type: "fixed", price: "", duration: "2" });
 
     useEffect(() => {
-        fetchMarketItems();
-        fetchUserItems();
-    }, []);
+        if(activeTab === "market"){
+            fetchMarketItems();
+        } else if (activeTab === "inventory"){
+            fetchUserItems();
+        }
+    }, [activeTab]);
 
     /** 🔥 Pobieranie przedmiotów z marketu */
     const fetchMarketItems = async () => {
@@ -130,6 +133,7 @@ const Market = () => {
             console.warn('Brak tokenu w localStorage');
             return;
         }
+        console.log("🛒 Kupuję przedmiot:", marketItem);
     
         try {
             const response = await fetch("http://localhost:8080/api/market/buy", {
@@ -345,6 +349,7 @@ const Market = () => {
                     <option value="8">8 godzin</option>
                     <option value="24">24 godziny</option>
                 </select>
+                <p className="text-maincolor4 font-bold">Prowizja: {Math.floor(sellData.price * (sellData.duration === "2" ? 0.02 : sellData.duration === "8" ? 0.03 : 0.04))}</p>
                 <div className="flex flex-col md:flex-row justify-end mt-4 p-4 space-y-2 md:space-y-0 md:space-x-2">
                     <button
                         onClick={() => handleSell('fixed')}
