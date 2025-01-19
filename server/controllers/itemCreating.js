@@ -1,7 +1,7 @@
 import ItemBaseData from "../model/ItemBaseModel.js";
-import ItemSchema from "../model/Item.js";
+
 import UserModel from '../model/User.model.js'
-import e from "express";
+
 const baseSections = [  'power',
     'vitality', 
     'strength',

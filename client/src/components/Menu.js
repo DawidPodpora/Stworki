@@ -38,7 +38,7 @@ function Menu({ toogleOptions, onButtonClick, username, creatureFightActiveButto
     t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
     t('Misje'),             // Tłumaczenie dla dodatkowej opcji E
     t('Gildie'),             // Tłumaczenie dla dodatkowej opcji F
-    t('optionG')              // Tłumaczenie dla dodatkowej opcji G
+    t('Ranking')              // Tłumaczenie dla dodatkowej opcji G
   ];
   const [buttonPressed, setButtonPressed] = useState(0);
   const changeButton =(number)=>{
