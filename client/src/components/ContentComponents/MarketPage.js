@@ -85,16 +85,16 @@ const Market = () => {
     };
 
     /** 🔥 Tooltipy */
-    const handleMouseEnter = (event, item) => {
-        setTooltipPosition({ x: event.pageX, y: event.pageY });
+    const handleMouseEnter = (actualEvent, item) =>{
+        const rect = actualEvent.currentTarget.getBoundingClientRect();
+        setTooltipPosition({ x: actualEvent.pageX, y: actualEvent.pageY });
         setTooltipContent(item);
         setTooltipVisible(true);
     };
-
+    
     const handleMouseMove = (event) => {
-        setTooltipPosition({ x: event.pageX, y: event.pageY });
+        setTooltipPosition({ x: event.pageX, y: event.pageY }); // Aktualizuj pozycję tooltipa podczas ruchu myszy
     };
-
     const handleMouseLeave = () => {
         setTooltipVisible(false);
     };
@@ -246,7 +246,7 @@ const Market = () => {
                                 const marketItem = item.item || {}; // Upewniamy się, że `item` istnieje
 
                                 return (
-                                    <div key={item._id} className="bg-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all"
+                                    <div key={item._id} className="bg-gradient-to-r from-maincolor1 to-black border-2 border-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all"
                                         onMouseEnter={(event) => handleMouseEnter(event, marketItem)}
                                         onMouseLeave={handleMouseLeave}
                                         onMouseMove={handleMouseMove}>
@@ -334,17 +334,20 @@ const Market = () => {
             )}
 
             {/* Tooltip */}
-            {tooltipVisible && tooltipContent && (
-                <div style={{
+            {tooltipVisible && (
+                <div
+                    style={{
                     position: "fixed",
-                    top: tooltipPosition.y + 10,
-                    left: tooltipPosition.x + 10,
+                    top: tooltipPosition.y+10,
+                    left: tooltipPosition.x+10,
                     zIndex: 10,
                     backgroundColor: "rgba(0, 0, 0, 0.8)",
                     color: "white",
                     padding: "8px",
-                    borderRadius: "10px",
-                }} className={`border-4 ${tooltipContent?.element === "fire"
+                    borderRadius: "20px",
+                    
+                    }}
+                    className={`border-4  ${tooltipContent?.element === "fire"
                     ? "border-red-500"
                     : tooltipContent?.element === "water"
                     ? "border-cyan-500"
@@ -354,11 +357,36 @@ const Market = () => {
                     ? "border-yellow-500"
                     : tooltipContent?.element === "dark"
                     ? "border-purple-900"
-                    : "border-white"} `}>
-                    <h4 className="text-2xl font-bold">{tooltipContent?.name || "Brak nazwy"}</h4>
-                    <img className="w-20 h-20" src={`images/${tooltipContent?.photo || "default"}.png`} alt="item tooltip" />
-                    <p className="text-lg font-bold">TYPE: {tooltipContent?.type || "Brak danych"}</p>
-                    <p>ELEMENT: {tooltipContent?.element || "Brak elementu"}</p>
+                    : "border-white"} `}
+                >
+                    <h4 className="text-2xl font-bold">{tooltipContent?.name}</h4>
+                    <img className="w-20 h-20" src={`images/${tooltipContent?.photo}.png`}></img>
+                    <p className="text-lg font-bold">TYPE: {tooltipContent?.type} </p>
+                    {tooltipContent?.power !== 0  &&(
+                    <p>POWER: +{tooltipContent?.power}</p>)}
+                    {tooltipContent?.vitality !== 0  &&(
+                    <p>VITALITY: +{tooltipContent?.vitality}</p>)}
+                    {tooltipContent?.strength !== 0  &&(
+                    <p>STRENGTH: +{tooltipContent?.strength}</p>)}
+                    {tooltipContent?.dexterity !== 0  &&(
+                    <p>DEXTERITY: +{tooltipContent?.dexterity}</p>)}
+                    {tooltipContent?.intelligence !== 0  &&(
+                    <p>INTELLIGENCE: +{tooltipContent?.intelligence}</p>)}
+                    {tooltipContent?.armor !== 0  &&(
+                    <p>ARMOR: +{tooltipContent?.armor}</p>)}
+                    <p><span>ELEMENT: </span>{" "}<span className={` ${
+                        tooltipContent?.element === "fire"
+                        ? "text-red-500"
+                        : tooltipContent?.element === "water"
+                        ? "text-cyan-500"
+                        : tooltipContent?.element === "nature"
+                        ? "text-green-400"
+                        : tooltipContent?.element === "light"
+                        ? "text-yellow-500"
+                        : tooltipContent?.element === "dark"
+                        ? "text-purple-900"
+                        : "text-white"} font-bold`}>{tooltipContent?.element}</span></p>
+        
                 </div>
             )}
 
