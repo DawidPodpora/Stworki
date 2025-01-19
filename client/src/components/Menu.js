@@ -12,7 +12,7 @@ function Menu({ toogleOptions, onButtonClick, username }) {
     t('Moje stworki'),        // Tłumaczenie dla "Moje stworki"
     t('Sklep'),               // Tłumaczenie dla "Sklep"
     t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
-    t('optionE'),             // Tłumaczenie dla dodatkowej opcji E
+    t('Market'),             // Tłumaczenie dla dodatkowej opcji E
     t('optionF'),             // Tłumaczenie dla dodatkowej opcji F
     t('optionG')              // Tłumaczenie dla dodatkowej opcji G
   ];

@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import connect from './database/conn.js'; // Importowanie funkcji do połączenia z bazą danych
 import router from './router/route.js'; // Importowanie tras (routes) aplikacji
+import './controllers/auctionChecker.js';
 
 
 

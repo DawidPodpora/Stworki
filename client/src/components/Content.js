@@ -2,6 +2,8 @@ import TestButton2 from './ContentComponents/TestButton2.js'; // Import komponen
 import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponentu TestButton3
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
 import PrivateMessages from './ContentComponents/PrivateMessages.js';
+import MarketPage from './ContentComponents/MarketPage.js';
+
 
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
 function Content({ selectedButton, data, NewCreatureActiveButton}) {
@@ -22,6 +24,9 @@ function Content({ selectedButton, data, NewCreatureActiveButton}) {
     case 4:
       ComponentToRender = PrivateMessages;
       break;
+    case 5:
+      ComponentToRender = MarketPage;
+    break;
     default:
       // Domyślny przypadek, gdy `selectedButton` nie pasuje do żadnej wartości
       ComponentToRender = () => <div>Brak komponentu do renderowania</div>;

@@ -82,7 +82,11 @@ router.route('/notices').post(verifyAdmin, createNotice);
 router.route('/notices/:id').delete(verifyAdmin, deleteNotice);
 
 //market
-router.route('/add').post(Auth, marketController.addItemToMarket);
-router.route('/').get(marketController.getMarketItems);
-router.route('/bid').post(Auth, marketController.placeBid);
+
+router.route('/market/sell').post(Auth, marketController.addItemToMarket);
+router.route('/market').get(marketController.getMarketItems);
+router.route('/market/bid').post(Auth, marketController.placeBid);
+router.route('/market/buy').post(Auth, marketController.buyMarketItem);
+
+
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
