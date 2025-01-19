@@ -10,6 +10,7 @@ const Market = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
     const [sellData, setSellData] = useState({ type: "fixed", price: "", duration: "2" });
+    const [timers, setTimers] = useState({});
 
     useEffect(() => {
         if(activeTab === "market"){
@@ -17,6 +18,8 @@ const Market = () => {
         } else if (activeTab === "inventory"){
             fetchUserItems();
         }
+        const interval = setInterval(() => updateTimers(), 1000); //aktualizacja co sekundę
+        return () => clearInterval(interval);
     }, [activeTab]);
 
     /** 🔥 Pobieranie przedmiotów z marketu */
@@ -47,6 +50,7 @@ const Market = () => {
                 ...item,
                 item: item.item?.item || item.item || {} // Upewniamy się, że `item` istnieje
             })));
+            updateTimers();
         } catch (error) {
             console.error('❌ Błąd pobierania przedmiotów na markecie:', error);
         }
@@ -93,6 +97,34 @@ const Market = () => {
 
     const handleMouseLeave = () => {
         setTooltipVisible(false);
+    };
+
+    /** Obliczanie pozostałego czasu */
+    const calculateTimeLeft = (endtime) => {
+        const now = new Date();
+        const end = new Date(endtime);
+        const diff = end - now;
+
+        if (diff <= 0) return "Zakończono";
+
+        const hours = Math.floor(diff / (1000*60*60));
+        const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((diff % (1000*60)) / 1000);
+
+        return`${hours}h ${minutes}m ${seconds}s`;
+    };
+
+    /** Aktualizowanie czasu pozostałego */
+    const updateTimers = () => {
+        setTimers(prevTimers => {
+            const newTimers = { ...prevTimers }; // Kopia obiektu stanu
+            marketItems.forEach(item => {
+                if (item.endTime) { // Upewnij się, że masz poprawną nazwę pola
+                    newTimers[item._id] = calculateTimeLeft(item.endTime);
+                }
+            });
+            return newTimers;
+        });
     };
 
     /** Wystawianie przedmiotu na sprzedaż */
@@ -236,6 +268,10 @@ const Market = () => {
                                                     )}
                                                 </>
                                             )}
+                                        </p>
+                                        {/* Wyświetlanie czasu do końca */}
+                                        <p className="text-maincolor4 font-bold mt-2">
+                                        Czas do końca: {timers[item._id] !== undefined ? timers[item._id] : "Ładowanie..."}
                                         </p>
                                         
                                         {/* Przycisk kupna lub licytacji */}
