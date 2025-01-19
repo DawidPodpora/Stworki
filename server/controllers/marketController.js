@@ -8,7 +8,7 @@ export const addItemToMarket = async (req, res) => {
         const { itemId, type, price, duration } = req.body;
         const userId = req.user.userId;
 
-        const user = await UserModel.findById(userId); // Pobierz użytkownika jako zwykły obiekt
+        const user = await UserModel.findById(userId).lean(); // Pobierz użytkownika jako zwykły obiekt
         const item = user.items.find(i => i._id.toString() === itemId);
 
         if (!item) {
@@ -26,8 +26,6 @@ export const addItemToMarket = async (req, res) => {
         if (user.money < commissionFee){
             return res.status(400).json({error: "Nie masz wystarczających środków na pokrycie prowizji"})
         }
-        user.money -= commissionFee;
-        await user.save();
 
         const endTime = new Date(Date.now() + duration * 60 * 60 * 1000);
 
