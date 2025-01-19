@@ -3,10 +3,11 @@ import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponen
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
 import PrivateMessages from './ContentComponents/PrivateMessages.js';
 import MarketPage from './ContentComponents/MarketPage.js';
-
-
+import Misions from './ContentComponents/Misions.js';
+import GuildView from './ContentComponents/GuildView.js';
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
-function Content({ selectedButton, data, NewCreatureActiveButton}) {
+
+function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightActiveButton}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
@@ -26,7 +27,13 @@ function Content({ selectedButton, data, NewCreatureActiveButton}) {
       break;
     case 5:
       ComponentToRender = MarketPage;
-    break;
+      break;
+    case 6:
+      ComponentToRender = Misions;
+      break;
+    case 7:
+     ComponentToRender = GuildView; // Nowy widok gildii
+      break;
     default:
       // Domyślny przypadek, gdy `selectedButton` nie pasuje do żadnej wartości
       ComponentToRender = () => <div>Brak komponentu do renderowania</div>;
@@ -37,7 +44,7 @@ function Content({ selectedButton, data, NewCreatureActiveButton}) {
   return (
     <div className="absolute w-4/5 bg-black1 h-screen right-0">
       {/* Renderowanie wybranego komponentu */}
-      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton}/>
+      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton}/>
     </div>
   );
 }

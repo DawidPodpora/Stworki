@@ -5,15 +5,17 @@ const router = Router();
 import * as controller from '../controllers/appController.js'; // Importowanie wszystkich kontrolerów aplikacji
 import { registerMail } from '../controllers/mailer.js'; // Importowanie funkcji do wysyłania e-maili
 import Auth, { localVariables, verifyAdmin } from '../middleware/auth.js'; // Importowanie middleware do autoryzacji i zmiennych lokalnych
-import { getCreaturesbyName } from "../controllers/creaturesFight.js";
+import * as creaturesFight from "../controllers/creaturesFight.js";
 import { createNewSpecies } from "../middleware/newSpecies.js";
 import {createNewItemBaseData} from "../middleware/newItemBaseData.js"
 import * as items  from "../controllers/itemCreating.js";
 import * as itemsActions from "../controllers/itemsActions.js";
 import * as messagesController from '../controllers/messagesController.js';
+import * as missionsControler from '../controllers/missionControler.js'
 import { getAllNotices, createNotice, deleteNotice } from "../controllers/noticeController.js";
 import * as marketController from "../controllers/marketController.js";
-
+import * as guildController from "../controllers/guildController.js";
+import { enhanceUserWithGuildData } from '../middleware/enUserWithGuildData.js';
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -57,10 +59,11 @@ router.route('/updateuser').put(Auth, controller.updateUser); // aktualizacja pr
 // Ścieżka do resetowania hasła użytkownika
 router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); // resetowanie hasła
 
-router.route('/creaturesFight').get(getCreaturesbyName);
+router.route('/creaturesFight').get(missionsControler.CreaturesFightArena);
 router.route('/userData').get(Auth, controller.getUserData);
 router.route('/newSpecie').post(createNewSpecies);
 router.route('/newItemBaseData').post(createNewItemBaseData);
+//Przedmioty
 router.route('/ItemsToShop').get(items.ItemsToShop);
 router.route('/ItemToEq').post(items.ItemToEq);
 router.route('/ItemShop').get(Auth, items.ItemsToShop);
@@ -75,6 +78,10 @@ router.route('/messages').get(Auth, messagesController.getuserMessages);
 router.route('/message').post(Auth, messagesController.sendMessage);
 router.route('/messages/:id').delete(Auth, messagesController.deleteMessage);
 router.route('/messages/:id/read').put(Auth, messagesController.markMessageAsReaded);
+//Misje
+router.route('/missionsInfo').get(Auth, missionsControler.SendAndCheckMissionInfo);
+router.route('/SendOnMission').get(Auth, missionsControler.SendOnMission);
+router.route('/ClaimMission').get(Auth, missionsControler.ClaimMission);
 router.route('/messageToAll').post(verifyAdmin, messagesController.sendMessageToAll);
 //Ogłoszenia
 router.route('/notices').get(getAllNotices);
@@ -88,5 +95,24 @@ router.route('/market').get(marketController.getMarketItems);
 router.route('/market/bid').post(Auth, marketController.placeBid);
 router.route('/market/buy').post(Auth, marketController.buyMarketItem);
 
+router.route('/add').post(Auth, marketController.addItemToMarket);
+router.route('/').get(marketController.getMarketItems);
+router.route('/bid').post(Auth, marketController.placeBid);
+
+// Gildie
+router.route('/userGuilds').get(Auth, guildController.getUserGuilds); 
+router.route('/createGuild').post(Auth, guildController.createGuild); 
+router.route('/onlineUsers').get(Auth, guildController.getOnlineUsers); 
+router.route('/leaveGuild').post(Auth, guildController.leaveGuild);
+router.route('/inviteToGuild').post(Auth, enhanceUserWithGuildData, guildController.inviteToGuild);
+router.route('/handleInvitation').post(Auth, guildController.handleGuildInvitation);
+router.route('/invitations').get(Auth, guildController.getUserInvitations);
+router.route('/removeMember/:guildId').delete(Auth, guildController.removeMember);
+router.route('/updateMaxMembers/:guildId').patch(Auth, guildController.updateMaxMembers);
+router.route('/deleteGuild/:guildId').delete(Auth, guildController.deleteGuild);
+router.route('/guilds/:guildId/members').get(Auth, guildController.getGuildMembersUsernames);
+
+//logout
+router.route('/logout').post(Auth, guildController.logout);
 
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

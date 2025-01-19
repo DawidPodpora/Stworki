@@ -6,7 +6,7 @@ import { resetPassword } from '../helper/helper'; // Funkcja wysyłająca żąda
 import { useAuthStore } from '../store/store'; // Hook do zarządzania globalnym stanem autoryzacji
 import { useNavigate, Navigate } from 'react-router-dom'; // Funkcje do nawigacji i przekierowań w React Router
 import useFetch from '../hooks/fetch.hook'; // Niestandardowy hook do obsługi żądań HTTP
-
+import { RedirectIfLoggedIn } from '../components/RedirectIfLoggedIn';
 import styles from '../styles/Username.module.css'; // Import modułu stylów CSS
 
 export default function Reset() {
@@ -57,6 +57,7 @@ export default function Reset() {
   if (status && status !== 201) return <Navigate to={'/password'} replace={true}></Navigate>;
 
   return (
+    <RedirectIfLoggedIn>
     <div className="container mx-auto"> {/* Kontener główny */}
 
       {/* Obsługa powiadomień */}
@@ -88,5 +89,6 @@ export default function Reset() {
         </div>
       </div>
     </div>
+    </RedirectIfLoggedIn>
   )
 }

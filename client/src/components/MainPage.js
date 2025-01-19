@@ -2,6 +2,7 @@ import Menu from './Menu.js'; // Import komponentu Menu
 import Options from './Options.js'; // Import komponentu Options
 import Content from './Content.js'; // Import komponentu Content
 import FirstOrb from './FirstOrb.js';
+import FightScreen from './FightScreen.js';
 import React, { useState, useEffect } from 'react'; // Import React i hooka useState do zarządzania stanem
 import NewCreatureWindow from './NewCreatureWindow.js';
 
@@ -12,6 +13,8 @@ function MainPage() {
   const [newCreature, setNewCreature] = useState(false);
   const [creatureData, setNewCreatureData] = useState();
   const [userFullData, setUserFullData] = useState(null);
+  const [creatrureFight, setCreatureFight] = useState(false);
+  const [creatureFightData, setCreatureFightData] = useState(null);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -61,6 +64,10 @@ function MainPage() {
     setOptionsVisible((prevState) => !prevState); // Odwrócenie obecnego stanu (true <-> false)
   };
 
+  const creatureFightActiveButton = (fightData) =>{
+    setCreatureFightData(fightData);
+    setCreatureFight(true);
+  }
   // Funkcja do obsługi kliknięcia przycisku w menu
   const handleButtonClick = (buttonNumber) => {
     setSelectedButton(buttonNumber); // Ustawienie wybranego numeru przycisku
@@ -77,6 +84,9 @@ function MainPage() {
     setNewCreatureData(creatureData);
     nameForCreatureSwitch();
   }
+  const creatureFightCloseButton =()=>{
+    setCreatureFight(false);
+  }
   // Wygląd strony
   return (
     <div className="bg-maincolor1 absolute h-screen w-screen flex">
@@ -88,11 +98,11 @@ function MainPage() {
       />
 
       {/* Komponent treści, wyświetlający zawartość na podstawie wybranego przycisku */}
-      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} NewCreatureActiveButton={NewCreatureActiveButton}/>)}
+      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton}/>)}
 
       {/* Warunkowe wyświetlanie panelu opcji */}
       {isOptionsVisible && (
-        <Options toogleOptions={toggleOptionVisibility} /> // Przekazanie funkcji zamykania opcji
+        <Options toogleOptions={toggleOptionVisibility}/> // Przekazanie funkcji zamykania opcji
       )}
       {firstChoice && (
       <FirstOrb firsOrbActiveButton={firsOrbActiveButton} NewCreatureActiveButton={NewCreatureActiveButton}/>
@@ -100,6 +110,9 @@ function MainPage() {
       {newCreature &&(
         <NewCreatureWindow newCreatureData={creatureData} windowSwicher={nameForCreatureSwitch}/>
       )}
+      {creatrureFight &&(
+        <FightScreen creatureFightData={creatureFightData} creatureFightCloseButton={creatureFightCloseButton}/>
+        )}
     </div>
   );
 }

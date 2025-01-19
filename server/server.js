@@ -84,3 +84,12 @@ connect().then(() => {
     console.log("Invalid database connection:", error); 
     // Obsługa błędów przy połączeniu z bazą danych
 });
+
+
+app.use(
+    cors({
+        origin: 'http://localhost:3000', // Pozwól na żądania z front-endu
+        methods: ['GET', 'POST', 'PATCH', 'DELETE'], // Dozwolone metody HTTP
+        allowedHeaders: ['Content-Type', 'Authorization'], // Dozwolone nagłówki
+    }));
+app.options('*', cors()); // Obsłuż wszystkie zapytania OPTIONS

@@ -1,5 +1,6 @@
 import Creature from '../model/Creature.js';
 import Species from '../model/Species.js';
+import UserModel from '../model/User.model.js'
 import mongoose from 'mongoose';
 
 
@@ -36,45 +37,49 @@ const statConversion = async(creature) =>
             }
         else{
             int = stat + statsAfterLevelTimesLevel[4] + species.baseStats[4];
+            console.log(int,"int staty");
         }
     }); 
 
         creature.items.forEach((item, index) => {
             
-            if(item.power >= 1 ){
+            if(item.power >= 1 || item.power === 0){
             bonusPow += item.power;
             }else{
                 bonusPow = pow * (1 + item.power);
             }
-            if(item.vitality >= 1 ){
+            if(item.vitality >= 1 || item.vitality === 0){
                 bonusVit = item.vitality + bonusVit;
                 }else{
                     bonusVit = vit * (1 + item.vitality);
                 }
-            if (item.strength >= 1) {
+            if (item.strength >= 1 || item.strength === 0) {
                 bonusStr = item.strength + bonusStr;
                 } else {
                     bonusStr = str * (1 + item.strength);
                 }
-            if(item.dexterity >= 1) {
+            if(item.dexterity >= 1 || item.dexterity === 0) {
                 bonusDex = item.dexterity + bonusDex;
                 } else {
                     bonusDex = dex * (1 + item.dexterity);
                 }
-            if(item.inteligence >= 1) {
-                bonusInt = item.inteligence + bonusInt;
+            if(item.intelligence >= 1 || item.intelligence === 0 ) {
+                bonusInt = item.intelligence + bonusInt;
+               
                 } else {
-                    bonusInt = int * (1 + item.inteligence);
+                    console.log(item.intelligence, "item.intelligence");
+                    bonusInt = int * (1 + item.intelligence);
                 }
             armor = armor + item.armor;
         });
-        
+        console.log(bonusInt,"bonusInt");
+        console.log(bonusDex,"bonusDex");
         pow = pow + bonusPow;
         vit = (vit + bonusVit)* 10;
         str = str + bonusStr;
         dex = dex + bonusDex;
         int = int + bonusInt;
-        fightstats.push(pow, vit, str, dex, int,armor);
+        fightstats.push(pow, vit, str, dex, int, armor);
 
         
     fightstats.forEach((stat ,index) =>{
@@ -93,12 +98,15 @@ const getRandomNumber = () => Math.floor(Math.random() * 101);
 
 const dodgeMechanicGenerator = (creature1, creature2) => 
 {
-    const dodgechanceFull = Math.abs(creature1.staty[2] + creature2.staty[2]);
-    
-    const creature1dodgeChance = Math.round(creature1.staty[2]/dodgechanceFull/2*100);
-    
-    const creature2dodgeChance = Math.round(creature2.staty[2]/dodgechanceFull/2*100);
-    
+    console.log(creature1,"creature1");
+    console.log(creature1.fightstats[3],"creature1.staty[2]");
+    console.log(creature2.fightstats[3],"creature2.staty[2]");
+    const dodgechanceFull = Math.abs(creature1.fightstats[3] + creature2.fightstats[3]);
+    console.log(dodgechanceFull,"dodgechanceFull");
+    const creature1dodgeChance = Math.round(creature1.fightstats[3]/dodgechanceFull/2*100);
+    console.log(creature1dodgeChance,"creature1dodgeChance");
+    const creature2dodgeChance = Math.round(creature2.fightstats[3]/dodgechanceFull/2*100);
+    console.log(creature2dodgeChance,"creature2dodgeChance");
     return {
         creature1dodgeChance,
         creature2dodgeChance
@@ -106,11 +114,11 @@ const dodgeMechanicGenerator = (creature1, creature2) =>
 }
 const critMechanicGenerator = (creature1, creature2) => 
     {
-        const dodgechanceFull = Math.abs(creature1.staty[4] + creature2.staty[4]);
+        const dodgechanceFull = Math.abs(creature1.fightstats[4] + creature2.fightstats[4]);
         
-        const creature1critChance = Math.round(creature1.staty[4]/dodgechanceFull/1.5*100);
+        const creature1critChance = Math.round(creature1.fightstats[4]/dodgechanceFull/2*100);
         
-        const creature2critChance = Math.round(creature2.staty[4]/dodgechanceFull/1.5*100);
+        const creature2critChance = Math.round(creature2.fightstats[4]/dodgechanceFull/2*100);
         
         return {
             creature1critChance,
@@ -119,9 +127,9 @@ const critMechanicGenerator = (creature1, creature2) =>
     }
 const bonusArmorMechanicGenerator = (creature1, creature2)=>
 {
-    const bonusArmorfull = Math.abs(creature1.staty[2] + creature2.staty[2]);
-    const creature1bonusArmorMultiplier = Math.round(creature1.staty[2]/bonusArmorfull);
-    const creature2bonusArmorMultiplier = Math.round(creature2.staty[2]/bonusArmorfull);
+    const bonusArmorfull = Math.abs(creature1.fightstats[2] + creature2.fightstats[2]);
+    const creature1bonusArmorMultiplier = Math.round(creature1.fightstats[2]/bonusArmorfull);
+    const creature2bonusArmorMultiplier = Math.round(creature2.fightstats[2]/bonusArmorfull);
     return{
         creature1bonusArmorMultiplier,
         creature2bonusArmorMultiplier
@@ -131,21 +139,25 @@ const bonusArmorMechanicGenerator = (creature1, creature2)=>
 }
 const atakTurn = (random, atac, ratio, critchance, critMultiplier) =>
 {
+    let info;
     let critM;
     if(random >= critchance)
     {
         critM = 1;
+        info = "Standard atack";
     }
     else
     {
         critM = critMultiplier;
         console.log("CRIT!!!!!");
+        info = " Crit atack";
     }
     const maxdmg = atac + atac * ratio;
     const mindmg = atac - atac * ratio;
     const damageFromCreature = Math.round((mindmg + Math.random() * (maxdmg - mindmg))*critM);
     return {
-        damageFromCreature
+        damageFromCreature,
+        info,
     };
 }
 
@@ -164,13 +176,26 @@ const defTurn = (armor, damageTaken, armorMultiplier ) =>
 
 const fightMechanism = async(creature1 , creature2) =>
 {
+    let fightData = {
+        creature1: {
+            info: [],
+            dmg: []
+        },
+        creature2: {
+            info: [],
+            dmg: []
+        }
+    };
     
     const creature1convertedStats = await statConversion(creature1);
     const creature2convertedStats = await statConversion(creature2);
-    
-    const doges = dodgeMechanicGenerator(creature1, creature2);
-    const crits = critMechanicGenerator(creature1, creature2);
-    const armorForCreatures = bonusArmorMechanicGenerator(creature1, creature2);
+    console.log(creature1convertedStats,"creature1convertedStats");
+    console.log(creature2convertedStats,"creature2convertedStats");
+    const doges = dodgeMechanicGenerator(creature1convertedStats, creature2convertedStats);
+    console.log(doges,"doges");
+    const crits = critMechanicGenerator(creature1convertedStats, creature2convertedStats);
+    console.log(crits,"crits");
+    const armorForCreatures = bonusArmorMechanicGenerator(creature1convertedStats, creature2convertedStats);
     let hpcreature1 = creature1convertedStats.fightstats[1];
     
     let hpcreature2 = creature2convertedStats.fightstats[1];
@@ -180,13 +205,15 @@ const fightMechanism = async(creature1 , creature2) =>
     const atac2 = creature2convertedStats.fightstats[0];
     const armor1 = creature1convertedStats.fightstats[5];
     const armor2 = creature2convertedStats.fightstats[5];
-
+    
+    console.log(creature1convertedStats.fightstats,"creature1");
+    console.log(creature2convertedStats.fightstats,"creature2");
     const critMultiplier = 1.5;
     const ratio1 = 0.5;//do zastąpienia przez zmienną zewnętrzną
     
     const ratio2 = 0.5;//do zastąpienia przez zmienną zewnętrzną
     
-    while(hpcreature1 > 0 && hpcreature2 > 0 )
+   while(hpcreature1 > 0 && hpcreature2 > 0 )
     {
         let randomdodge = getRandomNumber();
         console.log("losowanie dla c2 dodge", randomdodge);
@@ -195,12 +222,15 @@ const fightMechanism = async(creature1 , creature2) =>
             let randomcrit = getRandomNumber();
             const pureDamage = atakTurn(randomcrit,atac1, ratio1, crits.creature1critChance, critMultiplier);
             const reducedDamage = defTurn(armor2, pureDamage.damageFromCreature ,armorForCreatures.creature2bonusArmorMultiplier);
-            
+            fightData.creature1.info.push(pureDamage.info);
+            fightData.creature1.dmg.push(reducedDamage.finalDamage);
             hpcreature2 -= reducedDamage.finalDamage;
             console.log("od c 1 atak za: ", reducedDamage.finalDamage, "aktualne hpc2:", hpcreature2);
         }
         else 
         {
+            fightData.creature1.info.push("Dodge");
+            fightData.creature1.dmg.push(0);
             console.log("c 2 wykonał unik");
         }
         if(hpcreature2 <= 0 )
@@ -215,34 +245,48 @@ const fightMechanism = async(creature1 , creature2) =>
             let randomcrit = getRandomNumber();
             const pureDamage = atakTurn(randomcrit,atac2, ratio2, crits.creature1critChance, critMultiplier);
             const reducedDamage = defTurn(armor1, pureDamage.damageFromCreature, armorForCreatures.creature1bonusArmorMultiplier);
+            fightData.creature2.info.push(pureDamage.info);
+            fightData.creature2.dmg.push(reducedDamage.finalDamage);
             hpcreature1 -= reducedDamage.finalDamage;
             console.log("od c 2 atak za: ", reducedDamage.finalDamage, "aktualne hpc1:", hpcreature1);
         }
         else
         {
+            fightData.creature2.info.push("Dodge");
+            fightData.creature2.dmg.push(0);
             console.log("c 1 wykonał unik");
         }
         
     }
+    let whoWon
     if(hpcreature1 <= 0)
     {
+        whoWon = "c2";
         console.log("wygrywa c2")
     }
     else if(hpcreature2 <= 0)
     {
+        whoWon = "c1";
         console.log("wygrywa c1")
+    }
+    return{
+        fightData,
+        whoWon
     }
 }
 
 export const getCreaturesbyName = async (req, res) => {
     try {
-    
-    const creature1 = await Creature.findOne({name:'maciek'});
-    
-    const creature2 = await Creature.findOne({name:'darek'});
-    
-    fightMechanism(creature1, creature2);
-        res.status(200).json(creature1); // Odpowiadamy na żądanie z danymi stworków
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaa");
+    const user1 = await UserModel.findById("678ab941be7ae87a81ba1b39");
+    const user2 = await UserModel.findById("678a98c88bc707999dc627a2");
+    console.log(user1.creatures);
+    console.log(user2.creatures);
+    const creature1 = user1.creatures.find((creature)=> creature._id.toString() === "678ab952be7ae87a81ba1b45");  
+    const creature2 = user2.creatures.find((creature)=> creature._id.toString() === "678a98d38bc707999dc627ad"); 
+    const fight = await fightMechanism(creature1, creature2);
+    console.log(fight);
+        res.status(200).json({fight}); // Odpowiadamy na żądanie z danymi stworków
     } 
     //po niepowodzeniu
     catch (error) {

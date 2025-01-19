@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom"; // Importujemy komponent Navigate do przekierowania użytkownika
 import { useAuthStore } from "../store/store"; // Importujemy hook do odczytu stanu autentykacji z globalnego stanu aplikacji
-
+import jwt_decode from "jwt-decode";
 /** Komponent do autoryzacji użytkownika na podstawie tokenu */
 export const AuthorizeUser = ({ children }) => {
     // Pobieramy token z localStorage (czyli lokalnej pamięci przeglądarki)
@@ -29,3 +29,10 @@ export const ProtectRoute = ({ children }) => {
     // Jeśli użytkownik jest zalogowany, wyświetlamy dzieci komponentu
     return children;
 }
+const token = localStorage.getItem('token');
+if (token) {
+    const decoded = jwt_decode(token);
+    console.log(decoded);
+}
+
+
