@@ -157,7 +157,7 @@ useEffect(()=>{
           {/* Lista przedmiotów do kupienia */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[60vh]">
             {shopItems.map((item, index) => (
-              <div key={item._id} className="bg-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all" 
+              <div key={item._id} className="bg-gradient-to-r from-maincolor1 to-black border-2 border-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all" 
               onMouseEnter={(event) => handleMouseEnter(event, item)} onMouseLeave={handleMouseLeave} onMouseMove={handleMouseMove}>
                 {/* Obraz przedmiotu */}
                 <img src={`images/${item.photo}.png`} alt={item.name} className="w-full h-32 object-cover rounded-xl mb-2 border-4 border-maincolor4 shadow-md" />
@@ -171,7 +171,7 @@ useEffect(()=>{
                 
                 <button
                   onClick={()=>BuyItemClick(item._id)}
-                  className="mt-3 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
+                  className="mt-3  bg-gradient-to-r from-maincolor2 to-maincolor5 text-black py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
                 >
                   Buy item
                 </button>

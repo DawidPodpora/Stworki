@@ -414,7 +414,7 @@ export async function fullDataForAllCreatures(req, res)
     try{
         console.log("pobieranie stworkow");
         const userId = req.user.userId;
-        const creaturesanditems = await UserModel.findById(userId).select('creatures items',);
+        const creaturesanditems = await UserModel.findById(userId).select('creatures items exp money username exp expToNextLevel level',);
         const creatures = creaturesanditems.creatures;
         const items = creaturesanditems.items;
         const speciesData = [];
@@ -431,8 +431,13 @@ export async function fullDataForAllCreatures(req, res)
         res.status(200).send({
             species: speciesData, 
             creatures: creatures,
-            items: items
-        });
+            items: items,
+            exp: creaturesanditems.exp,
+            gold: creaturesanditems.money,
+            username: creaturesanditems.username,
+            expToNextLevel :creaturesanditems.expToNextLevel,
+            level: creaturesanditems.level
+        })
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy pobieraniu danych o stworkach' }); 
     }

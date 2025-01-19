@@ -5,7 +5,7 @@ import PrivateMessages from './ContentComponents/PrivateMessages.js';
 import Misions from './ContentComponents/Misions.js';
 import GuildView from './ContentComponents/GuildView.js';
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
-function Content({ selectedButton, data, NewCreatureActiveButton}) {
+function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightActiveButton}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
@@ -39,7 +39,7 @@ function Content({ selectedButton, data, NewCreatureActiveButton}) {
   return (
     <div className="absolute w-4/5 bg-black1 h-screen right-0">
       {/* Renderowanie wybranego komponentu */}
-      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton}/>
+      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton}/>
     </div>
   );
 }
