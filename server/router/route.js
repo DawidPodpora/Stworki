@@ -16,6 +16,7 @@ import { getAllNotices, createNotice, deleteNotice } from "../controllers/notice
 import * as marketController from "../controllers/marketController.js";
 import * as guildController from "../controllers/guildController.js";
 import { enhanceUserWithGuildData } from '../middleware/enUserWithGuildData.js';
+import * as tezzaController from '../controllers/tezzaController.js';
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -108,5 +109,13 @@ router.route('/guilds/:guildId/members').get(Auth, guildController.getGuildMembe
 
 //logout
 router.route('/logout').post(Auth, guildController.logout);
+
+// Ustawianie tezy użytkownika
+router.route('/setTeza').post(Auth, tezzaController.setTeza);
+
+// Pobieranie listy użytkowników z aktywnymi tezami
+
+
+
 
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji

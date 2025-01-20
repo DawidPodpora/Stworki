@@ -114,8 +114,31 @@ export const UserSchema = new mongoose.Schema({
         guildId: { type: mongoose.Schema.Types.ObjectId, ref: 'Guild' },
         status: { type: String, enum: ['pending', 'accepted', 'rejected'], default: 'pending' }
     }],
-    
+    guildId: { type: mongoose.Schema.Types.ObjectId, ref: 'Guild' },
+    teza: {
+        type: String, 
+        unique: true
+    },
 });
+
+
+UserSchema.methods.calculateBonusEXP = async function (baseEXP) {
+    if (this.isInGuild) {
+      const guild = await GuildModel.findById(this.guildId);
+      const bonus = guild ? guild.bonus_exp : 0;
+      return baseEXP + (baseEXP * bonus / 100);
+    }
+    return baseEXP;
+  };
+  
+  UserSchema.methods.calculateBonusGold = async function (baseGold) {
+    if (this.isInGuild) {
+      const guild = await GuildModel.findById(this.guildId);
+      const bonus = guild ? guild.bonus_gold : 0;
+      return baseGold + (baseGold * bonus / 100);
+    }
+    return baseGold;
+  };
 
 // Eksportowanie modelu User, który będzie używał zdefiniowanego schematu
 export default mongoose.models.Users || mongoose.model('User', UserSchema);

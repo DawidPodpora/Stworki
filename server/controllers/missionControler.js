@@ -142,17 +142,19 @@ export async function SendOnMission(req, res) {
     }
     
 }
-
 export async function ClaimMission(req, res){
     try{
         let fight;
         const speciesPhotos=[];
         let gold = 0;
         let exp = 0;
+        let bonusExp = 0;
+        let bonusGold = 0;
+        let bonusMessage = '';
        console.log("dziala");
         const userId = req.user.userId;
         const {creatureId} = req.query;
-        const user = await UserModel.findById(userId);
+        const user = await UserModel.findById(userId).populate('guildId');;
         if(!user){
             return res.status(404).send({ error: 'blad nie ma usera' });
         }
@@ -179,12 +181,25 @@ export async function ClaimMission(req, res){
             speciesPhotos.push(creaturePhotos2.photos);
             console.log(speciesPhotos,"Photossssssssssssssssssssssssssss");
             if(fight.whoWon === "c1")
-            {
-            user.money += mission.goldForMission;
-            user.exp += mission.expForMission;
-            creature.exp += mission.expForMission;
-            gold = mission.goldForMission;
-            exp = mission.expForMission;
+            { let baseExp = mission.expForMission;
+                let baseGold = mission.goldForMission;
+
+                // Dodanie bonusów z gildii, jeśli użytkownik do niej należy
+                if (user.isInGuild && user.guildId) {
+                    bonusExp = Math.floor(baseExp * (user.guildId.bonus_exp / 100));
+                    bonusGold = Math.floor(baseGold * (user.guildId.bonus_gold / 100));
+
+                    baseExp += bonusExp;
+                    baseGold += bonusGold;
+
+                    bonusMessage = `🎉 Otrzymałeś ${bonusExp} dodatkowego EXP i ${bonusGold} złota dzięki swojej gildii! 🏰`;
+                }
+
+                user.money += baseGold;
+                user.exp += baseExp;
+                creature.exp += baseExp;
+                gold = baseGold;
+                exp = baseExp;
             }
             while(user.exp >= user.expToNextLevel)
             {
@@ -236,14 +251,15 @@ export async function ClaimMission(req, res){
             fight,
             gold,
             exp,
+            bonusExp,
+            bonusGold,
+            bonusMessage,
             speciesPhotos,
         });
     }catch(error){
         res.status(500).send({ error: 'Błąd serwera przy wysyłaniu danych itemow' }); 
     }
 }
-
-
 
 // WALKA MECHANIZMY
 
@@ -544,3 +560,5 @@ const statConversion = async(creature) =>
     
     
     };
+
+    

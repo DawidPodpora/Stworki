@@ -8,6 +8,9 @@ function FightScreen({creatureFightData, creatureFightCloseButton}){
     const [creature2ActualHp ,setCreature2ActualHp] = useState(creatureFightData.fight.fullhpcreature2);
     const [infoSpeed, setInfoSpeed] = useState(1000);
     const scrollRef = useRef(null);
+
+   
+
     useEffect(() => {
         if (visibleItems < fullFightLenght) {
             const timer = setTimeout(() => {
@@ -89,13 +92,13 @@ function FightScreen({creatureFightData, creatureFightCloseButton}){
                         <div className='w-full h-[2hw] relative'>{creatureFightData.fight.whoWon === "c1"?(
                             <>
                             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 '>You Win</div>
-                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[2vh] flex items-center'><img className='w-[2vw] h-full' src="images/money.png"></img><p>{creatureFightData.gold}</p></div>
-                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[5vh] flex items-center'><img className='w-[2vw] h-full' src="images/experience.png"></img><p>{creatureFightData.exp}</p></div>
+                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[2vh] flex items-center'><img className='w-[2vw] h-full' src="images/money.png"></img><p>{creatureFightData.gold}</p>{creatureFightData.bonusGold > 0 &&(<span className='ml-2 text-green-300'>+ {creatureFightData.bonusGold} </span>)}</div>
+                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[5vh] flex items-center'><img className='w-[2vw] h-full' src="images/experience.png"></img><p>{creatureFightData.exp}</p>{creatureFightData.bonusExp > 0 && (<span className='ml-2 text-green-300'>+ {creatureFightData.bonusExp}</span>)}</div>
                                 </>
                         ):(<>
                         <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 '>You Lose</div>
-                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[2vh] flex items-center'><img className='w-[2vw] h-full' src="images/money.png"></img><p>{creatureFightData.gold}</p></div>
-                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[5vh] flex items-center'><img className='w-[2vw] h-full' src="images/experience.png"></img><p>{creatureFightData.exp}</p></div>
+                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[2vh] flex items-center'><img className='w-[2vw] h-full' src="images/money.png"></img><p>{creatureFightData.gold}</p>{creatureFightData.bonusGold > 0 &&(<span className='ml-2 text-green-300'>+ {creatureFightData.bonusGold}</span>)}</div>
+                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[5vh] flex items-center'><img className='w-[2vw] h-full' src="images/experience.png"></img><p>{creatureFightData.exp}</p>{creatureFightData.bonusExp > 0 && (<span className='ml-2 text-green-300'>+ {creatureFightData.bonusExp}</span>)}</div>
                             </>)}</div>
                     )
                     }
