@@ -43,7 +43,17 @@ const resources = {
             "loading": "Loading...",
             "type": "TYPE:",
             "armor": "ARMOR",
-            "element": "ELEMENT"
+            "element": "ELEMENT",
+            "fetchShopError": "Error fetching shop:",
+            "buyError": "Buy error:",
+            "inventory": "Inventory",
+            "newShop": "New Shop",
+            "price": "Price:",
+            "coins": "coins",
+            "buyButton": "Buy item",
+            "emptyInventory": "Your inventor is empty!",
+            "sellValue": "Sell value:",
+            "sellButton": "Sell item"
         }
     },
     pl: {
@@ -86,7 +96,17 @@ const resources = {
             "loading": "Ładowanie...",//<---------
             "type": "TYP:",
             "armor": "PANCERZ",
-            "element": "ŻYWIOŁ"
+            "element": "ŻYWIOŁ",
+            "fetchShopError": "Błąd pobierania sklepu:",
+            "buyError": "Błąd kupna:",
+            "inventory": "Ekwipunek",
+            "newShop": "Nowy sklep",
+            "price": "Cena:",
+            "coins": "monet",
+            "buyButton": "Kup przedmiot",
+            "emptyInventory": "Twój inventarz jest pusty!",
+            "sellValue": "Wartość sprzedaży:",
+            "sellButton": "Sprzedaj"
         }
     },
     ua: {
@@ -129,7 +149,17 @@ const resources = {
             "loading": "",
             "type": "",
             "armor": "",
-            "element": ""
+            "element": "",
+            "fetchShopError": "",
+            "buyError": "",
+            "inventory": "",
+            "newShop": "",
+            "price": "",
+            "coins": "",
+            "buyButton": "",
+            "emptyInventory": "",
+            "sellValue": "",
+            "sellButton": ""
         }
     },
     ru: {
@@ -172,7 +202,17 @@ const resources = {
             "loading": "",
             "type": "",
             "armor": "",
-            "element": ""
+            "element": "",
+            "fetchShopError": "",
+            "buyError": "",
+            "inventory": "",
+            "newShop": "",
+            "price": "",
+            "coins": "",
+            "buyButton": "",
+            "emptyInventory": "",
+            "sellValue": "",
+            "sellButton": ""
         }
     }
 };
