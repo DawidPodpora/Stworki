@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 
 const Market = () => {
     const [activeTab, setActiveTab] = useState("market"); // Domyślnie otwieramy Market
@@ -11,6 +12,7 @@ const Market = () => {
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
     const [sellData, setSellData] = useState({ type: "fixed", price: "", duration: "2" });
     const [timers, setTimers] = useState({});
+    const { t } = useTranslation();
 
     useEffect(() => {
         if(activeTab === "market"){
@@ -26,7 +28,7 @@ const Market = () => {
     const fetchMarketItems = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.warn('Brak tokenu w localStorage');
+            console.warn(t('noTokenWarning'));
             return;
         }
 
@@ -38,12 +40,11 @@ const Market = () => {
             });
 
             if (!response.ok) {
-                console.error('❌ Błąd pobierania przedmiotów na markecie:', response.statusText);
+                console.error(t('fetchMarketError'), response.statusText);
                 return;
             }
 
             const data = await response.json();
-            console.log("✅ Market items API response:", data);
             
             // Naprawione mapowanie itemów, jeśli są zagnieżdżone
             setMarketItems(data.map(item => ({
@@ -52,7 +53,7 @@ const Market = () => {
             })));
             updateTimers();
         } catch (error) {
-            console.error('❌ Błąd pobierania przedmiotów na markecie:', error);
+            console.error(t('fetchMarketError'), error);
         }
     };
 
@@ -60,27 +61,25 @@ const Market = () => {
     const fetchUserItems = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.warn('Brak tokenu w localStorage');
+            console.warn(t('noTokenWarning'));
             return;
         }
 
         try {
-            console.log("🔄 Pobieram ekwipunek użytkownika...");
             const response = await fetch("http://localhost:8080/api/usersCreaturesAndItemsData", { 
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
             if (!response.ok) {
-                console.error('❌ Błąd pobierania ekwipunku:', response.statusText);
+                console.error(t('fetchInventoryError'), response.statusText);
                 return;
             }
 
             const data = await response.json();
-            console.log("✅ User items API response:", data);
             setUserItems(data.items || []);
         } catch (error) {
-            console.error('❌ Błąd pobierania ekwipunku:', error);
+            console.error(t('fetchInventoryError'), error);
         }
     };
 
@@ -105,7 +104,7 @@ const Market = () => {
         const end = new Date(endtime);
         const diff = end - now;
 
-        if (diff <= 0) return "Zakończono";
+        if (diff <= 0) return t('ended');
 
         const hours = Math.floor(diff / (1000*60*60));
         const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
@@ -131,7 +130,7 @@ const Market = () => {
     const handleSell = async (type) => {
         const token = localStorage.getItem('token');
         if (!token || !selectedItem) {
-            console.warn('Brak tokenu lub nie wybrano przedmiotu');
+            console.warn(t('tokenOrItemWarning'));
             return;
         }
         try {
@@ -148,24 +147,23 @@ const Market = () => {
                 })
             });
             if (!response.ok) {
-                console.error('Błąd wystawiania przedmiotu:', response.statusText);
+                console.error(t('listingError'), response.statusText);
                 return;
             }
-            alert('Przedmiot został wystawiony!');
+            alert(t('itemListed'));
             fetchMarketItems();
             setIsSellModalOpen(false);
         } catch (error) {
-            console.error('Błąd wystawiania przedmiotu:', error);
+            console.error(t('listingError'), error);
         }
     };
 
     const handleBuy = async (marketItem) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.warn('Brak tokenu w localStorage');
+            console.warn(t('noTokenWarning'));
             return;
         }
-        console.log("🛒 Kupuję przedmiot:", marketItem);
     
         try {
             const response = await fetch("http://localhost:8080/api/market/buy", {
@@ -178,22 +176,22 @@ const Market = () => {
             });
     
             if (!response.ok) {
-                console.error('Błąd zakupu przedmiotu:', response.statusText);
+                console.error(t('purchasingItemError'), response.statusText);
                 return;
             }
     
-            alert('Przedmiot został kupiony!');
+            alert(t('itemHasBeenPurchased'));
             fetchMarketItems();
             fetchUserItems();
         } catch (error) {
-            console.error('Błąd zakupu przedmiotu:', error);
+            console.error(t('purchasingItemError'), error);
         }
     };
     
     const handleBid = async (marketItem, bidAmount) => {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.warn('Brak tokenu w localStorage');
+            console.warn(t('noTokenWarning'));
             return;
         }
     
@@ -211,14 +209,14 @@ const Market = () => {
             });
     
             if (!response.ok) {
-                console.error('Błąd licytacji:', response.statusText);
+                console.error(t('biddingError'), response.statusText);
                 return;
             }
     
-            alert('Oferta została złożona!');
+            alert(t('offerSubmission'));
             fetchMarketItems();
         } catch (error) {
-            console.error('Błąd licytacji:', error);
+            console.error(t('biddingError'), error);
         }
     };
     
@@ -228,10 +226,10 @@ const Market = () => {
             {/* Panel nawigacyjny */}
             <div className="flex justify-around w-full p-4 bg-maincolor1 rounded-xl mb-4 shadow-lg sticky top-0 z-10">
                 <button onClick={() => setActiveTab("market")} className="text-maincolor4 text-lg hover:text-blue-600 transition-all">
-                    Market
+                    {t('market')}
                 </button>
                 <button onClick={() => setActiveTab("inventory")} className="text-maincolor4 text-lg hover:text-blue-600 transition-all">
-                    Inventory
+                    {t('inventory')}
                 </button>
             </div>
 
@@ -240,7 +238,7 @@ const Market = () => {
                 <div className="flex-grow overflow-y-auto">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-h-[80vh] overflow-y-auto p-4">
                         {marketItems.length === 0 ? (
-                            <p className="text-maincolor4 text-center">Brak przedmiotów na markecie.</p>
+                            <p className="text-maincolor4 text-center">{t('noItemsInTheMarket')}</p>
                         ) : (
                             marketItems.map((item) => {
                                 const marketItem = item.item || {}; // Upewniamy się, że `item` istnieje
@@ -253,25 +251,25 @@ const Market = () => {
                                         <img src={`images/${marketItem.photo || "default"}.png`} 
                                             alt={marketItem.name || "Brak zdjęcia"} 
                                             className="w-full h-32 object-cover rounded-xl mb-2 border-4 border-maincolor4 shadow-md" />
-                                            <h3 className="text-xl text-maincolor4 mb-2 font-bold">{marketItem.name || "Brak nazwy"}</h3>
+                                            <h3 className="text-xl text-maincolor4 mb-2 font-bold">{marketItem.name || t('noName')}</h3>
                                         
                                         {/* Poprawne wyświetlanie ceny */}
                                         <p className="text-maincolor4 font-bold mt-2">
                                             {item.type === "fixed" ? (
-                                                <>Cena: {item.buyoutPrice}</>
+                                                <>{t('price')} {item.buyoutPrice}</>
                                             ) : (
                                                 <>
                                                     {item.currentBid ? (
-                                                        <>Aktualna oferta: {item.currentBid}</>
+                                                        <>{t('currentOffer')} {item.currentBid}</>
                                                     ) : (
-                                                        <>Cena startowa: {item.startingPrice}</>
+                                                        <>{t('startingPrice')} {item.startingPrice}</>
                                                     )}
                                                 </>
                                             )}
                                         </p>
                                         {/* Wyświetlanie czasu do końca */}
                                         <p className="text-maincolor4 font-bold mt-2">
-                                        Czas do końca: {timers[item._id] !== undefined ? timers[item._id] : "Ładowanie..."}
+                                        {t('timeToEnd')} {timers[item._id] !== undefined ? timers[item._id] : t('loading')}
                                         </p>
                                         
                                         {/* Przycisk kupna lub licytacji */}
@@ -280,7 +278,7 @@ const Market = () => {
                                                 onClick={() => handleBuy(item)}
                                                 className="mt-3 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
                                             >
-                                                Kup
+                                                {t('buy')}
                                             </button>
                                         ) : (
                                             <>
@@ -294,7 +292,7 @@ const Market = () => {
                                                     onClick={() => handleBid(item, sellData.price)}
                                                     className="mt-3 bg-yellow-500 text-black py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all"
                                                 >
-                                                    Licytuj
+                                                    {t('bid')}
                                                 </button>
                                             </>
                                         )}
@@ -310,7 +308,7 @@ const Market = () => {
                 <div className="flex-grow overflow-y-auto">
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[60vh]">
                         {userItems.length === 0 ? (
-                            <p className="text-maincolor4 text-center">Twój ekwipunek jest pusty.</p>
+                            <p className="text-maincolor4 text-center">{t('emptyInventory')}</p>
                         ) : (
                             userItems.map((item) => (
                                 <div key={item._id} className="bg-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all"
@@ -321,10 +319,10 @@ const Market = () => {
                                     <img src={`images/${item.photo || "default"}.png`} 
                                         alt={item.name} 
                                         className="w-full h-32 object-cover rounded-xl mb-2 border-4 border-maincolor4 shadow-md" />
-                                    <p className="text-maincolor4 font-bold mt-2">Cena sprzedaży: {Math.round(item.price / 3)} coins</p>
+                                    <p className="text-maincolor4 font-bold mt-2">{t('sellValue')} {Math.round(item.price / 3)} {t('coins')}</p>
                                     <button onClick={() => {setSelectedItem(item); setIsSellModalOpen(true);}}
                                         className="mt-3 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all">
-                                        Sprzedaj
+                                        {t('sellButton')}
                                     </button>
                                 </div>
                             ))
@@ -361,20 +359,20 @@ const Market = () => {
                 >
                     <h4 className="text-2xl font-bold">{tooltipContent?.name}</h4>
                     <img className="w-20 h-20" src={`images/${tooltipContent?.photo}.png`}></img>
-                    <p className="text-lg font-bold">TYPE: {tooltipContent?.type} </p>
+                    <p className="text-lg font-bold">{t('type')} {tooltipContent?.type} </p>
                     {tooltipContent?.power !== 0  &&(
-                    <p>POWER: +{tooltipContent?.power}</p>)}
+                    <p>{t('power')}: +{tooltipContent?.power}</p>)}
                     {tooltipContent?.vitality !== 0  &&(
-                    <p>VITALITY: +{tooltipContent?.vitality}</p>)}
+                    <p>{t('vitality')}: +{tooltipContent?.vitality}</p>)}
                     {tooltipContent?.strength !== 0  &&(
-                    <p>STRENGTH: +{tooltipContent?.strength}</p>)}
+                    <p>{t('strength')}: +{tooltipContent?.strength}</p>)}
                     {tooltipContent?.dexterity !== 0  &&(
-                    <p>DEXTERITY: +{tooltipContent?.dexterity}</p>)}
+                    <p>{t('dexterity')}: +{tooltipContent?.dexterity}</p>)}
                     {tooltipContent?.intelligence !== 0  &&(
-                    <p>INTELLIGENCE: +{tooltipContent?.intelligence}</p>)}
+                    <p>{t('intelligence')}: +{tooltipContent?.intelligence}</p>)}
                     {tooltipContent?.armor !== 0  &&(
-                    <p>ARMOR: +{tooltipContent?.armor}</p>)}
-                    <p><span>ELEMENT: </span>{" "}<span className={` ${
+                    <p>{t('armor')}: +{tooltipContent?.armor}</p>)}
+                    <p><span>{t('element')}: </span>{" "}<span className={` ${
                         tooltipContent?.element === "fire"
                         ? "text-red-500"
                         : tooltipContent?.element === "water"
@@ -394,38 +392,38 @@ const Market = () => {
         {isSellModalOpen && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
             <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/4">
-                <h2 className="text-lg font-bold mb-4 text-maincolor4">Sprzedaj lub Licytuj</h2>
+                <h2 className="text-lg font-bold mb-4 text-maincolor4">{t('sellOrAuction')}</h2>
                 <h3 className="font-bold mb-4 text-maincolor4">{selectedItem.name}</h3>
-                <label className="block mb-2 text-maincolor4">Cena</label>
+                <label className="block mb-2 text-maincolor4">{t('price')}</label>
                 <input
                     type="number"
                     value={sellData.price}
                     onChange={(e) => setSellData({ ...sellData, price: e.target.value})}
                     className="w-full p-2 border rounded mb-4 text-black"
                 />
-                <label className="block mb-2 text-maincolor4">Czas trwania</label>
+                <label className="block mb-2 text-maincolor4">{t('duration')}</label>
                 <select
                     value={sellData.duration}
                     onChange={(e) => setSellData({ ...sellData, duration: e.target.value })}
                     className="w-full p-2 border rounded mb-4 text-black"
                 >
-                    <option value="2">2 godziny</option>
-                    <option value="8">8 godzin</option>
-                    <option value="24">24 godziny</option>
+                    <option value="2">{t('2h')}</option>
+                    <option value="8">{t('8h')}</option>
+                    <option value="24">{t('24h')}</option>
                 </select>
-                <p className="text-maincolor4 font-bold">Prowizja: {Math.floor(sellData.price * (sellData.duration === "2" ? 0.02 : sellData.duration === "8" ? 0.03 : 0.04))}</p>
+                <p className="text-maincolor4 font-bold">{t('commission')}: {Math.floor(sellData.price * (sellData.duration === "2" ? 0.02 : sellData.duration === "8" ? 0.03 : 0.04))}</p>
                 <div className="flex flex-col md:flex-row justify-end mt-4 p-4 space-y-2 md:space-y-0 md:space-x-2">
                     <button
                         onClick={() => handleSell('fixed')}
                         className="border-maincolor2 rounded-xl text-maincolor4 border py-2 px-4 w-full md:w-1/3 hover:border-maincolor5 hover:shadow-maincolor5 hover:bg-maincolor4 shadow-buttonshadow transition duration-300 hover:text-black1 hover:bg-opacity-75"
                     >
-                        Sprzedaj
+                        {t('sellButton')}
                     </button>
                     <button
                         onClick={() => handleSell('auction')}
                         className="border-maincolor2 rounded-xl text-maincolor4 border py-2 px-4 w-full md:w-1/3 hover:border-maincolor5 hover:shadow-maincolor5 hover:bg-maincolor4 shadow-buttonshadow transition duration-300 hover:text-black1 hover:bg-opacity-75"
                     >
-                        Licytuj
+                        {t('bid')}
                     </button>
                     <button
                         onClick={() =>{
@@ -434,7 +432,7 @@ const Market = () => {
                         }}
                         className="border-maincolor2 rounded-xl text-maincolor4 border py-2 px-4 w-full md:w-1/3 hover:border-maincolor5 hover:shadow-maincolor5 hover:bg-maincolor4 shadow-buttonshadow transition duration-300 hover:text-black1 hover:bg-opacity-75"
                     >
-                        Anuluj
+                        {t('cancel')}
                     </button>
                 </div>
             </div>

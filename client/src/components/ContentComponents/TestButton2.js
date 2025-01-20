@@ -320,14 +320,6 @@ function TestButton2({data, NewCreatureActiveButton}) {
                   </div>
                 </div>
               </div>
-
-              {/* Panel pasywny */}
-              <div className="w-full h-1/3 p-2">
-                <p className="h-1/6 text-maincolor4 text-[2vh] flex items-center justify-center">PASIVE</p>
-                <div className="border-2 border-maincolor5 bg-black1 bg-opacity-50 w-full h-5/6 rounded-xl text-maincolor4 p-2">
-                  MIEJSCE NA UMIEJĘTNOSĆ PASYWNĄ
-                </div>
-              </div>
             </div>
           </div>
 
