@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Chat from './Chat';
 import Notice from './Notice'; // Komponent do wyświetlania ogłoszeń
 
@@ -6,18 +7,19 @@ function StartPage({data}) {
   const [notices, setNotices] = useState([]); //stan do przechowywania ogłoszeń
   const [showModal, setShowModal] = useState(false);
   const [newNotice, setNewNotice] = useState({title:'', content:''});
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetch('http://localhost:8080/api/notices')
       .then((response) => response.json())
       .then((data) => setNotices(data))
-      .catch((error) => console.error('Błąd podczas pobierania ogłoszeń: ',error));
+      .catch((error) => console.error(t('fetchError'),error));
   }, []);
 
   //Obsługa dodawania ogłoszenia
   const handleAddNotice = async () => {
     if(!newNotice.title || !newNotice.content){
-      alert('Tytuł i treść są wymagane!');
+      alert(t('titleAndContentRequired'));
       return;
     }
 
@@ -37,10 +39,10 @@ function StartPage({data}) {
         setShowModal(false);
         setNewNotice({title:'', content:''});
       } else{
-        alert('Błąd podczas dodawania ogłoszenia!');
+        alert(t('adNoticeError'));
       }
     } catch(error){
-      console.error('Błąd serwera: ',error);
+      console.error(t('serverError'),error);
     }
   };
   //Obsługa usuwania ogłoszenia
@@ -55,10 +57,10 @@ function StartPage({data}) {
       if(response.ok){
         setNotices(notices.filter((notice) => notice._id !== id)); //aktualizacja stanu po usunięciu
       } else{
-        alert('Błąd podczas usuwania ogłoszenia!');
+        alert(t('deleteNoticeError'));
       }
     }catch(error){
-      console.error('Błąd serwera', error);
+      console.error(t('serverError'),error);
     }
   };
 
@@ -66,14 +68,14 @@ function StartPage({data}) {
     <div className="flex h-full">
       {/* Tablica Ogłoszeń */}
       <div className="w-2/3 bg-gray-800 p-4">
-        <h2 className="text-2xl font-bold text-white mb-4">Tablica Ogłoszeń</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">{t('noticeBoard')}</h2>
         
         {data.isAdmin && (
           <button
           className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
           onClick={() => setShowModal(true)}
           >
-            Dodaj Ogłoszenie
+            {t('addNotice')}
           </button>
         )}
 
@@ -95,7 +97,7 @@ function StartPage({data}) {
 
       {/* Sekcja czatu */}
       <div className="w-1/3 flex flex-col justify-between bg-gray-900 p-4 border-l border-gray-700">
-        <h2 className="text-2xl font-bold text-white">Czat</h2>
+        <h2 className="text-2xl font-bold text-white">{t('chat')}</h2>
         <Chat data={data} />
       </div>
       
@@ -103,16 +105,16 @@ function StartPage({data}) {
       {showModal &&(
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
           <div className="bg-maincolor1 p-6 rounded-lg shadow-md w-1/2">
-            <h2 className="text-white text-xl font-bold mb-4">Dodaj nowe ogłoszenie</h2>
+            <h2 className="text-white text-xl font-bold mb-4">{t('addNewNotice')}</h2>
             <input
               type="text"
-              placeholder="Tytuł"
+              placeholder={t('title')}
               value={newNotice.title}
               onChange={(e) => setNewNotice({...newNotice, title: e.target.value})}
               className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
             />
             <textarea
-              placeholder="Treść"
+              placeholder={t('content')}
               value={newNotice.content}
               onChange={(e) => setNewNotice({...newNotice, content: e.target.value})}
               className="w-full mb-4 p-2 border rounded bg-black text-maincolor4"
@@ -122,13 +124,13 @@ function StartPage({data}) {
                 onClick={() => setShowModal(false)}
                 className="bg-red-500 text-white px-4 py-2 rounded"
               >
-                Anuluj
+                {t('cancel')}
               </button>
               <button
                 onClick={handleAddNotice}
                 className="bg-blue-500 text-white px-4 py-2 rounded"
               >
-                Dodaj
+                {t('add')}
               </button>
             </div>
           </div>

@@ -16,7 +16,22 @@ const resources = {
             "loadingUser": "Loading user data...",
             "options": "Options",
             "logout": "Logout",
-            "chooseLanguage": "Choose your language"
+            "chooseLanguage": "Choose your language",
+            "fetchError": "Error fetching notices: ",
+            "titleAndContentRequired": "Title and content are required!",
+            "addNoticeError": "Error adding notice!",
+            "serverError": "Server error: ",
+            "deleteNoticeError": "Error deleting notice!",
+            "noticeBoard": "Notice Board",
+            "addNotice": "Add Notice",
+            "chat": "Chat",
+            "addNewNotice": "Add New Notice",
+            "title": "Title",
+            "content": "Content",
+            "cancel": "Cancel",
+            "add": "Add",
+            "typeMessage": "Type message...",
+            "send": "Send"
         }
     },
     pl: {
@@ -32,10 +47,25 @@ const resources = {
             "loadingUser": "Ładowanie danych użytkownika...",
             "options": "Opcje",
             "logout": "Wyloguj",
-            "chooseLanguage": "Wybierz język"
+            "chooseLanguage": "Wybierz język",
+            "fetchError": "Błąd podczas pobierania ogłoszeń: ",
+            "titleAndContentRequired": "Tytuł i treść są wymagane!",
+            "addNoticeError": "Błąd podczas dodawania ogłoszenia!",
+            "serverError": "Błąd serwera: ",
+            "deleteNoticeError": "Błąd podczas usuwania ogłoszenia!",
+            "noticeBoard": "Tablica ogłoszeń",
+            "addNotice": "Dodaj ogłoszenie",
+            "chat": "Czat",
+            "addNewNotice": "Dodaj nowe ogłoszenie",
+            "title": "Tytuł",
+            "content": "Treść",
+            "cancel": "Anuluj",
+            "add": "Dodaj",
+            "typeMessage": "Wpisz swoją wiadomość...",
+            "send": "Wyślij"
         }
     },
-    uk: {
+    ua: {
         translation: {
             "home": "Головна",
             "myCreatures": "Мої створіння",
@@ -48,7 +78,22 @@ const resources = {
             "loadingUser": "Завантаження даних користувача...",
             "options": "Налаштування",
             "logout": "Вийти",
-            "chooseLanguage": "Оберіть мову"
+            "chooseLanguage": "Оберіть мову",
+            "fetchError": "",
+            "titleAndContentRequired": "",
+            "addNoticeError": "",
+            "serverError": "",
+            "deleteNoticeError": "",
+            "noticeBoard": "",
+            "addNotice": "",
+            "chat": "",
+            "addNewNotice": "",
+            "title": "",
+            "content": "",
+            "cancel": "",
+            "add": "",
+            "typeMessage": "",
+            "send": ""
         }
     },
     ru: {
@@ -64,7 +109,22 @@ const resources = {
             "loadingUser": "Загрузка данных пользователя...",
             "options": "Настройки",
             "logout": "Выход",
-            "chooseLanguage": "Выберите язык"
+            "chooseLanguage": "Выберите язык",
+            "fetchError": "",
+            "titleAndContentRequired": "",
+            "addNoticeError": "",
+            "serverError": "",
+            "deleteNoticeError": "",
+            "noticeBoard": "",
+            "addNotice": "",
+            "chat": "",
+            "addNewNotice": "",
+            "title": "",
+            "content": "", 
+            "cancel": "",
+            "add": "",
+            "typeMessage": "",
+            "send": ""
         }
     }
 };
