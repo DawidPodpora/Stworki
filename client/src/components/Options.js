@@ -1,14 +1,23 @@
-import React from 'react'; // Import biblioteki React
+import React, { useEffect, useState } from 'react'; // Import biblioteki React
 import { useTranslation } from 'react-i18next'; // Import hooka `useTranslation` z biblioteki do obsługi tłumaczeń
 
 // Komponent `Options`, który obsługuje wybór języka i posiada przycisk zamykający okno opcji
 function Options({ toogleOptions }) {
-  const { i18n } = useTranslation(); // Inicjalizacja tłumaczeń z `react-i18next`
-
+  const { t, i18n } = useTranslation(); // Inicjalizacja tłumaczeń z `react-i18next`
+  const [selectedLanguage, setSelectedLanguage] = useState(localStorage.getItem('language' || i18n.language));
   // Funkcja obsługująca zmianę języka
   const handleLanguageChange = (e) => {
-    i18n.changeLanguage(e.target.value); // Zmiana języka na wybrany w select
+    const newLanguage = e.target.value;
+    setSelectedLanguage(newLanguage);
+    i18n.changeLanguage(newLanguage);
+    localStorage.setItem('language', newLanguage);
   };
+
+  useEffect(() => {
+    if(i18n.language !== selectedLanguage){
+      i18n.changeLanguage(selectedLanguage);
+    }
+  }, [selectedLanguage]);
 
   // Wygląd i logika komponentu
   return (
@@ -20,7 +29,7 @@ function Options({ toogleOptions }) {
         <select
           onChange={handleLanguageChange} // Obsługa zmiany języka
           className="bg-maincolor1 border-maincolor5 border-2 w-1/3 absolute top-10 rounded-xl shadow-buttonshadow"
-          defaultValue={i18n.language} // Domyślnie ustawiony język
+          defaultValue={selectedLanguage} // Domyślnie ustawiony język
         >
           <option value="en">English</option> {/* Opcja dla języka angielskiego */}
           <option value="pl">Polski</option> {/* Opcja dla języka polskiego */}
