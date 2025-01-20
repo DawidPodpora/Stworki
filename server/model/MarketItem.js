@@ -2,8 +2,7 @@ import mongoose from 'mongoose';
 
 const MarketItemSchema = new mongoose.Schema({
     item: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Item',
+        type: Object, // Przechowujemy uproszczone dane przedmiotu
         required: true
     },
     seller: {
@@ -13,34 +12,40 @@ const MarketItemSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['fixed', 'auction'], // 'fixed' dla sprzedaży, 'auction' dla licytacji
+        enum: ['fixed', 'auction'],
         required: true
     },
     startingPrice: {
         type: Number,
-        required: function () { return this.type === 'auction'; } // Wymagane tylko dla licytacji
+        required: function () { return this.type === 'auction'; },
+        min: [1, 'Cena początkowa musi być większa niż 0']
     },
     buyoutPrice: {
         type: Number,
-        required: function () { return this.type === 'fixed'; } // Wymagane tylko dla stałej ceny
+        required: function () { return this.type === 'fixed'; }
     },
     currentBid: {
         type: Number,
-        default: null // Aktualna najwyższa oferta w licytacji
+        default: null
     },
     bidder: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        default: null // Użytkownik, który złożył najwyższą ofertę
+        default: null
     },
     endTime: {
         type: Date,
-        required: true // Czas zakończenia oferty
+        required: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    status: {
+        type: String,
+        enum: ['active', 'sold', 'expired'],
+        default: 'active'
+    },
+    isProcessing: {
+        type: Boolean,
+        default: false
     }
-});
+}, { timestamps: true });
 
-export default mongoose.model('MarketItem', MarketItemSchema);
+export default mongoose.models.MarketItem || mongoose.model('MarketItem', MarketItemSchema);

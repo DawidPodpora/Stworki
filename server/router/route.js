@@ -16,6 +16,7 @@ import { getAllNotices, createNotice, deleteNotice } from "../controllers/notice
 import * as marketController from "../controllers/marketController.js";
 import * as guildController from "../controllers/guildController.js";
 import { enhanceUserWithGuildData } from '../middleware/enUserWithGuildData.js';
+import * as ranking from "../controllers/rankingControler.js";
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -89,6 +90,12 @@ router.route('/notices').post(verifyAdmin, createNotice);
 router.route('/notices/:id').delete(verifyAdmin, deleteNotice);
 
 //market
+
+router.route('/market/sell').post(Auth, marketController.addItemToMarket);
+router.route('/market').get(marketController.getMarketItems);
+router.route('/market/bid').post(Auth, marketController.placeBid);
+router.route('/market/buy').post(Auth, marketController.buyMarketItem);
+
 router.route('/add').post(Auth, marketController.addItemToMarket);
 router.route('/').get(marketController.getMarketItems);
 router.route('/bid').post(Auth, marketController.placeBid);
@@ -105,7 +112,11 @@ router.route('/removeMember/:guildId').delete(Auth, guildController.removeMember
 router.route('/updateMaxMembers/:guildId').patch(Auth, guildController.updateMaxMembers);
 router.route('/deleteGuild/:guildId').delete(Auth, guildController.deleteGuild);
 router.route('/guilds/:guildId/members').get(Auth, guildController.getGuildMembersUsernames);
-
+//Ranking
+router.route('/RankingForUserById').get(Auth, ranking.RankingForUserById);
+router.route('/RankingForUserByNumber').get(Auth, ranking.RankingForUserByNumber);
+router.route('/RankingForUserByName').get(Auth, ranking.RankingForUserByName);
+router.route('/UserDataForRanking').get(ranking.UserDataForRanking);
 //logout
 router.route('/logout').post(Auth, guildController.logout);
 
