@@ -36,9 +36,9 @@ function Menu({ toogleOptions, onButtonClick, username, creatureFightActiveButto
     t('Moje stworki'),        // Tłumaczenie dla "Moje stworki"
     t('Sklep'),               // Tłumaczenie dla "Sklep"
     t('Wiadomości prywatne'), // Tłumaczenie dla dodatkowej opcji D
+    t('Market'),             // Tłumaczenie dla dodatkowej opcji E
     t('Misje'),             // Tłumaczenie dla dodatkowej opcji E
     t('Gildie'),             // Tłumaczenie dla dodatkowej opcji F
-    t('optionG')              // Tłumaczenie dla dodatkowej opcji G
   ];
   const [buttonPressed, setButtonPressed] = useState(0);
   const changeButton =(number)=>{

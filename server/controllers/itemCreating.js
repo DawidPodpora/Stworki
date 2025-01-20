@@ -215,7 +215,7 @@ export async function ItemToEq(req, res) {
     }
     
 }
-
+3636
 //tworzenie nowych rzeczy do sklepu
 export async function ItemsToShop(req, res)
 {

@@ -2,9 +2,11 @@ import TestButton2 from './ContentComponents/TestButton2.js'; // Import komponen
 import TestButton3 from './ContentComponents/TestButton3.js'; // Import komponentu TestButton3
 import StartPage from './ContentComponents/StartPage.js'; // Import komponentu StartPage
 import PrivateMessages from './ContentComponents/PrivateMessages.js';
+import MarketPage from './ContentComponents/MarketPage.js';
 import Misions from './ContentComponents/Misions.js';
 import GuildView from './ContentComponents/GuildView.js';
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
+
 function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightActiveButton}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
@@ -24,9 +26,12 @@ function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightA
       ComponentToRender = PrivateMessages;
       break;
     case 5:
-      ComponentToRender = Misions;
+      ComponentToRender = MarketPage;
       break;
     case 6:
+      ComponentToRender = Misions;
+      break;
+    case 7:
      ComponentToRender = GuildView; // Nowy widok gildii
       break;
     default:
