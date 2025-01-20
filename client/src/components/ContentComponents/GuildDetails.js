@@ -104,93 +104,91 @@ function GuildDetails({ guild, goBack }) {
     };
 
     return (
-        <div className="absolute w-full bg-black1 h-screen text-maincolor4">
-        <div className="w-full h-full flex p-5">
-            {/* Sekcja gildii */}
-            <div className="w-[100vw] bg-maincolor1 h-skreen rounded-3xl m-[1.0vh]  p-[1vh] border-2 ">
-            <button
-                onClick={goBack}
-                className="bg-gray-800 text-white px-4 py-2 rounded-xl mb-4 hover:bg-blue-900 transition-all font-bold border-2 border-white"
-            >
-                Powrót
-            </button>
-    
-            {/* Informacje o gildii */}
-            <h2 className="text-white text-3xl font-bold mb-4">{guild.name}</h2>
-            <p className="text-maincolor4 text-lg mb-4">Opis gildii: <span className="text-white">{guild.goal}</span></p>
-    
-          {/* Lista członków */}
-         <h3 className="text-maincolor4 text-2xl font-semibold mb-2">Członkowie:</h3>
-        <ul className="space-y-3">
-    {guildMembersUsernames.map((member) => (
-        <li key={member._id}
-            className="flex justify-between items-center p-3 bg-gray-800 rounded-xl hover:bg-black transition-all border-2 border-white"
-        >
-            {/* Oznaczenie właściciela */}
-            <span className="text-white">
-                {member.username} {member.isOwner && "(Owner)"}
-            </span>
-
-            {/* Przycisk "Usuń" tylko dla nie-właścicieli */}
-            {!member.isOwner && isOwner && (
+        <div className="absolute w-full  bg-black1 mt-[-1vh] text-maincolor4 flex justify-center items-center">
+            <div className="w-[85vw] h-[80vh] bg-gradient-to-r from-black to-maincolor1 flex flex-col p-4 rounded-3xl shadow-lg  border-gray-700">
+                
+                {/* Powrót */}
                 <button
-                    className="bg-blue-900 text-white px-3 py-1 rounded-xl hover:bg-red-400 transition-all"
-                    onClick={() => removeMember(member._id)}
+                    onClick={goBack}
+                    className="bg-gray-800 text-white px-5 py-2 rounded-lg mb-4 hover:bg-maincolor2 transition-all font-bold border-2 border-white"
                 >
-                    Usuń
+                    ⬅ Powrót
                 </button>
-            )}
-        </li>
-    ))}
-</ul>
-
-
-            <div className="border-t-2 border-gray-600 my-4"></div>
     
-            {/* Sekcja właściciela */}
-            {isOwner && (
-                <>
-                    {/* Zmiana limitu użytkowników */}
-                    <div className="mt-6">
-                        <h3 className="text-maincolor4 text-2xl font-semibold mb-2">Limit użytkowników</h3>
-                        <input
-                            type="number"
-                            className="block w-full p-3 bg-gray-700 text-white rounded-xl mb-4"
-                            value={newMaxMembers}
-                            onChange={(e) => setNewMaxMembers(Number(e.target.value))}
-                        />
-                        <button
-                            onClick={updateMaxMembers}
-                            className="bg-gradient-to-r from-blue-900 to-maincolor2 text-black font-bold py-2 px-6 rounded-xl hover:text-maincolor4"
-                        >
-                            Zaktualizuj limit
-                        </button>
-                    </div>
+                {/* Informacje o gildii */}
+                <div className="bg-gray-900 p-4 rounded-xl border-2 border-gray-600 shadow-md">
+                    <h2 className="text-white text-3xl font-extrabold">{guild.name}</h2>
+                    <p className="text-maincolor4 text-md mt-1">🎯 Opis gildii: <span className="text-white">{guild.goal}</span></p>
+                </div>
     
-                    {/* Wysyłanie zaproszeń */}
-                    <div className="mt-6">
-                        <h3 className="text-maincolor4 text-2xl font-semibold mb-2">Wyślij zaproszenie do gildii</h3>
-                        <input
-                            type="text"
-                            placeholder="Nazwa użytkownika"
-                            className="block w-full p-3 bg-gray-700 text-white rounded-xl mb-4"
-                            value={inviteUsername}
-                            onChange={(e) => setInviteUsername(e.target.value)}
-                        />
-                        <button
-                            onClick={sendInvite}
-                            className="bg-gradient-to-r from-blue-900 to-maincolor2 text-black font-bold py-2 px-6 rounded-xl hover:text-maincolor4"
-                        >
-                            Wyślij zaproszenie
-                        </button>
-                        {inviteStatus && (
-                            <p className="text-gray-300 mt-2">{inviteStatus}</p>
-                        )}
+                {/* Lista członków */}
+                <div className="mt-4">
+                    <h3 className="text-maincolor4 text-xl font-semibold mb-3">👥 Członkowie:</h3>
+                    <ul className="grid grid-cols-2 md:grid-cols-1 gap-2 max-h-[40vh] overflow-auto">
+                        {guildMembersUsernames.map((member) => (
+                            <li key={member._id} className="p-3 bg-gray-800 rounded-xl flex justify-between items-center hover:bg-black transition-all border-2 border-white shadow-md">
+                                <span className="text-white text-md font-semibold">
+                                    {member.username} {member.isOwner && "👑 (Lider)"}
+                                </span>
+                                {!member.isOwner && isOwner && (
+                                    <button
+                                        className="bg-maincolor2 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all"
+                                        onClick={() => removeMember(member._id)}
+                                    >
+                                        ❌ Usuń
+                                    </button>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+    
+                <div className="border-t-2 border-gray-600 my-3"></div>
+    
+                {/* Panel właściciela */}
+                {isOwner && (
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-1">
+                        
+                        {/* Zmiana limitu użytkowników */}
+                        <div className="mt-2">
+                            <h3 className="text-maincolor4 text-lg font-semibold mb-1">⚙️ Limit użytkowników</h3>
+                            <input
+                                type="number"
+                                className="block w-full p-2 bg-gray-700 text-white rounded-lg border-2 border-gray-500 focus:ring-2 focus:ring-blue-500"
+                                value={newMaxMembers}
+                                onChange={(e) => setNewMaxMembers(Number(e.target.value))}
+                            />
+                            <button
+                                onClick={updateMaxMembers}
+                                className="w-full mt-2 bg-gradient-to-r from-blue-900 to-maincolor2 text-black font-bold py-2 px-4 rounded-lg hover:text-maincolor4 transition-all"
+                            >
+                                ✅ Zaktualizuj
+                            </button>
+                        </div>
+    
+                        {/* Wysyłanie zaproszeń */}
+                        <div className="mt-2">
+                            <h3 className="text-maincolor4 text-lg font-semibold mb-1">📩 Wyślij zaproszenie</h3>
+                            <input
+                                type="text"
+                                placeholder="Nazwa użytkownika"
+                                className="block w-full p-2 bg-gray-700 text-white rounded-lg border-2 border-gray-500 focus:ring-2 focus:ring-blue-500"
+                                value={inviteUsername}
+                                onChange={(e) => setInviteUsername(e.target.value)}
+                            />
+                            <button
+                                onClick={sendInvite}
+                                className="w-full mt-2 bg-gradient-to-r from-blue-900 to-maincolor2 text-black font-bold py-2 px-4 rounded-lg hover:text-maincolor4 transition-all"
+                            >
+                                ✉ Wyślij
+                            </button>
+                            {inviteStatus && (
+                                <p className="text-gray-300 mt-1">{inviteStatus}</p>
+                            )}
+                        </div>
                     </div>
-                </>
-            )}
-        </div>
-        </div>
+                )}
+            </div>
         </div>
     );
 }
