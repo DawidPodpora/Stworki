@@ -31,7 +31,19 @@ const resources = {
             "cancel": "Cancel",
             "add": "Add",
             "typeMessage": "Type message...",
-            "send": "Send"
+            "send": "Send",
+            "fetchUserDataError": "Error fetching user data:",
+            "noTokenWarning": "No token found in localStorage",
+            "power": "POW",
+            "vitality": "VIT",
+            "strength": "STR",
+            "dexterity": "DEX",
+            "intelligence": "INT",
+            "level": "Level:",
+            "loading": "Loading...",
+            "type": "TYPE:",
+            "armor": "ARMOR",
+            "element": "ELEMENT"
         }
     },
     pl: {
@@ -62,7 +74,19 @@ const resources = {
             "cancel": "Anuluj",
             "add": "Dodaj",
             "typeMessage": "Wpisz swoją wiadomość...",
-            "send": "Wyślij"
+            "send": "Wyślij",
+            "fetchUserDataError": "Błąd pobierania danych użytkownika:",
+            "noTokenWarning": "Brak tokenu w localStorage",
+            "power": "MOC",
+            "vitality": "WIT",
+            "strength": "SIŁ",
+            "dexterity": "ZRĘ",
+            "intelligence": "INT",
+            "level": "Poziom:",
+            "loading": "Ładowanie...",//<---------
+            "type": "TYP:",
+            "armor": "PANCERZ",
+            "element": "ŻYWIOŁ"
         }
     },
     ua: {
@@ -93,7 +117,19 @@ const resources = {
             "cancel": "",
             "add": "",
             "typeMessage": "",
-            "send": ""
+            "send": "",
+            "fetchUserDataError": "Błąd pobierania danych użytkownika:",
+            "noTokenWarning": "Brak tokenu w localStorage",
+            "power": "",
+            "vitality": "",
+            "strength": "",
+            "dexterity": "",
+            "intelligence": "",
+            "level": "",
+            "loading": "",
+            "type": "",
+            "armor": "",
+            "element": ""
         }
     },
     ru: {
@@ -124,7 +160,19 @@ const resources = {
             "cancel": "",
             "add": "",
             "typeMessage": "",
-            "send": ""
+            "send": "",
+            "fetchUserDataError": "",
+            "noTokenWarning": "",
+            "power": "",
+            "vitality": "",
+            "strength": "",
+            "dexterity": "",
+            "intelligence": "",
+            "level": "",
+            "loading": "",
+            "type": "",
+            "armor": "",
+            "element": ""
         }
     }
 };
