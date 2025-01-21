@@ -57,45 +57,55 @@ export async function getUserGuilds(req, res) {
 
 
 
+
 export async function createGuild(req, res) {
     try {
-        console.log('Otrzymane dane:', req.body); // Dane z frontendu
-        console.log('Użytkownik z tokena:', req.user); // Użytkownik z tokena
+        console.log('Otrzymane dane:', req.body);
+        console.log('Użytkownik z tokena:', req.user);
 
-        const { name, goal, maxMembers } = req.body;
+        const { name, goal, maxMembers, bonus_exp, bonus_gold } = req.body;
         const userId = req.user.userId;
 
         if (!userId) {
-            console.log('Brak userId w tokenie!');
             return res.status(400).json({ error: 'Nieprawidłowy token użytkownika' });
         }
 
         if (!name || typeof name !== 'string') {
-            console.log('Nieprawidłowa nazwa gildii:', name);
             return res.status(400).json({ error: 'Nazwa gildii jest wymagana' });
         }
 
         if (!goal || typeof goal !== 'string') {
-            console.log('Nieprawidłowy opis gildii:', goal);
             return res.status(400).json({ error: 'Opis gildii jest wymagany' });
         }
 
         if (!maxMembers || typeof maxMembers !== 'number' || maxMembers <= 0) {
-            console.log('Nieprawidłowa liczba członków:', maxMembers);
             return res.status(400).json({ error: 'Nieprawidłowa maksymalna liczba członków' });
         }
 
-        // Sprawdzenie, czy użytkownik już należy do gildii
         const user = await UserModel.findById(userId);
         if (!user) {
-            console.log('Nie znaleziono użytkownika z ID:', userId);
             return res.status(404).json({ error: 'Użytkownik nie istnieje' });
         }
 
         if (user.isInGuild) {
-            console.log('Użytkownik jest już w gildii i nie może stworzyć nowej');
             return res.status(400).json({ error: 'Najpierw opuść swoją obecną gildię, aby stworzyć nową' });
         }
+
+        // Sprawdzenie, czy użytkownik ma wystarczająco złota
+        if (user.money < 50) {
+            return res.status(400).json({ error: 'Nie masz wystarczająco złota, aby stworzyć gildię.' });
+        }
+
+        if (user.exp < 50) {
+            if (bonus_exp < 1 || bonus_exp > 10 || bonus_gold < 1 || bonus_gold > 10) {
+                return res.status(400).json({ error: `Bonusy muszą być w zakresie 1-10%. Podano: EXP ${bonus_exp}%, Gold ${bonus_gold}%` });
+            }
+        } else {
+            if (bonus_exp < 10 || bonus_exp > 20 || bonus_gold < 10 || bonus_gold > 20) {
+                return res.status(400).json({ error: `Bonusy muszą być w zakresie 10-20%. Podano: EXP ${bonus_exp}%, Gold ${bonus_gold}%` });
+            }
+        }
+        
 
         // Tworzenie nowej gildii
         const newGuild = new GuildModel({
@@ -104,34 +114,49 @@ export async function createGuild(req, res) {
             maxMembers,
             members: [mongoose.Types.ObjectId(userId)],
             ownerId: mongoose.Types.ObjectId(userId),
+            bonus_exp,
+            bonus_gold
         });
 
         await newGuild.save();
 
-        console.log('Gildia została utworzona:', newGuild);
-
-        // Aktualizacja danych użytkownika
+        // Odejmowanie złota za założenie gildii
+        user.money -= 50;
         user.isInGuild = true;
         user.guildId = newGuild._id;
-
         await user.save();
 
-        res.status(201).json({ message: 'Gildia została pomyślnie utworzona' });
+        res.status(201).json({ message: 'Gildia została pomyślnie utworzona', guild: newGuild });
     } catch (error) {
-        console.error('Błąd podczas tworzenia gildii:', error); // Szczegóły błędu
+        console.error('Błąd podczas tworzenia gildii:', error);
         res.status(500).json({ error: 'Nie udało się utworzyć gildii' });
     }
 }
 
+
+
+
+
 export async function getOnlineUsers(req, res) {
     try {
-        const onlineUsers = await UserModel.find({ isOnline: true }).select('username');
+        const now = new Date();
+       
+
+        // Pobierz użytkowników online
+        const onlineUsers = await UserModel.find({
+            isOnline: true, // Użytkownik jest online
+        }).select("username exp teza tezaTimestamp");
+
+        console.log("Online Users Data:", onlineUsers); // Debugowanie
+
         res.status(200).json({ onlineUsers });
     } catch (error) {
         console.error('Błąd podczas pobierania użytkowników online:', error.message);
         res.status(500).json({ error: 'Nie udało się pobrać użytkowników online' });
     }
 }
+
+
 
 
 export async function logout(req, res) {
@@ -301,26 +326,42 @@ try {
     return res.status(500).json({ error: 'Błąd serwera podczas obsługi zaproszenia' });
 }
 }
-
 export async function getUserInvitations(req, res) {
-try {
-    const user = await UserModel.findById(req.user.userId).populate('invitations.guildId', 'name');
-    if (!user) {
-        return res.status(404).json({ error: 'Użytkownik nie został znaleziony' });
+    try {
+        const user = await UserModel.findById(req.user.userId)
+            .populate({
+                path: 'invitations.guildId',
+                select: 'name bonus_exp bonus_gold'
+            });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Użytkownik nie został znaleziony' });
+        }
+
+        console.log("📥 Pobieranie zaproszeń z gildii:", user.invitations);
+
+        // Sprawdzenie, czy dane są poprawnie pobierane
+        const invitations = user.invitations
+            .filter(inv => inv.guildId) // Filtrujemy null/undefined
+            .map(inv => ({
+                guildId: inv.guildId._id.toString(), // Konwersja na string
+                guildName: inv.guildId.name,
+                bonusExp: inv.guildId.bonus_exp ?? 0,  // Pobranie bonusu EXP
+                bonusGold: inv.guildId.bonus_gold ?? 0 // Pobranie bonusu GOLD
+            }));
+
+        console.log("📤 API zwraca zaproszenia:", invitations); // Debugowanie
+
+        return res.status(200).json({ invitations });
+    } catch (error) {
+        console.error('❌ Błąd podczas pobierania zaproszeń:', error);
+        return res.status(500).json({ error: 'Błąd serwera podczas pobierania zaproszeń' });
     }
-
-    const pendingInvitations = user.invitations.filter(inv => inv.status === 'pending' && inv.guildId);
-    const invitations = pendingInvitations.map(inv => ({
-        guildId: inv.guildId._id,
-        guildName: inv.guildId.name,
-    }));
-
-    return res.status(200).json({ invitations });
-} catch (error) {
-    console.error('Błąd podczas pobierania zaproszeń:', error);
-    return res.status(500).json({ error: 'Błąd serwera podczas pobierania zaproszeń' });
 }
-}
+
+
+
+
 
 
 export async function removeMember(req, res) {

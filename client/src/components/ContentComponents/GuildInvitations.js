@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 function GuildInvitations({ fetchGuilds }) {
     const [invitations, setInvitations] = useState([]);
-    const [error, setError] = useState(null); 
-    const [successMessage, setSuccessMessage] = useState(null); 
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
 
     useEffect(() => {
         fetchInvitations();
@@ -24,6 +24,7 @@ function GuildInvitations({ fetchGuilds }) {
             }
 
             const result = await response.json();
+            console.log("📥 Odpowiedź API (zaproszenia):", result); // LOGOWANIE API
             setInvitations(result.invitations || []);
         } catch (error) {
             setError('Błąd podczas pobierania zaproszeń: ' + error.message);
@@ -32,7 +33,6 @@ function GuildInvitations({ fetchGuilds }) {
 
     const handleInvitation = async (guildId, action) => {
         try {
-           
             setError(null);
             setSuccessMessage(null);
 
@@ -56,14 +56,11 @@ function GuildInvitations({ fetchGuilds }) {
                     setError('Musisz opuścić swoją obecną gildię, aby dołączyć do nowej.');
                 } else {
                     setSuccessMessage(result.message);
-                    
                     setInvitations((prev) => prev.filter((inv) => inv.guildId !== guildId));
-                    
                     fetchGuilds();
                 }
             } else if (action === 'reject') {
                 setSuccessMessage('Zaproszenie zostało odrzucone.');
-                
                 setInvitations((prev) => prev.filter((inv) => inv.guildId !== guildId));
             }
             await fetchGuilds();
@@ -73,9 +70,9 @@ function GuildInvitations({ fetchGuilds }) {
     };
 
     return (
-        <div className="w-[40vw] bg-gradient-to-r from-black to-maincolor1 h-skreen m-[1.0vh]  p-[1vh] ">
-            <h2 className="text-white text-2xl font-bold mb-4">Zaproszenia do gildii</h2>
-            
+        <div className="absolutli  w full row-span-1 h-[9vh] col-span-1   flex flex-col">
+            <h2 className="text-white text-xl font-bold mb-4">Zaproszenia</h2>
+
             {/* Wyświetlanie komunikatów */}
             {error && <p className="text-red-500 mt-2">{error}</p>}
             {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
@@ -83,25 +80,33 @@ function GuildInvitations({ fetchGuilds }) {
             <ul className="space-y-4">
                 {invitations.length > 0 ? (
                     invitations.map((inv) => (
-                        <li
-                            key={inv.guildId}
-                            className="p-4 bg-gray-800 rounded-xl flex justify-between items-center hover:bg-green-400 border-2 border-white"
-                        >
-                            <span className="text-white">{inv.guildName}</span>
-                            <div className="space-x-2">
-                                <button
-                                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-400 transition-all"
-                                    onClick={() => handleInvitation(inv.guildId, 'accept')}
-                                >
-                                    Akceptuj
-                                </button>
-                                <button
-                                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400 transition-all"
-                                    onClick={() => handleInvitation(inv.guildId, 'reject')}
-                                >
-                                    Odrzuć
-                                </button>
+                        <li key={inv.guildId} className="p-4 bg-gray-800 rounded-xl flex flex-col hover:bg-maincolor1 border-2 border-white">
+                            {/* Nazwa Gildii */}
+                            <div className="flex justify-between items-center">
+                                <span className="text-white font-bold">{inv.guildName}</span>
+                                <div className="space-x-2">
+                                    <button
+                                        className="bg-gradient-to-r from-maincolor2 to-maincolor5 text-white px-4 py-2 rounded hover:bg-green-400 transition-all"
+                                        onClick={() => handleInvitation(inv.guildId, 'accept')}
+                                    >
+                                        Akceptuj
+                                    </button>
+                                    <button
+                                        className="bg-gradient-to-r from-maincolor2 to-maincolor5 text-white px-4 py-2 rounded hover:bg-red-400 transition-all"
+                                        onClick={() => handleInvitation(inv.guildId, 'reject')}
+                                    >
+                                        Odrzuć
+                                    </button>
+                                </div>
                             </div>
+
+                            {/* Bonusy EXP i Gold */}
+                            {inv.bonusExp !== undefined && inv.bonusGold !== undefined && (
+                                <div className="mt-2 flex justify-between text-sm text-gray-300">
+                                    <span>Bonus EXP: <span className="text-green-400">{inv.bonusExp}%</span></span>
+                                    <span>Bonus złota: <span className="text-yellow-400">{inv.bonusGold}%</span></span>
+                                </div>
+                            )}
                         </li>
                     ))
                 ) : (

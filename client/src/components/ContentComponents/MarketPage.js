@@ -10,6 +10,7 @@ const Market = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [isSellModalOpen, setIsSellModalOpen] = useState(false);
     const [sellData, setSellData] = useState({ type: "fixed", price: "", duration: "2" });
+    const [timers, setTimers] = useState({});
 
     useEffect(() => {
         if(activeTab === "market"){
@@ -17,6 +18,8 @@ const Market = () => {
         } else if (activeTab === "inventory"){
             fetchUserItems();
         }
+        const interval = setInterval(() => updateTimers(), 1000); //aktualizacja co sekundę
+        return () => clearInterval(interval);
     }, [activeTab]);
 
     /** 🔥 Pobieranie przedmiotów z marketu */
@@ -47,6 +50,7 @@ const Market = () => {
                 ...item,
                 item: item.item?.item || item.item || {} // Upewniamy się, że `item` istnieje
             })));
+            updateTimers();
         } catch (error) {
             console.error('❌ Błąd pobierania przedmiotów na markecie:', error);
         }
@@ -81,18 +85,46 @@ const Market = () => {
     };
 
     /** 🔥 Tooltipy */
-    const handleMouseEnter = (event, item) => {
-        setTooltipPosition({ x: event.pageX, y: event.pageY });
+    const handleMouseEnter = (actualEvent, item) =>{
+        const rect = actualEvent.currentTarget.getBoundingClientRect();
+        setTooltipPosition({ x: actualEvent.pageX, y: actualEvent.pageY });
         setTooltipContent(item);
         setTooltipVisible(true);
     };
-
+    
     const handleMouseMove = (event) => {
-        setTooltipPosition({ x: event.pageX, y: event.pageY });
+        setTooltipPosition({ x: event.pageX, y: event.pageY }); // Aktualizuj pozycję tooltipa podczas ruchu myszy
     };
-
     const handleMouseLeave = () => {
         setTooltipVisible(false);
+    };
+
+    /** Obliczanie pozostałego czasu */
+    const calculateTimeLeft = (endtime) => {
+        const now = new Date();
+        const end = new Date(endtime);
+        const diff = end - now;
+
+        if (diff <= 0) return "Zakończono";
+
+        const hours = Math.floor(diff / (1000*60*60));
+        const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((diff % (1000*60)) / 1000);
+
+        return`${hours}h ${minutes}m ${seconds}s`;
+    };
+
+    /** Aktualizowanie czasu pozostałego */
+    const updateTimers = () => {
+        setTimers(prevTimers => {
+            const newTimers = { ...prevTimers }; // Kopia obiektu stanu
+            marketItems.forEach(item => {
+                if (item.endTime) { // Upewnij się, że masz poprawną nazwę pola
+                    newTimers[item._id] = calculateTimeLeft(item.endTime);
+                }
+            });
+            return newTimers;
+        });
     };
 
     /** Wystawianie przedmiotu na sprzedaż */
@@ -214,7 +246,7 @@ const Market = () => {
                                 const marketItem = item.item || {}; // Upewniamy się, że `item` istnieje
 
                                 return (
-                                    <div key={item._id} className="bg-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all"
+                                    <div key={item._id} className="bg-gradient-to-r from-maincolor1 to-black border-2 border-maincolor1 rounded-xl p-4 shadow-xl transform hover:scale-105 transition-all"
                                         onMouseEnter={(event) => handleMouseEnter(event, marketItem)}
                                         onMouseLeave={handleMouseLeave}
                                         onMouseMove={handleMouseMove}>
@@ -236,6 +268,10 @@ const Market = () => {
                                                     )}
                                                 </>
                                             )}
+                                        </p>
+                                        {/* Wyświetlanie czasu do końca */}
+                                        <p className="text-maincolor4 font-bold mt-2">
+                                        Czas do końca: {timers[item._id] !== undefined ? timers[item._id] : "Ładowanie..."}
                                         </p>
                                         
                                         {/* Przycisk kupna lub licytacji */}
@@ -298,17 +334,20 @@ const Market = () => {
             )}
 
             {/* Tooltip */}
-            {tooltipVisible && tooltipContent && (
-                <div style={{
+            {tooltipVisible && (
+                <div
+                    style={{
                     position: "fixed",
-                    top: tooltipPosition.y + 10,
-                    left: tooltipPosition.x + 10,
+                    top: tooltipPosition.y+10,
+                    left: tooltipPosition.x+10,
                     zIndex: 10,
                     backgroundColor: "rgba(0, 0, 0, 0.8)",
                     color: "white",
                     padding: "8px",
-                    borderRadius: "10px",
-                }} className={`border-4 ${tooltipContent?.element === "fire"
+                    borderRadius: "20px",
+                    
+                    }}
+                    className={`border-4  ${tooltipContent?.element === "fire"
                     ? "border-red-500"
                     : tooltipContent?.element === "water"
                     ? "border-cyan-500"
@@ -318,11 +357,36 @@ const Market = () => {
                     ? "border-yellow-500"
                     : tooltipContent?.element === "dark"
                     ? "border-purple-900"
-                    : "border-white"} `}>
-                    <h4 className="text-2xl font-bold">{tooltipContent?.name || "Brak nazwy"}</h4>
-                    <img className="w-20 h-20" src={`images/${tooltipContent?.photo || "default"}.png`} alt="item tooltip" />
-                    <p className="text-lg font-bold">TYPE: {tooltipContent?.type || "Brak danych"}</p>
-                    <p>ELEMENT: {tooltipContent?.element || "Brak elementu"}</p>
+                    : "border-white"} `}
+                >
+                    <h4 className="text-2xl font-bold">{tooltipContent?.name}</h4>
+                    <img className="w-20 h-20" src={`images/${tooltipContent?.photo}.png`}></img>
+                    <p className="text-lg font-bold">TYPE: {tooltipContent?.type} </p>
+                    {tooltipContent?.power !== 0  &&(
+                    <p>POWER: +{tooltipContent?.power}</p>)}
+                    {tooltipContent?.vitality !== 0  &&(
+                    <p>VITALITY: +{tooltipContent?.vitality}</p>)}
+                    {tooltipContent?.strength !== 0  &&(
+                    <p>STRENGTH: +{tooltipContent?.strength}</p>)}
+                    {tooltipContent?.dexterity !== 0  &&(
+                    <p>DEXTERITY: +{tooltipContent?.dexterity}</p>)}
+                    {tooltipContent?.intelligence !== 0  &&(
+                    <p>INTELLIGENCE: +{tooltipContent?.intelligence}</p>)}
+                    {tooltipContent?.armor !== 0  &&(
+                    <p>ARMOR: +{tooltipContent?.armor}</p>)}
+                    <p><span>ELEMENT: </span>{" "}<span className={` ${
+                        tooltipContent?.element === "fire"
+                        ? "text-red-500"
+                        : tooltipContent?.element === "water"
+                        ? "text-cyan-500"
+                        : tooltipContent?.element === "nature"
+                        ? "text-green-400"
+                        : tooltipContent?.element === "light"
+                        ? "text-yellow-500"
+                        : tooltipContent?.element === "dark"
+                        ? "text-purple-900"
+                        : "text-white"} font-bold`}>{tooltipContent?.element}</span></p>
+        
                 </div>
             )}
 

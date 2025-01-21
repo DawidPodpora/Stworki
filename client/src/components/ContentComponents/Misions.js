@@ -124,7 +124,9 @@ useEffect(() => {
         
         const data = await response.json();
         console.log(data);
-
+        if (response.bonusMessage) {
+          alert(response.bonusMessage);
+      }
         return data;
         
     } catch (error) {

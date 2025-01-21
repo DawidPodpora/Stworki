@@ -178,7 +178,7 @@ export const updateExpiredMarketItems = async () => {
         const expiredItems = await MarketItem.find({
             endTime: { $lt: now },
             status: 'active'
-        }).populate('item seller bidder');
+        }).populate('item.item seller bidder');
 
         for (const marketItem of expiredItems) {
             if (marketItem.currentBid && marketItem.bidder) {
@@ -191,7 +191,7 @@ export const updateExpiredMarketItems = async () => {
                     continue;
                 }
 
-                buyer.items.push(marketItem.item);
+                buyer.items.push(marketItem.item.item);
                 seller.money += marketItem.currentBid;
                 await buyer.save();
                 await seller.save();
@@ -201,7 +201,7 @@ export const updateExpiredMarketItems = async () => {
                 // Licytacja zakończona bez ofert - zwrot przedmiotu
                 const seller = await UserModel.findById(marketItem.seller._id);
                 if (seller) {
-                    seller.items.push(marketItem.item);
+                    seller.items.push(marketItem.item.item);
                     await seller.save();
                 }
             }

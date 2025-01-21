@@ -1,35 +1,16 @@
 import UserModel from '../model/User.model.js'
 import Species from '../model/Species.js';
-const RankingTableGenerator = (allUserNames, userIndex) => {
+import mongoose from 'mongoose';
+const RankingTableGenerator = (rankTable, firstIndex) => {
     const rankingTable = [];
 
-    if (userIndex - 6 < 0) {
-        for (let i = 0; i < Math.min(13, allUserNames.length); i++) {
-            const { _id, ...userWithoutId } = allUserNames[i]._doc;
+    for(let i = 0; i < 13; i++)
+    {
+        const { _id, ...userWithoutId } = rankTable[i]._doc;
             rankingTable.push({
                 ...userWithoutId,
-                position: i + 1
+                position: firstIndex + i
             });
-            console.log("dla góry rankingu");
-        }
-    } else if (allUserNames.length - userIndex < 7) {
-        for (let i = Math.max(0, allUserNames.length - 13); i < allUserNames.length; i++) {
-            const { _id, ...userWithoutId } = allUserNames[i]._doc;
-            rankingTable.push({
-                ...userWithoutId,
-                position: i + 1
-            });
-            console.log("dla dołu rankingu");
-        }
-    } else {
-        for (let i = userIndex - 6; i < userIndex + 7; i++) {
-            const { _id, ...userWithoutId } = allUserNames[i]._doc;
-            rankingTable.push({
-                ...userWithoutId,
-                position: i + 1
-            });
-            console.log("dla środka tabeli");
-        }
     }
 
     console.log(rankingTable);
@@ -39,19 +20,60 @@ const RankingTableGenerator = (allUserNames, userIndex) => {
 export async function RankingForUserById(req, res) {
     try {
         const userId = req.user.userId;
-        const allUserNames = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1 });
+        const userFromDatabase = await UserModel.aggregate(
+            [
 
-        const userIndex = allUserNames.findIndex(user => user._id.toString() === userId);
+                {
+                  $setWindowFields: {
+                    sortBy: { rankingPoints: -1 },
+                    output: {
+                      rank: { $documentNumber: {} }, 
+                    }
+                  }
+                },
+                { $match: {_id:  mongoose.Types.ObjectId(userId) } } 
+              ]
+        )
+        //find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1 });
 
-        if (userIndex === -1) {
+        //const userIndex = allUserNames.findIndex(user => user._id.toString() === userId);
+        if (userFromDatabase.length === 0) {
             return res.status(404).json({ message: "Użytkownik nie znaleziony w rankingu" });
         }
-
-        const ranking = RankingTableGenerator(allUserNames, userIndex);
-
+        console.log(userFromDatabase);
+        const userRank = userFromDatabase[0].rank;
+        // if (userIndex === -1) {
+        //     return res.status(404).json({ message: "Użytkownik nie znaleziony w rankingu" });
+        // }
+        //const ranking = RankingTableGenerator(allUserNames, userIndex);
+        console.log(userRank, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        const a = await UserModel.count();
+        let ranking;
+        let finalRanking;
+        if(userRank - 7 < 0)
+        {
+            ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, 1);
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        }
+        else if(userRank+7 > a )
+        {
+             ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).skip(a - 13).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, a - 12);
+             console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+            }
+        else{
+             ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).skip(userRank - 7).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, a - 6);
+             console.log("ccccccccccccccccccccccccccccccccc");
+            }
+        
+        console.log(finalRanking,"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+        
+        
         res.status(200).json({
-            userRank: userIndex + 1,
-            ranking
+            userRank: userRank,
+            ranking: finalRanking
         });
     } catch (error) {
         console.error('Nie udało się pobrać rankingu:', error);
@@ -62,26 +84,74 @@ export async function RankingForUserById(req, res) {
 
 export async function RankingForUserByNumber(req, res) {
     try {
-    
-        const allUserNames = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1 });
-
-        let userIndex = parseInt(req.query.userIndex);
-        console.log(userIndex);
-        if(userIndex < 0)
+        let userRank = Number(req.query.userIndex);
+        const a = await UserModel.count();
+        if(userRank > a)
         {
-            userIndex = 0;
+            userRank = a;
         }
-       if(allUserNames.length < userIndex)
-       {
-            userIndex = allUserNames.length - 1;
-       }
+        if(userRank <= 0)
+        {
+            userRank = 1
+        }
+        const userFromDatabase = await UserModel.aggregate(
+            [
 
-        const ranking = RankingTableGenerator(allUserNames, userIndex);
+                {
+                  $setWindowFields: {
+                    sortBy: { rankingPoints: -1 },
+                    output: {
+                      rank: { $documentNumber: {} }, 
+                    }
+                  }
+                },
+                { $match: {rank: userRank } } 
+              ]
+        )
+        console.log(userFromDatabase);
+        if (userFromDatabase.length === 0) {
+            return res.status(404).json({ message: "Użytkownik nie znaleziony w rankingu" });
+        }
+        console.log(userFromDatabase);
+        
+        let ranking;
+        let finalRanking;
+        if(userRank - 7 < 0)
+        {
+            ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, 1);
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        }
+        else if(userRank+7 > a )
+        {
+             ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).skip(a - 13).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, a - 12);
+             console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+            }
+        else{
+             ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).skip(userRank - 7).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, userRank - 6);
+             console.log("ccccccccccccccccccccccccccccccccc");
+            }
+        
+        console.log(finalRanking,"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+    //     const allUserNames = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1 });
+    //     console.log(userIndex);
+    //     if(userIndex < 0)
+    //     {
+    //         userIndex = 0;
+    //     }
+    //    if(allUserNames.length < userIndex)
+    //    {
+    //         userIndex = allUserNames.length - 1;
+    //    }
 
-        res.status(200).json({
-            userRank: userIndex + 1,
-            ranking
-        });
+    //     const ranking = RankingTableGenerator(allUserNames, userIndex);
+
+         res.status(200).json({
+             userRank: userRank,
+             ranking: finalRanking
+         });
     } catch (error) {
         console.error('Nie udało się pobrać rankingu:', error);
         res.status(500).json({ message: 'Błąd przy sprawdzaniu użytkowników', error: error.message });
@@ -92,29 +162,58 @@ export async function RankingForUserByName(req, res) {
     try {
         
         const username = req.query.UserName;
-        console.log("AAAAAAAAAAAAAAAAAAAA");
-        const allUserNames = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1 });
+        const userFromDatabase = await UserModel.aggregate(
+            [
 
-        const userIndex = allUserNames.findIndex(user => user.username === username);
-        if (userIndex === -1) {
+                {
+                  $setWindowFields: {
+                    sortBy: { rankingPoints: -1 },
+                    output: {
+                      rank: { $documentNumber: {} }, 
+                    }
+                  }
+                },
+                { $match: {username: username } } 
+              ]
+        )
+        //find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1 });
+
+        //const userIndex = allUserNames.findIndex(user => user._id.toString() === userId);
+        if (userFromDatabase.length === 0) {
             return res.status(404).json({ message: "Użytkownik nie znaleziony w rankingu" });
         }
-        if(userIndex <= 0)
+        console.log(userFromDatabase);
+        const userRank = userFromDatabase[0].rank;
+        // if (userIndex === -1) {
+        //     return res.status(404).json({ message: "Użytkownik nie znaleziony w rankingu" });
+        // }
+        //const ranking = RankingTableGenerator(allUserNames, userIndex);
+        console.log(userRank, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        const a = await UserModel.count();
+        let ranking;
+        let finalRanking;
+        if(userRank - 7 < 0)
         {
-            
-            return res.status(404).send({ error: 'nie znaleziono'}); 
+            ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, 1);
+            console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         }
-       if(allUserNames.length <= userIndex)
-       {
+        else if(userRank+7 > a )
+        {
+             ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).skip(a - 13).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, a - 12);
+             console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+            }
+        else{
+             ranking = await UserModel.find({}, { username: 1, _id: 1, rankingPoints: 1 }).sort({ rankingPoints: -1, _id: -1 }).skip(userRank - 7).limit(13).exec();
+            finalRanking = RankingTableGenerator(ranking, a - 6);
+             console.log("ccccccccccccccccccccccccccccccccc");
+            }
         
-        return res.status(404).send({ error: 'nie znaleziono'});
-       }
-
-        const ranking = RankingTableGenerator(allUserNames, userIndex);
-
+        console.log(finalRanking,"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
         res.status(200).json({
-            userRank: userIndex + 1,
-            ranking
+            userRank: userRank,
+            ranking: finalRanking
         });
     } catch (error) {
         console.error('Nie udało się pobrać rankingu:', error);
@@ -124,7 +223,8 @@ export async function RankingForUserByName(req, res) {
 
 export async function UserDataForRanking(req, res) {
     try {
-        const name = "qwer4"; // Możesz to zamienić na req.query.username, jeśli chcesz dynamiczne wyszukiwanie
+        console.log("aaaaaaaaaaaaaaaaaaaaaaa");
+        const name = req.query.name; // Możesz to zamienić na req.query.username, jeśli chcesz dynamiczne wyszukiwanie
 
         const userData = await UserModel.findOne({ username: name });
 
@@ -132,19 +232,28 @@ export async function UserDataForRanking(req, res) {
             return res.status(404).send({ error: 'Nie znaleziono użytkownika' });
         }
 
-        const photosForCreature = [];
-        
+        const speciesData = [];
+        const statsForCreature = [];
+        const creaturesData = userData.creatures.map(({ name, level, staty, _id, items }) => ({
+            name,
+            level,
+            staty,
+            _id,
+            items
+        }));
         // Używamy for...of dla prawidłowego await
         for (const creature of userData.creatures) {
-            const speciesPhoto = await Species.findOne({ name: creature.species });
-            photosForCreature.push(speciesPhoto.photos);
+            const species = await Species.findOne({ name: creature.species }).lean(); // lean() usuwa metadane Mongoose
+            if (species) {
+                const { _id, ...speciesWithoutId } = species; // Usuń _id z obiektu
+                speciesData.push(speciesWithoutId);
+            }
         }
-
-        console.log(photosForCreature);
 
         res.status(200).json({
             username: userData.username,
-            creaturesPhotos: photosForCreature,
+            creatures: creaturesData,
+            creatureSpeciesData: speciesData,
         });
 
     } catch (error) {

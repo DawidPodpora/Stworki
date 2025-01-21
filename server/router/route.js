@@ -17,6 +17,7 @@ import * as marketController from "../controllers/marketController.js";
 import * as guildController from "../controllers/guildController.js";
 import { enhanceUserWithGuildData } from '../middleware/enUserWithGuildData.js';
 import * as ranking from "../controllers/rankingControler.js";
+import * as tezzaController from '../controllers/tezzaController.js';
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
 router.route('/register').post(controller.register); // rejestracja użytkownika
@@ -113,11 +114,19 @@ router.route('/updateMaxMembers/:guildId').patch(Auth, guildController.updateMax
 router.route('/deleteGuild/:guildId').delete(Auth, guildController.deleteGuild);
 router.route('/guilds/:guildId/members').get(Auth, guildController.getGuildMembersUsernames);
 //Ranking
-router.route('/RankingForUserById').get(Auth, ranking.RankingForUserById);
-router.route('/RankingForUserByNumber').get(Auth, ranking.RankingForUserByNumber);
+router.route('/RankingForUserById').get(Auth,ranking.RankingForUserById);
+router.route('/RankingForUserByNumber').get(Auth,ranking.RankingForUserByNumber);
 router.route('/RankingForUserByName').get(Auth, ranking.RankingForUserByName);
-router.route('/UserDataForRanking').get(ranking.UserDataForRanking);
+router.route('/UserDataForRanking').get(Auth, ranking.UserDataForRanking);
 //logout
 router.route('/logout').post(Auth, guildController.logout);
+
+// Ustawianie tezy użytkownika
+router.route('/setTeza').post(Auth, tezzaController.setTeza);
+
+// Pobieranie listy użytkowników z aktywnymi tezami
+
+
+
 
 export default router; // Eksportowanie routera do dalszego użytku w aplikacji
