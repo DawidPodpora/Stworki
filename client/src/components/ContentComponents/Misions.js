@@ -30,22 +30,13 @@ useEffect(() => {
   return () => clearInterval(timer); // Wyczyść timer przy odmontowaniu
 }, [remainingTimes]);
 
-
-
-
-
-
-
-
-
   useEffect(()=>{
     const loadData = async()=>{
       await fetchData();
-      console.log(creaturesData);
-      console.log(spiecesPhotos);
     };
     loadData();
   },[]);
+
   const fetchData = async()=>{
     const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
     if (!token) {
@@ -61,12 +52,11 @@ useEffect(() => {
       });
 
       if (!response.ok) {
-          console.error('Błąd pobierania danych użytkownika:', response.statusText);
+          console.error(t('fetchUserDataError'), response.statusText);
           return;
       }
       
       const data = await response.json();
-      console.log(data);
       setSpeciesPhoto(data.speciesPhotos)
       setCreaturesData(data.creatures);
       const creaturesOnMission = data.creatures.filter(
@@ -79,7 +69,6 @@ useEffect(() => {
         }
         return result;
       }, []);
-      console.log(creaturesOnMission);
       setCreaturesOnMissionPhotos(photosOnMission);
       const times = creaturesOnMission.map((creature) => {
         const endTime = new Date(creature.timeOfEndOfMission);
@@ -87,7 +76,6 @@ useEffect(() => {
         const diffInSeconds = Math.max(Math.floor((endTime - currentTime) / 1000), 0); // Pozostały czas w sekundach
         return diffInSeconds;
       });
-      console.log(times,"times");
       setRemainingTimes(times);
       const activeMissionTimes = creaturesOnMission.flatMap((creature) =>
         creature.misions
@@ -95,12 +83,11 @@ useEffect(() => {
           .map((mission) => mission.timeOfMission)         // Pobierz timeOfMission
       );
       
-      console.log(activeMissionTimes, "Czasy aktywnych misji");
       setMissionsFullTime(activeMissionTimes);
     
 
   } catch (error) {
-      console.error('Błąd podczas pobierania danych użytkownika:', error);
+      console.error(t('fetchUserDataError'), error);
   }
   }
 
@@ -120,7 +107,7 @@ useEffect(() => {
         });
 
         if (!response.ok) {
-            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            console.error(t('fetchUserDataError'), response.statusText);
             return;
         }
         
@@ -132,7 +119,7 @@ useEffect(() => {
         return data;
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   };
 
@@ -153,12 +140,12 @@ useEffect(() => {
       try {
         if(!creature)
         {
-          console.warn('Creature not choosed');
+          console.warn(t('creatureNotChoosed'));
           return;
         }
         if(!mission)
           {
-            console.warn('Mission not choosed');
+            console.warn(t('missionNotChoosed'));
             return;
           }
         const creatureId = creature._id;
@@ -171,13 +158,13 @@ useEffect(() => {
         });
 
         if (!response.ok) {
-            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            console.error(t('fetchUserDataError'), response.statusText);
             return;
         }
         const data = await response.json();
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   }
   const changeCreature = (number)=>{
@@ -229,7 +216,7 @@ useEffect(() => {
             </div>
             {remainingTimes[index] / (missionsFullTime[index]*60) > 0 ?
             (<div className="text-white ml-auto text-[1.5vw] w-[6vh] ml-[3vh]">{formatTime(remainingTimes[index])}</div>):(
-            <div className=" w-[6vh] h-[3vh] ml-[3vh]"><button onClick={()=>claimMissionClick(creaturesOnMission[index])} className="bg-gradient-to-r from-maincolor3 to-maincolor5 w-full h-[4vh] rounded-2xl text-black font-extrabold border-2">CLAIM</button></div>) 
+            <div className=" w-[6vh] h-[3vh] ml-[3vh]"><button onClick={()=>claimMissionClick(creaturesOnMission[index])} className="bg-gradient-to-r from-maincolor3 to-maincolor5 w-full h-[4vh] rounded-2xl text-black font-extrabold border-2">{t('claim')}</button></div>) 
             }
           </div>
 ):(<div></div>)}
@@ -262,17 +249,17 @@ useEffect(() => {
                 <div className="w-full h-full bg-maincolor1 rounded-2xl p-[0.5vw] relative">
                   <div className="absolute right-0 bottom-1"><img src="images/money.png" className="w-[2vw]"></img>{creaturesData[activeCreature].misions[index].goldForMission}</div>
                   <div className="absolute left-1 bottom-1"><img src="images/experience.png" className="w-[2vw]"></img>{creaturesData[activeCreature].misions[index].expForMission}</div>
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl font-extrabold"><p>{creaturesData[activeCreature].misions[index].timeOfMission} MINUTES</p></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl font-extrabold"><p>{creaturesData[activeCreature].misions[index].timeOfMission} {t('minutes')}</p></div>
                 </div>
               </div>
             ))}
             
           <div className="w-full h-[4vh] flex justify-center items-center">
-            <button onClick={()=>acceptMissionClick(creaturesData[activeCreature])} className="w-[6vw] h-[4vh] bg-gradient-to-r from-maincolor2 to-maincolor5 text-black text-2xl font-extrabold rounded-3xl border-2 border-maincolor4 hover:text-maincolor4">ACCEPT</button>
+            <button onClick={()=>acceptMissionClick(creaturesData[activeCreature])} className="w-[6vw] h-[4vh] bg-gradient-to-r from-maincolor2 to-maincolor5 text-black text-2xl font-extrabold rounded-3xl border-2 border-maincolor4 hover:text-maincolor4">{t('accept')}</button>
           </div>
-          </div>):(<div className="ml-[2vh] mt-[12vh] w-[35vh] h-[6vh] bg-maincolor5 flex items-center justify-center text-black font-extrabold text-[3vh] rounded-xl">IS ON MISSION</div>)}
+          </div>):(<div className="ml-[2vh] mt-[12vh] w-[35vh] h-[6vh] bg-maincolor5 flex items-center justify-center text-black font-extrabold text-[3vh] rounded-xl">{t('isOnMission')}</div>)}
           </div>
-          </div>):(<div>LOADING</div>)}
+          </div>):(<div>{t('loading')}</div>)}
     </div>
   );
 }
