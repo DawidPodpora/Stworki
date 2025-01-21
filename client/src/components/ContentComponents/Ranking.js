@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 
-function Ranking(){
+function Ranking({ClickEnemyDatasToFight}){
     const [rankingTable, setRankingTable] = useState(null);
     const [positon, setPosition] = useState(null);
     const [nametoSend, setNameToSend] = useState(null);
@@ -218,7 +218,7 @@ function Ranking(){
                     <div className='mb-[1vw] text-[1.5vw]'>{item}: {creatures[activeCreature].staty[index] + creatureSpeciesData[activeCreature].baseStats[index] + creatureSpeciesData[activeCreature].statsAfterLevel[index] * (creatures[activeCreature].level-1) }</div>
                 ))}
             </div>
-            <button className='w-[9vw] h-[4vh] bg-gradient-to-r from-maincolor3 to-maincolor5 absolute right-2 bottom-[1vh] rounded-full flex items-center justify-center font-bold'>FIGHT</button>
+            <button className='w-[9vw] h-[4vh] bg-gradient-to-r from-maincolor3 to-maincolor5 absolute right-2 bottom-[1vh] rounded-full flex items-center justify-center font-bold' onClick={()=>ClickEnemyDatasToFight(creatures[activeCreature]._id,username)}>FIGHT</button>
         </div>
        
     </div>):(<></>)

@@ -8,7 +8,7 @@ import GuildView from './ContentComponents/GuildView.js';
 import Ranking from './ContentComponents/Ranking.js';
 // Komponent odpowiedzialny za wyświetlanie zawartości w zależności od wybranego przycisku
 
-function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightActiveButton}) {
+function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightActiveButton, ClickEnemyDatasToFight}) {
   let ComponentToRender; // Zmienna przechowująca referencję do komponentu, który ma być renderowany
 
   // Logika wyboru komponentu na podstawie wartości `selectedButton`
@@ -48,7 +48,7 @@ function Content({ selectedButton, data, NewCreatureActiveButton, creatureFightA
   return (
     <div className="absolute w-4/5 bg-black1 h-screen right-0">
       {/* Renderowanie wybranego komponentu */}
-      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton}/>
+      <ComponentToRender data = {data} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton} ClickEnemyDatasToFight={ClickEnemyDatasToFight}/>
     </div>
   );
 }

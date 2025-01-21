@@ -118,6 +118,8 @@ router.route('/RankingForUserById').get(Auth,ranking.RankingForUserById);
 router.route('/RankingForUserByNumber').get(Auth,ranking.RankingForUserByNumber);
 router.route('/RankingForUserByName').get(Auth, ranking.RankingForUserByName);
 router.route('/UserDataForRanking').get(Auth, ranking.UserDataForRanking);
+router.route('/CreaturesToFight').get(Auth,ranking.CreaturesToFight);
+router.route('/CreaturesFightVsPlayer').get(Auth, missionsControler.CreaturesFightArena);
 //logout
 router.route('/logout').post(Auth, guildController.logout);
 

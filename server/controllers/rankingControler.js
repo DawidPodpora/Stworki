@@ -241,7 +241,6 @@ export async function UserDataForRanking(req, res) {
             _id,
             items
         }));
-        // Używamy for...of dla prawidłowego await
         for (const creature of userData.creatures) {
             const species = await Species.findOne({ name: creature.species }).lean(); // lean() usuwa metadane Mongoose
             if (species) {
@@ -257,6 +256,29 @@ export async function UserDataForRanking(req, res) {
         });
 
     } catch (error) {
+        console.error('Nie udało się pobrać danych użytkownika:', error);
+        res.status(500).json({ message: 'Błąd przy pobieraniu danych', error: error.message });
+    }
+}
+
+export async function CreaturesToFight(req,res){
+    try{
+        const userId = req.user.userId;
+        const user = await UserModel.findById(userId);
+        const speciesPhotos = [];
+        const idOfCretures = []
+        for (const creature of user.creatures) {
+            const species = await Species.findOne({ name: creature.species }).lean(); // lean() usuwa metadane Mongoose
+            if (species) {
+                speciesPhotos.push(species.photos);
+                idOfCretures.push(creature._id);
+            }
+        }
+        res.status(200).json({
+            speciesPhotos: speciesPhotos,
+            idOfCretures: idOfCretures
+        })
+    }catch (error) {
         console.error('Nie udało się pobrać danych użytkownika:', error);
         res.status(500).json({ message: 'Błąd przy pobieraniu danych', error: error.message });
     }

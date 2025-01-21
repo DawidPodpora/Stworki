@@ -5,6 +5,7 @@ import FirstOrb from './FirstOrb.js';
 import FightScreen from './FightScreen.js';
 import React, { useState, useEffect } from 'react'; // Import React i hooka useState do zarządzania stanem
 import NewCreatureWindow from './NewCreatureWindow.js';
+import CreatureSelect from './CreatureSelect.js';
 
 // Główny komponent strony
 function MainPage() {
@@ -15,7 +16,9 @@ function MainPage() {
   const [userFullData, setUserFullData] = useState(null);
   const [creatrureFight, setCreatureFight] = useState(false);
   const [creatureFightData, setCreatureFightData] = useState(null);
-
+  const [CreatureSelectVisible, setCreatureSelectVisible] = useState(false);
+  const [enemyNameToFight, setEnemyDataToFight] = useState(null);
+  const [enemyCreatureIdToFight, setEnemyCreatureIdToFight] = useState(null);
     useEffect(() => {
       const fetchUserData = async () => {
           const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
@@ -87,6 +90,11 @@ function MainPage() {
   const creatureFightCloseButton =()=>{
     setCreatureFight(false);
   }
+  const ClickEnemyDatasToFight =(creatureId, enemyName)=>{
+    setEnemyCreatureIdToFight(creatureId);
+    setEnemyDataToFight(enemyName);
+    setCreatureSelectVisible(true);
+  }
   // Wygląd strony
   return (
     <div className="bg-maincolor1 absolute h-screen w-screen flex">
@@ -98,7 +106,7 @@ function MainPage() {
       />
 
       {/* Komponent treści, wyświetlający zawartość na podstawie wybranego przycisku */}
-      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton}/>)}
+      {userFullData!=null && (<Content selectedButton={selectedButton} data={userFullData} NewCreatureActiveButton={NewCreatureActiveButton} creatureFightActiveButton={creatureFightActiveButton} ClickEnemyDatasToFight={ClickEnemyDatasToFight} />)}
 
       {/* Warunkowe wyświetlanie panelu opcji */}
       {isOptionsVisible && (
@@ -113,7 +121,11 @@ function MainPage() {
       {creatrureFight &&(
         <FightScreen creatureFightData={creatureFightData} creatureFightCloseButton={creatureFightCloseButton}/>
         )}
+        {CreatureSelectVisible &&(
+      <CreatureSelect enemyName={enemyNameToFight} enemyCreatureToFightId={enemyCreatureIdToFight}></CreatureSelect>
+    )}
     </div>
+    
   );
 }
 
