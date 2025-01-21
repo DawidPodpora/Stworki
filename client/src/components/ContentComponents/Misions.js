@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 function Misions({ data, creatureFightActiveButton }) {
 
@@ -14,7 +15,8 @@ function Misions({ data, creatureFightActiveButton }) {
   const [creaturesOnMissionPhotos, setCreaturesOnMissionPhotos] = useState([]);
   const [missionsFullTime, setMissionsFullTime] = useState([]);
   const [fightData, setFightData] = useState(null);
- 
+  const { t } = useTranslation();
+
 
 useEffect(() => {
   if (remainingTimes.length === 0) return; // Jeśli brak danych, nie uruchamiaj timera
@@ -47,7 +49,7 @@ useEffect(() => {
   const fetchData = async()=>{
     const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
     if (!token) {
-        console.warn('Brak tokenu w localStorage');
+        console.warn(t('noTokenWarning'));
         return;
     }
     try {
@@ -105,7 +107,7 @@ useEffect(() => {
   const ClaimMission = async (creatureId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-        console.warn('Brak tokenu w localStorage');
+        console.warn(t('noTokenWarning'));
         return;
     }
 
@@ -145,7 +147,7 @@ useEffect(() => {
   {
     const token = localStorage.getItem('token');
       if (!token) {
-          console.warn('Brak tokenu w localStorage');
+          console.warn(t('noTokenWarning'));
           return;
       }
       try {
@@ -161,7 +163,6 @@ useEffect(() => {
           }
         const creatureId = creature._id;
         const missionId = mission._id;
-        console.log(missionId,"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
         const response = await fetch(`http://localhost:8080/api/SendOnMission?missionId=${missionId}&creatureId=${creatureId} `, {
             method: 'GET',
             headers: {
@@ -188,7 +189,6 @@ useEffect(() => {
   }
   const acceptMissionClick = async(creature) =>{
     const mission = creature.misions[missionChoose];
-    console.log(mission,"AAAAAAAAAAAAAAAAAAAAAAAA");
     await sendCreatureOnMission(creature, mission);
     await fetchData();
   }
