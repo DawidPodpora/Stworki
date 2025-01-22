@@ -6,6 +6,7 @@ function Ranking({ClickEnemyDatasToFight}){
     const [positon, setPosition] = useState(null);
     const [nametoSend, setNameToSend] = useState(null);
     const [numberToSend, setNumberToSend] = useState(1);
+    const [userPosition, setUserPosition] = useState(null);
     
 
     const [creatureSpeciesData, setCreatureSpeciesData] = useState([]);
@@ -38,6 +39,7 @@ function Ranking({ClickEnemyDatasToFight}){
             const data = await response.json();
             console.log(data);
             setPosition(data.userRank);
+            setUserPosition(data.userRank);
             setRankingTable(data.ranking);
         } catch (error) {
             console.error('Błąd podczas pobierania danych użytkownika:', error);
@@ -92,7 +94,7 @@ function Ranking({ClickEnemyDatasToFight}){
             } 
             const data = await response.json();
             console.log(data);
-            
+            setPosition(data.userRank);
             setRankingTable(data.ranking);
         } catch (error) {
             console.error('Błąd podczas pobierania danych użytkownika:', error);
@@ -156,7 +158,7 @@ function Ranking({ClickEnemyDatasToFight}){
     <div className='text-maincolor4 w-1/2 h-full  bg-gradient-to-r from-maincolor1 via-black to-maincolor1 border-2 border-maincolor1 rounded-2xl'>
         {playersplace.map((_,index)=>(
             <div onClick={()=>fetchUserDataClick(rankingTable[index].username)} className='w-[97%] h-[6.2%] m-[0.5vw] border-2 border-black bg-gradient-to-r from-maincolor1 to-black rounded-xl relative'>
-                {rankingTable[index].position === positon ?(<>
+                {rankingTable[index].position === userPosition ?(<>
                     <div className='absolute top-1/2 transform -translate-y-1/2 left-[5%] text-maincolor5'>{rankingTable[index].position}</div>
                     <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-maincolor5'>{rankingTable[index].username}</div>
                     <div className='absolute top-1/2 transform -translate-y-1/2 right-[5%] text-maincolor5'>Points: {rankingTable[index].rankingPoints} </div>

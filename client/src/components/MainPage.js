@@ -95,6 +95,9 @@ function MainPage() {
     setEnemyDataToFight(enemyName);
     setCreatureSelectVisible(true);
   }
+  const ClickSelectNonVisible=()=>{
+    setCreatureSelectVisible(false);
+  }
   // Wygląd strony
   return (
     <div className="bg-maincolor1 absolute h-screen w-screen flex">
@@ -122,7 +125,7 @@ function MainPage() {
         <FightScreen creatureFightData={creatureFightData} creatureFightCloseButton={creatureFightCloseButton}/>
         )}
         {CreatureSelectVisible &&(
-      <CreatureSelect enemyName={enemyNameToFight} enemyCreatureToFightId={enemyCreatureIdToFight}></CreatureSelect>
+      <CreatureSelect enemyName={enemyNameToFight} enemyCreatureToFightId={enemyCreatureIdToFight} creatureFightActiveButton={creatureFightActiveButton} ClickSelectNonVisible={ClickSelectNonVisible}></CreatureSelect>
     )}
     </div>
     

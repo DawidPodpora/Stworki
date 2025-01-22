@@ -85,6 +85,7 @@ export async function RankingForUserById(req, res) {
 export async function RankingForUserByNumber(req, res) {
     try {
         let userRank = Number(req.query.userIndex);
+        console.log(userRank,"userRank");
         const a = await UserModel.count();
         if(userRank > a)
         {

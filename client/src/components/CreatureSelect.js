@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function CreatureSelect({enemyName, enemyCreatureToFightId}){
+function CreatureSelect({enemyName, enemyCreatureToFightId, creatureFightActiveButton, ClickSelectNonVisible}){
     const [speciesPhotosUser, setSpeciesPhotosUser] = useState(null);
     const [creaturesId, setCreaturesId] = useState([]);
     const [selectedCreture, setSelectedCreture] = useState(null);
@@ -12,7 +12,7 @@ function CreatureSelect({enemyName, enemyCreatureToFightId}){
         }
     
         try {
-            const response = await fetch(`http://localhost:8080/api/CreaturesFightVsPlayer?enemyName=${enemyName}&enemyCreatureToFightId=${enemyCreatureToFightId}& UserCreatureId=${UserCreatureId}`, {
+            const response = await fetch(`http://localhost:8080/api/CreaturesFightVsPlayer?enemyName=${enemyName}&enemyCreatureToFightId=${enemyCreatureToFightId}&UserCreatureId=${UserCreatureId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -25,9 +25,7 @@ function CreatureSelect({enemyName, enemyCreatureToFightId}){
             }
             
             const data = await response.json();
-            console.log(data)
-            setSpeciesPhotosUser(data.speciesPhotos);
-            setCreaturesId(data.idOfCreatures);
+            console.log(data);
             if (response.bonusMessage) {
               alert(response.bonusMessage);
           }
@@ -60,9 +58,9 @@ function CreatureSelect({enemyName, enemyCreatureToFightId}){
             }
             
             const data = await response.json();
-            console.log(data)
+            console.log(data);
             setSpeciesPhotosUser(data.speciesPhotos);
-            setCreaturesId(data.idOfCreatures);
+            setCreaturesId(data.idOfCretures);
             if (response.bonusMessage) {
               alert(response.bonusMessage);
           }
@@ -83,14 +81,28 @@ function CreatureSelect({enemyName, enemyCreatureToFightId}){
         setSelectedCreture(index);
       }
       const placeForCreatue = Array(6).fill("");
+
+
+
       const FightClick = async(enemyName, enemyCreatureToFightId, UserCreatureId)=>{
-        await FightStart(enemyName, enemyCreatureToFightId, UserCreatureId);
+        console.log(enemyName,"enemyName");
+        console.log(enemyCreatureToFightId,"enemyCreatureToFightId");
+        console.log(UserCreatureId,"UserCreatureId");
+        await FightStart(enemyName, enemyCreatureToFightId, UserCreatureId).then((response)=>creatureFightActiveButton(response));
+        ClickSelectNonVisible();
+
       }
+
+
     return(<div className="absolute bg-black1 bg-opacity-90 w-full h-full items-center flex flex-col justify-center" >
-        {speciesPhotosUser?(
+        {console.log(enemyName,"enemyName")}
+        {console.log(enemyCreatureToFightId,"enemyCreatureToFightId")}
+        
+        {speciesPhotosUser && creaturesId ?(
         <div className="grid grid-cols-3 grid-rows-2 gap-[1vw] w-[50vw] h-[60vh]  pl-[2vw]">
             <>
             {placeForCreatue.map((_,index)=>(
+                
                 <div key={index} className="h-full aspect-square border-8 border-maincolor4 rounded-2xl">
                 {speciesPhotosUser[index]?
                     (<>{selectedCreture === index?(<img className="border-4 rounded-md border-maincolor5" src={`images/${speciesPhotosUser[index][0]}.png`}></img>
@@ -101,7 +113,7 @@ function CreatureSelect({enemyName, enemyCreatureToFightId}){
 
             }
             </>
-            <button className="ml-[100%] mr-[120%] w-full h-[5vh] bg-gradient-to-r from-maincolor3 to-maincolor5 rounded-full text-center flex flex-col justify-center items-center" onClick={()=>FightClick(enemyName, enemyCreatureToFightId,creaturesId[selectedCreture])}>FIGHT</button>
+            <button className="ml-[100%] mr-[120%] w-full h-[5vh] bg-gradient-to-r from-maincolor3 to-maincolor5 rounded-full text-center flex flex-col justify-center items-center" onClick={()=>FightClick(enemyName, enemyCreatureToFightId, creaturesId[selectedCreture])}>FIGHT</button>
         </div>
         ):(<div>Loading</div>)}
     </div>);

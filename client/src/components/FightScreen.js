@@ -94,11 +94,13 @@ function FightScreen({creatureFightData, creatureFightCloseButton}){
                             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 '>You Win</div>
                             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[2vh] flex items-center'><img className='w-[2vw] h-full' src="images/money.png"></img><p>{creatureFightData.gold}</p>{creatureFightData.bonusGold > 0 &&(<span className='ml-2 text-green-300'>+ {creatureFightData.bonusGold} </span>)}</div>
                             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[5vh] flex items-center'><img className='w-[2vw] h-full' src="images/experience.png"></img><p>{creatureFightData.exp}</p>{creatureFightData.bonusExp > 0 && (<span className='ml-2 text-green-300'>+ {creatureFightData.bonusExp}</span>)}</div>
+                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[8vh] flex items-center'>Ranking points: +{creatureFightData.pointsgain}</div>    
                                 </>
                         ):(<>
                         <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 '>You Lose</div>
                             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[2vh] flex items-center'><img className='w-[2vw] h-full' src="images/money.png"></img><p>{creatureFightData.gold}</p>{creatureFightData.bonusGold > 0 &&(<span className='ml-2 text-green-300'>+ {creatureFightData.bonusGold}</span>)}</div>
                             <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[5vh] flex items-center'><img className='w-[2vw] h-full' src="images/experience.png"></img><p>{creatureFightData.exp}</p>{creatureFightData.bonusExp > 0 && (<span className='ml-2 text-green-300'>+ {creatureFightData.bonusExp}</span>)}</div>
+                            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 mt-[8vh] flex items-center'>Ranking points: {creatureFightData.pointsgain}</div> 
                             </>)}</div>
                     )
                     }
