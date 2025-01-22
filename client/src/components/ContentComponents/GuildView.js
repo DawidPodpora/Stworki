@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GuildDetails from './GuildDetails';
 import GuildInvitations from './GuildInvitations';
+import { useTranslation } from 'react-i18next';
 
 function GuildView() {
     const [guilds, setGuilds] = useState([]);
@@ -15,15 +16,13 @@ function GuildView() {
     const [userGold, setUserGold] = useState(0);
     const userId = localStorage.getItem('userId');
     const [userTezaInput, setUserTezaInput] = useState("");
+    const { t } = useTranslation();
+    
     useEffect(() => {
         if (!userId) {
-            console.error('userId jest null! Użytkownik musi być zalogowany.');
-            console.log('Dostępne wartości localStorage:', localStorage);
-            console.log('Token:', localStorage.getItem('token'));
-            console.log('UserId:', localStorage.getItem('userId'));
+            console.error(t('fetchUserDataError'));
             return;
         }
-        console.log('userId w localStorage:', userId); 
         fetchUserData();
         fetchGuilds();
         fetchOnlineUsers();
@@ -43,12 +42,12 @@ function GuildView() {
             });
 
             const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Nie udało się pobrać danych użytkownika');
+            if (!response.ok) throw new Error(result.error || t('fetchUserDataError'));
 
             setUserExp(result.exp);
             setUserGold(result.money);
         } catch (error) {
-            console.error('Błąd podczas pobierania danych użytkownika:', error.message);
+            console.error(t('fetchUserDataError'), error.message);
         }
     };
 
@@ -60,10 +59,9 @@ function GuildView() {
             });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || 'Nie udało się pobrać gildii');
-            console.log('Odpowiedz z backendu:', result.guilds); 
             setGuilds(result.guilds || []);
         } catch (error) {
-            console.error('Błąd podczas pobierania gildii:', error.message);
+            console.error(t('fetchGuildsError'), error.message);
         }
     };
 
@@ -75,17 +73,16 @@ function GuildView() {
             });
             const result = await response.json();
     
-            console.log("Odpowiedź z backendu o online użytkownikach:", result.onlineUsers);
             setOnlineUsers(result.onlineUsers || []);
         } catch (error) {
-            console.error("Błąd podczas pobierania użytkowników online:", error.message);
+            console.error(t('fetchOnlineUsersError'), error.message);
         }
     };
 
     const createGuild = async () => {
         try {
             if (!newGuildName || !newGuildGoal || !newGuildMaxMembers) {
-                alert('Wszystkie pola są wymagane!');
+                alert(t('allFilesRequired'));
                 return;
             }
             const minBonus = userExp < 50 ? 1 : 10;
@@ -93,12 +90,12 @@ function GuildView() {
 
             if (newGuildExpBonus < minBonus || newGuildExpBonus > maxBonus ||
                 newGuildGoldBonus < minBonus || newGuildGoldBonus > maxBonus) {
-                alert(`❌ Nieprawidłowe wartości bonusów. Dla Twojego poziomu EXP dozwolone są wartości między ${minBonus}% a ${maxBonus}%.`);
+                    alert(t('incorrectBonusValues', { min: minBonus, max: maxBonus }));
                 return;
             }
 
             if (userGold < 50) {
-                alert('⚠ Nie masz wystarczająco złota, aby stworzyć gildię, kwota - 20.');
+                alert(t('notEnoughGoldToCreateGuil'));
                 return;
             }
             const token = localStorage.getItem('token');
@@ -109,7 +106,6 @@ function GuildView() {
                 bonus_exp: newGuildExpBonus,
                 bonus_gold: newGuildGoldBonus
             };
-            console.log("🚀 Wysyłane dane do backendu:", guildData); // DEBUG
             const response = await fetch('http://localhost:8080/api/createGuild', {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}`,'Content-Type': 'application/json' },
@@ -120,14 +116,14 @@ function GuildView() {
             
 
             if (!response.ok) {
-                if (result.error.includes('Najpierw opuść swoją obecną gildię')) {
-                    alert('⚠ Najpierw opuść swoją obecną gildię lub ją usuń, aby stworzyć nową.');
+                if (result.error.includes(t('firstLeaveYourGuild'))) {
+                    alert(t('firstLeaveYourGuildOrDelete'));
                 } else {
                     alert(`❌ Nie udało się utworzyć gildii: ${result.error}`);
                 }
-                throw new Error(result.error || 'Nie udało się utworzyć gildii');
+                throw new Error(result.error || t('failedToCreateGuild'));
             }
-            alert('Gildia została pomyślnie stworzona!');
+            alert(t('guildCreated'));
             setNewGuildName('');
             setNewGuildGoal('');
             setNewGuildMaxMembers(10);
@@ -136,8 +132,8 @@ function GuildView() {
             await fetchGuilds();
             await fetchUserData();
         } catch (error) {
-            console.error('Błąd podczas tworzenia gildii:', error.message);
-            alert('Nie udało się utworzyć gildii');
+            console.error(t('errorCreatinGuild'), error.message);
+            alert(t('failedToCreateGuild'));
         }
     };
     const handleTezaSubmit = async () => {
@@ -154,13 +150,13 @@ function GuildView() {
             });
     
             if (!response.ok) {
-                throw new Error("Nie udało się zapisać tezy.");
+                throw new Error(t('errorSavingThesis'));
             }
     
-            alert("Teza została zapisana i wygaśnie za 30 minut!");
+            alert(t('thesisSaved'));
             setUserTezaInput(""); // Reset inputa po zapisaniu
         } catch (error) {
-            console.error("Błąd podczas zapisywania tezy:", error);
+            console.error(t('errorSavingThesis'), error);
         }
     };
 
@@ -172,13 +168,13 @@ function GuildView() {
             });
     
             const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Nie udało się opuścić gildii');
+            if (!response.ok) throw new Error(result.error || t('leavingGuildError'));
     
-            alert('Opuściłeś gildię');
+            alert(t('leavingGuild'));
             await fetchGuilds();
         } catch (error) {
-            console.error('Błąd podczas opuszczania gildii:', error.message);
-            alert('Nie udało się opuścić gildii');
+            console.error(t('leavingGuildError'), error.message);
+            alert(t('leavingGuildError'));
         }
     };
 
@@ -190,13 +186,13 @@ function GuildView() {
             });
 
             const result = await response.json();
-            if (!response.ok) throw new Error(result.error || 'Nie udało się usunąć gildii');
+            if (!response.ok) throw new Error(result.error || t('deletingGuildError'));
 
-            alert('Gildia została usunięta');
+            alert(t('guildDeleted'));
             await fetchGuilds();
         } catch (error) {
-            console.error('Błąd podczas usuwania gildii:', error.message);
-            alert('Nie udało się usunąć gildii');
+            console.error(t('deletingGuildError'), error.message);
+            alert(t('deletingGuildError'));
         }
     };
 
@@ -215,7 +211,7 @@ function GuildView() {
                     
                 {/* Twoja Gildia - (1 rząd, 2 kolumny szerokości) */}
                 <div className="row-span-1  h-[23vh] col-span-2 bg-gradient-to-r from-black to-maincolor1 rounded-[30px] p-4 border-2">
-                    <h2 className="text-white text-2xl font-bold">Twoja gildia</h2>
+                    <h2 className="text-white text-2xl font-bold">{t('yourGuild')}</h2>
                     <ul className="space-y-4 mt-4">
                         {userGuilds.length > 0 ? userGuilds.map((guild) => (
                             <li key={guild._id} className="p-4 bg-gray-800 rounded-xl flex justify-between items-center hover:bg-maincolor1 cursor-pointer border-2 border-white"
@@ -223,9 +219,9 @@ function GuildView() {
                                 <div className="w-full flex justify-between items-center">
                                     <span className="text-white  text-lg font-bold">{guild.name}</span>
                                     <div className="flex items-center text-sm text-gray-300 space-x-6">
-                                        <span>🎖 Bonus EXP: <span className="text-green-400">{guild.bonus_exp}%</span></span>
+                                        <span>{t('expBonus')} <span className="text-green-400">{guild.bonus_exp}%</span></span>
                                         <span className="flex items-center">
-                                            💰 Bonus złota: <span className="text-yellow-400 ml-1">{guild.bonus_gold}%</span>
+                                        {t('goldBonus')} <span className="text-yellow-400 ml-1">{guild.bonus_gold}%</span>
                                             <span className="w-5 h-5 ml-2" />
                                         </span>
                                         <span>👥 {guild.members.length}/{guild.maxMembers}</span>
@@ -235,30 +231,30 @@ function GuildView() {
                                     {guild.ownerId === userId ? (
                                         <button onClick={(e) => { e.stopPropagation(); deleteGuild(guild._id); }} 
                                             className="bg-maincolor2 text-white px-3 py-1 rounded">
-                                            Usuń
+                                            {t('delete')}
                                         </button>
                                     ) : (
                                         <button onClick={(e) => { e.stopPropagation(); leaveGuild(); }} 
                                             className="bg-maincolor2 text-white px-3 py-1 rounded">
-                                            Opuść
+                                            {t('leave')}
                                         </button>
                                     )}
                                 </div>
                             </li>
-                        )) : <li className="text-gray-400">Nie jesteś członkiem żadnej gildii</li>}
+                        )) : <li className="text-gray-400">{t('notMember')}</li>}
                     </ul>
                 </div>
     {/* Użytkownicy Online - (2 rząd, 1 kolumna szerokości, zajmuje cały rząd) */}
     
     <div className="row-span-2 col-span-1 w-[49vh]  w-skreen  h-[95vh] bg-maincolor1 rounded-[30px]  w-skreen p-4 border-2 flex flex-col">
-                    <h2 className="text-white text-xl font-bold">Użytkownicy online</h2>
+                    <h2 className="text-white text-xl font-bold">{t('usersOnline')}</h2>
                     <div className="mb-4 p-3 bg-gray-800 rounded-lg">
-                        <h3 className="text-white text-lg font-semibold mb-2">Dodaj swoją tezę</h3>
-                        <input type="text" placeholder="Wpisz swoją myśl..." value={userTezaInput}
+                        <h3 className="text-white text-lg font-semibold mb-2">{t('addThesis')}</h3>
+                        <input type="text" placeholder={t('enterThesis')} value={userTezaInput}
                             onChange={(e) => setUserTezaInput(e.target.value)}
                             className="w-full p-2 rounded bg-gray-700 text-white" />
                         <button onClick={handleTezaSubmit} className="w-full mt-2 p-2 bg-gradient-to-r from-maincolor2 to-maincolor1 rounded text-white font-bold hover:bg-green-700">
-                            Zapisz tezę 
+                            {t('saveThesis')}
                         </button>
                     </div>
     
@@ -280,33 +276,33 @@ function GuildView() {
                                     </div>
                                 </li>
                             );
-                        }) : <li className="text-gray-400">🚫 Brak użytkowników online... gdzie oni wszyscy poszli? 🧐</li>}
+                        }) : <li className="text-gray-400">🚫 {t('noUsersOnline')} 🧐</li>}
                     </ul>
                 </div>
                 {/* Stwórz Gildię - (2 rząd, 1 kolumna szerokości) */}
                 <div className="row-span-2 h-[70vh] col-span-1 w-skreen mt-[-22vh] bg-maincolor1 rounded-[30px] p-4 border-2 flex flex-col">
-                <h2 className="text-white text-xl font-bold">Stwórz gildię</h2>
+                <h2 className="text-white text-xl font-bold">{t('createGuild')}</h2>
                     <input
                         type="text"
-                        placeholder="Nazwa gildii"
+                        placeholder={t('guildName')}
                         className="block w-full p-2 bg-gray-700 rounded mt-2"
                         value={newGuildName}
                         onChange={(e) => setNewGuildName(e.target.value)}
                     />
                     <textarea
-                        placeholder="Opis gildii"
+                        placeholder={t('guildDescription')}
                         className="block w-full p-2 bg-gray-700 rounded mt-2"
                         value={newGuildGoal}
                         onChange={(e) => setNewGuildGoal(e.target.value)}
                     />
                     <input
                         type="number"
-                        placeholder="Maksymalna liczba członków"
+                        placeholder={t('maxNumberOfMembers')}
                         className="block text-white w-full p-2 bg-gray-700 rounded mt-2"
                         value={newGuildMaxMembers}
                         onChange={(e) => setNewGuildMaxMembers(Number(e.target.value))}
                     />
-                    <label className="text-white block mt-2">Bonus EXP:</label>
+                    <label className="text-white block mt-2">{t('expBonus')}</label>
                     <input
                         type="number"
                         min={userExp < 50 ? 1 : 10}
@@ -315,7 +311,7 @@ function GuildView() {
                         value={newGuildExpBonus}
                         onChange={(e) => setNewGuildExpBonus(Number(e.target.value))}
                     />
-                    <label className="text-white block mt-2">Bonus złota:</label>
+                    <label className="text-white block mt-2">{t('goldBonus')}</label>
                     <input
                         type="number"
                         min={userExp < 50 ? 1 : 10}
@@ -325,13 +321,12 @@ function GuildView() {
                         onChange={(e) => setNewGuildGoldBonus(Number(e.target.value))}
                     />
                     <button onClick={createGuild} className="w-full bg-gradient-to-r from-maincolor2 to-maincolor5 p-2 mt-3 rounded">
-                        Stwórz Gildię
+                        {t('createGuild')}
                     </button>
                 </div>
                 
                 {/* Zaproszenia - (2 rząd, 1 kolumna szerokości) */}
                 <div className="row-span-1 h-[70vh] col-span-1 w-skreen mt-[-22vh] bg-gray-900 rounded-[30px] p-4 border-2 flex flex-col">
-               
                     
                     <GuildInvitations fetchGuilds={fetchGuilds} />
                 </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";  // Importujemy React oraz useState do obsługi stanów.
+import { useTranslation } from "react-i18next";
 
 function TestButton2({data, NewCreatureActiveButton}) {
   const [creatures, setCreatures] = useState(null);
@@ -19,6 +20,8 @@ function TestButton2({data, NewCreatureActiveButton}) {
   const [gold, setGold] = useState(0);
   const [name, setName] = useState(null);
   const [expToNextLevel, setExpToNextLevel] = useState(0);
+  const { t } = useTranslation();
+
   const fetchUserData = async () => {
     const token = localStorage.getItem('token'); // Pobranie tokena z localStorage
     if (!token) {
@@ -51,14 +54,14 @@ function TestButton2({data, NewCreatureActiveButton}) {
         setPlayerLevel(data.level);
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   };
 
   const equipeItem = async (itemId, creatureId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-        console.warn('Brak tokenu w localStorage');
+        console.warn(t('noTokenWarning'));
         return;
     }
 
@@ -71,7 +74,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
         });
 
         if (!response.ok) {
-            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            console.error(t('fetchUserDataError'), response.statusText);
             return;
         }
         
@@ -79,14 +82,14 @@ function TestButton2({data, NewCreatureActiveButton}) {
         console.log(data);
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   };
 
   const ItemUse = async (itemId, creatureId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-        console.warn('Brak tokenu w localStorage');
+        console.warn(t('noTokenWarning'));
         return;
     }
 
@@ -99,7 +102,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
         });
 
         if (!response.ok) {
-            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            console.error(t('fetchUserDataError'), response.statusText);
             return;
         }
         
@@ -107,14 +110,14 @@ function TestButton2({data, NewCreatureActiveButton}) {
         console.log(data);
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   };
 
   const unequipeItem = async (itemId, creatureId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-        console.warn('Brak tokenu w localStorage');
+        console.warn(t('noTokenWarning'));
         return;
     }
 
@@ -127,21 +130,21 @@ function TestButton2({data, NewCreatureActiveButton}) {
         });
 
         if (!response.ok) {
-            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            console.error(t('fetchUserDataError'), response.statusText);
             return;
         }
         
         const data = await response.json();
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   };
 
   const OrbUse = async (itemId) => {
     const token = localStorage.getItem('token');
     if (!token) {
-        console.warn('Brak tokenu w localStorage');
+        console.warn(t('noTokenWarning'));
         return;
     }
 
@@ -154,16 +157,15 @@ function TestButton2({data, NewCreatureActiveButton}) {
         });
 
         if (!response.ok) {
-            console.error('Błąd pobierania danych urzytkownika:', response.statusText);
+            console.error(t('fetchUserDataError'), response.statusText);
             return;
         }
         
         const data = await response.json();
-        console.log(data);
         return data;
         
     } catch (error) {
-        console.error('Błąd podczas pobierania danych użytkownika:', error);
+        console.error(t('fetchUserDataError'), error);
     }
   };
 
@@ -172,15 +174,12 @@ function TestButton2({data, NewCreatureActiveButton}) {
   useEffect(() => {
     const loadCreaturesAndItemData = async () =>{
       await fetchUserData();
-      console.log(creatures, "creatures");
-      console.log(species, "species");
-      console.log(itemsFromUser, " items");
     };
     loadCreaturesAndItemData();
   }, []);
 
   // Nazwy statystyk postaci
-  const statsNames = ["POW", "VIT", "STR", "DEX", "INT"];
+  const statsNames = [t("power"), t("vitality"), t("strength"), t("dexterity"), t("intelligence")];
   
   // Strzałki do przesuwania panelu
   const arrows = ["◂", "▸"];
@@ -204,7 +203,6 @@ function TestButton2({data, NewCreatureActiveButton}) {
 
   const makeItemPanelVisible =(itemData)=>{
     setItemActionVisible(!itemActionVisible);
-    console.log("panel widoczny", itemData);
     setActualItem(itemData);
   };
 
@@ -316,18 +314,10 @@ function TestButton2({data, NewCreatureActiveButton}) {
                     <div className="w-full h-3/4 text-center">{creatures[visibleCreature].name}
                       <div className=" mt-[3vh] ml-[3vw] w-4/5 h-1/4 bg-gradient-to-r from-maincolor2 via-black to-maincolor5 border-4 relative" ><div className="bg-maincolor1 h-full absolute right-0" style={{width:`${(creatures[visibleCreature].expToNextLevel -creatures[visibleCreature].exp)/creatures[visibleCreature].expToNextLevel * 100}%`}}></div></div>
                       <div className="mt-[2vh]">{creatures[visibleCreature].exp}/{creatures[visibleCreature].expToNextLevel}</div>
-                      <div className="mt-[2vh]">LEVEL: {creatures[visibleCreature].level}</div>
+                      <div className="mt-[2vh]">{t('level')} {creatures[visibleCreature].level}</div>
                     </div>
 
                   </div>
-                </div>
-              </div>
-
-              {/* Panel pasywny */}
-              <div className="w-full h-1/3 p-2">
-                <p className="h-1/6 text-maincolor4 text-[2vh] flex items-center justify-center">PASIVE</p>
-                <div className="border-2 border-maincolor5 bg-black1 bg-opacity-50 w-full h-5/6 rounded-xl text-maincolor4 p-2">
-                  MIEJSCE NA UMIEJĘTNOSĆ PASYWNĄ
                 </div>
               </div>
             </div>
@@ -420,7 +410,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
               panelVisible ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="text-[3vw] w-full flex items justify-center h-1/5">{name} LEVEL: {playerLevel}</div>
+            <div className="text-[3vw] w-full flex items justify-center h-1/5">{name} {t('level')} {playerLevel}</div>
             <div className="text-[1.5vw] flex justify-between m-[3vw] h-1/3 "><div className="w-1/6 flex justify-between relative"><img src="images/money.png" className="h-full"></img><div className="absolute top-1/2 left-[7vw]">{gold} </div></div>
               <div className="relative w-1/2"><div className="absolute top-1/2">{exp}/{expToNextLevel}</div><div className="w-3/4 h-1/4 border-2 top-1/2 absolute ml-[8vw]"><div className = "bg-maincolor2 h-full" style={{width:`${exp/expToNextLevel*100}%`}}></div></div></div>
             </div>
@@ -438,7 +428,7 @@ function TestButton2({data, NewCreatureActiveButton}) {
           </div>
         </>
       ) : (
-        <div>Loading...</div> // Wyświetlanie komunikatu ładowania
+        <div>{t('loading')}</div> // Wyświetlanie komunikatu ładowania
       )}
 
       {/* DODANE (5) – Render samego tooltipa */}
@@ -486,23 +476,23 @@ function TestButton2({data, NewCreatureActiveButton}) {
             src={`images/${tooltipContent.photo}.png`}
             alt=""
           />
-          <p className="text-lg font-bold">TYPE: {tooltipContent.type}</p>
-          {tooltipContent.power !== 0 && <p>POWER: +{tooltipContent.power}</p>}
+          <p className="text-lg font-bold">{t('type')} {tooltipContent.type}</p>
+          {tooltipContent.power !== 0 && <p>{t('power')}: +{tooltipContent.power}</p>}
           {tooltipContent.vitality !== 0 && (
-            <p>VITALITY: +{tooltipContent.vitality}</p>
+            <p>{t('vitality')}: +{tooltipContent.vitality}</p>
           )}
           {tooltipContent.strength !== 0 && (
-            <p>STRENGTH: +{tooltipContent.strength}</p>
+            <p>{t('strength')}: +{tooltipContent.strength}</p>
           )}
           {tooltipContent.dexterity !== 0 && (
-            <p>DEXTERITY: +{tooltipContent.dexterity}</p>
+            <p>{t('dexterity')}: +{tooltipContent.dexterity}</p>
           )}
           {tooltipContent.intelligence !== 0 && (
-            <p>INTELLIGENCE: +{tooltipContent.intelligence}</p>
+            <p>{t('intelligence')}: +{tooltipContent.intelligence}</p>
           )}
-          {tooltipContent.armor !== 0 && <p>ARMOR: +{tooltipContent.armor}</p>}
+          {tooltipContent.armor !== 0 && <p>{t('armor')}: +{tooltipContent.armor}</p>}
           <p>
-            <span>ELEMENT: </span>{" "}
+            <span>{t('element')}: </span>{" "}
             <span
               className={`${
                 tooltipContent.element === "fire"

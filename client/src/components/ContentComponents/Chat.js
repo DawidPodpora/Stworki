@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useTransition } from 'react';
+import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
 
 function Chat({data}) {
@@ -7,6 +8,7 @@ function Chat({data}) {
   const chatRef = useRef(null);
   const socket = useRef(null);
   const currentUser = data.username;
+  const { t } = useTranslation();
   // Automatycznie przewijaj czat na dół po każdej nowej wiadomości
   useEffect(() => {
     // połącz z backendem WebSocket
@@ -85,7 +87,7 @@ function Chat({data}) {
           <input
             type="text"
             className="flex-grow p-2 rounded-l-lg bg-gray-800 text-white border border-gray-700 focus:outline-none"
-            placeholder="Wpisz swoją wiadomość..."
+            placeholder={t('typeMessage')}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyPress}
@@ -94,7 +96,7 @@ function Chat({data}) {
             onClick={handleSendMessage}
             className="bg-blue-600 text-white p-2 rounded-r-lg hover:bg-blue-700"
           >
-            Wyślij
+            {t('send')}
           </button>
         </div>
       </div>

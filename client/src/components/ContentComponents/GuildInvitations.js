@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 function GuildInvitations({ fetchGuilds }) {
     const [invitations, setInvitations] = useState([]);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const { t } = useTranslation();
 
     useEffect(() => {
         fetchInvitations();
@@ -20,14 +22,13 @@ function GuildInvitations({ fetchGuilds }) {
             });
 
             if (!response.ok) {
-                throw new Error('Nie udało się pobrać zaproszeń');
+                throw new Error(t('fetchInvitationsError'));
             }
 
             const result = await response.json();
-            console.log("📥 Odpowiedź API (zaproszenia):", result); // LOGOWANIE API
             setInvitations(result.invitations || []);
         } catch (error) {
-            setError('Błąd podczas pobierania zaproszeń: ' + error.message);
+            setError(t('fetchInvitationsError') + error.message);
         }
     };
 
@@ -52,26 +53,26 @@ function GuildInvitations({ fetchGuilds }) {
             }
 
             if (action === 'accept') {
-                if (result.message === 'Najpierw opuść swoją obecną gildię, aby dołączyć do nowej') {
-                    setError('Musisz opuścić swoją obecną gildię, aby dołączyć do nowej.');
+                if (result.message === t('firstLeaveYourGuild')) {
+                    setError(t('firstLeaveYourGuild'));
                 } else {
                     setSuccessMessage(result.message);
                     setInvitations((prev) => prev.filter((inv) => inv.guildId !== guildId));
                     fetchGuilds();
                 }
             } else if (action === 'reject') {
-                setSuccessMessage('Zaproszenie zostało odrzucone.');
+                setSuccessMessage(t('rejectedInvitation'));
                 setInvitations((prev) => prev.filter((inv) => inv.guildId !== guildId));
             }
             await fetchGuilds();
         } catch (error) {
-            setError('Błąd podczas obsługi zaproszenia: ' + error.message);
+            setError(t('invitationHandlingError') + error.message);
         }
     };
 
     return (
         <div className="absolutli  w full row-span-1 h-[9vh] col-span-1   flex flex-col">
-            <h2 className="text-white text-xl font-bold mb-4">Zaproszenia</h2>
+            <h2 className="text-white text-xl font-bold mb-4">{t('invitations')}</h2>
 
             {/* Wyświetlanie komunikatów */}
             {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -89,13 +90,13 @@ function GuildInvitations({ fetchGuilds }) {
                                         className="bg-gradient-to-r from-maincolor2 to-maincolor5 text-white px-4 py-2 rounded hover:bg-green-400 transition-all"
                                         onClick={() => handleInvitation(inv.guildId, 'accept')}
                                     >
-                                        Akceptuj
+                                        {t('accept')}
                                     </button>
                                     <button
                                         className="bg-gradient-to-r from-maincolor2 to-maincolor5 text-white px-4 py-2 rounded hover:bg-red-400 transition-all"
                                         onClick={() => handleInvitation(inv.guildId, 'reject')}
                                     >
-                                        Odrzuć
+                                        {t('reject')}
                                     </button>
                                 </div>
                             </div>
@@ -103,14 +104,14 @@ function GuildInvitations({ fetchGuilds }) {
                             {/* Bonusy EXP i Gold */}
                             {inv.bonusExp !== undefined && inv.bonusGold !== undefined && (
                                 <div className="mt-2 flex justify-between text-sm text-gray-300">
-                                    <span>Bonus EXP: <span className="text-green-400">{inv.bonusExp}%</span></span>
-                                    <span>Bonus złota: <span className="text-yellow-400">{inv.bonusGold}%</span></span>
+                                    <span>{t('expBonus')} <span className="text-green-400">{inv.bonusExp}%</span></span>
+                                    <span>{t('goldBonus')} <span className="text-yellow-400">{inv.bonusGold}%</span></span>
                                 </div>
                             )}
                         </li>
                     ))
                 ) : (
-                    <li className="text-gray-400">Brak zaproszeń</li>
+                    <li className="text-gray-400">{t('noInvitations')}</li>
                 )}
             </ul>
         </div>
