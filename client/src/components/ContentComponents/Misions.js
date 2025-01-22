@@ -30,6 +30,7 @@ useEffect(() => {
   return () => clearInterval(timer); // Wyczyść timer przy odmontowaniu
 }, [remainingTimes]);
 
+
   useEffect(()=>{
     const loadData = async()=>{
       await fetchData();
@@ -44,7 +45,7 @@ useEffect(() => {
         return;
     }
     try {
-      const response = await fetch('http://localhost:8080/api/missionsInfo ', {
+      const response = await fetch('http://localhost:8080/api/missionsInfo', {
           method: 'GET',
           headers: {
               'Authorization': `Bearer ${token}`, // Wysłanie tokena w nagłówku

@@ -540,18 +540,93 @@ const statConversion = async(creature) =>
     
     export const CreaturesFightArena = async (req, res) => {
         try {
-        console.log("aaaaaaaaaaaaaaaaaaaaaaaa");
-        const user1 = await UserModel.findById("678ab941be7ae87a81ba1b39");
-        const user2 = await UserModel.findById("678a98c88bc707999dc627a2");
-        const creature1 = user1.creatures.find((creature)=> creature._id.toString() === "678ab952be7ae87a81ba1b45");  
+            let fight;
+        const speciesPhotos=[];
+        let gold = 100;
+        let exp = 100;
+        let bonusExp = 0;
+        let bonusGold = 0;
+        let bonusMessage = '';
+        
+        console.log("AAAAAAAAAAAAAAAAAAAAAAA");
+        const user1Id = req.user.userId;
+        const user2Name =req.query.enemyName;
+        console.log(user1Id,"user1Id");
+        console.log(user2Name,"user2Name");
+        const user1creatureId = req.query.UserCreatureId;
+        const user2creatureId = req.query.enemyCreatureToFightId;
+        const user1 = await UserModel.findById(user1Id);
+        const user2 = await UserModel.findOne({username: user2Name});
+        const creature1 = user1.creatures.find((creature)=> creature._id.toString() === user1creatureId);
+        const creature2 = user2.creatures.find((creature)=> creature._id.toString() === user2creatureId);
         console.log(creature1,"creeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeature1");
-        const waitForCreature2 = await randomCreatureGrenerator(creature1);
-        const creature2 = waitForCreature2.randomCreature;
-        console.log(creature2);
-        const fight = await fightMechanism(creature1, creature2);
-        console.log(fight);
-            res.status(200).json({fight}); // Odpowiadamy na żądanie z danymi stworków
+        console.log(creature2,"bbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+        const creaturePhotos1 = await Species.findOne({name:creature1.species},{photos:1,_id:0});
+        const creaturePhotos2 = await Species.findOne({name:creature2.species},{photos:1,_id:0});
+        speciesPhotos.push(creaturePhotos1.photos);
+        speciesPhotos.push(creaturePhotos2.photos);
+        fight = await fightMechanism(creature1, creature2);
+        const userLevelDifpoits = (user2.level - user1.level)*20;
+        const creaturesLevelDif = (creature2.level - creature1.level)* 4;
+        const fullbonus = userLevelDifpoits + creaturesLevelDif;
+        let pointsAfterplayer1Win = 100 + fullbonus;
+        let pointsAfterplayer2Win = -100 + fullbonus;
+        let pointsgain; 
+        
+        if(pointsAfterplayer1Win > 200)
+        {
+            pointsAfterplayer1Win = 200;
         }
+        if(pointsAfterplayer1Win < 0){
+            pointsAfterplayer1Win = 0;
+        }
+        if(pointsAfterplayer2Win < -200){
+            pointsAfterplayer2Win = -200;
+        }
+        if(pointsAfterplayer2Win > 0){
+            pointsAfterplayer2Win = 0;
+        }
+        pointsAfterplayer2Win = Math.abs(pointsAfterplayer2Win);
+        
+        if(fight.whoWon === "c1"){
+            user1.rankingPoints += pointsAfterplayer1Win;
+            user2.rankingPoints -= pointsAfterplayer1Win;
+            user1.exp += 100;
+            user1.money += 100;
+            pointsgain = pointsAfterplayer1Win;
+            if(user2.rankingPoints < 0)
+            {
+                user2.rankingPoints = 0;
+            }
+        }
+        console.log("bbbbbbbbbbbbbbbbbb");
+        if(fight.whoWon === "c2"){
+            user2.rankingPoints += pointsAfterplayer2Win;
+            user1.rankingPoints -= pointsAfterplayer2Win;
+            user2.exp += 100;
+            user2.money += 100;
+            pointsgain = -(pointsAfterplayer2Win);
+            gold = 0;
+            exp = 0;
+            if(user1.rankingPoints < 0){
+                user1.rankingPoints = 0;
+            }
+        }
+        console.log(fight);
+        await user1.save();
+        await user2.save();
+            res.status(200).json({
+                fight,
+                gold,
+                exp,
+                bonusExp,
+                bonusGold,
+                bonusMessage,
+                speciesPhotos,
+                pointsgain
+                }); // Odpowiadamy na żądanie z danymi stworków
+        }
+        
         //po niepowodzeniu
         catch (error) {
         console.log('nie Udalo sie');

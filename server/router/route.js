@@ -16,6 +16,7 @@ import { getAllNotices, createNotice, deleteNotice } from "../controllers/notice
 import * as marketController from "../controllers/marketController.js";
 import * as guildController from "../controllers/guildController.js";
 import { enhanceUserWithGuildData } from '../middleware/enUserWithGuildData.js';
+import * as ranking from "../controllers/rankingControler.js";
 import * as tezzaController from '../controllers/tezzaController.js';
 /** POST Metody */
 // Ścieżka do rejestracji użytkownika
@@ -112,7 +113,13 @@ router.route('/removeMember/:guildId').delete(Auth, guildController.removeMember
 router.route('/updateMaxMembers/:guildId').patch(Auth, guildController.updateMaxMembers);
 router.route('/deleteGuild/:guildId').delete(Auth, guildController.deleteGuild);
 router.route('/guilds/:guildId/members').get(Auth, guildController.getGuildMembersUsernames);
-
+//Ranking
+router.route('/RankingForUserById').get(Auth,ranking.RankingForUserById);
+router.route('/RankingForUserByNumber').get(Auth,ranking.RankingForUserByNumber);
+router.route('/RankingForUserByName').get(Auth, ranking.RankingForUserByName);
+router.route('/UserDataForRanking').get(Auth, ranking.UserDataForRanking);
+router.route('/CreaturesToFight').get(Auth,ranking.CreaturesToFight);
+router.route('/CreaturesFightVsPlayer').get(Auth, missionsControler.CreaturesFightArena);
 //logout
 router.route('/logout').post(Auth, guildController.logout);
 

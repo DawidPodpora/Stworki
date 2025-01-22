@@ -47,6 +47,7 @@ function Menu({ toogleOptions, onButtonClick, username }) {
     t('market'),             // Tłumaczenie dla dodatkowej opcji E
     t('missions'),             // Tłumaczenie dla dodatkowej opcji E
     t('guilds'),             // Tłumaczenie dla dodatkowej opcji F
+    t('ranking')
   ];
 
   const [buttonPressed, setButtonPressed] = useState(0);
